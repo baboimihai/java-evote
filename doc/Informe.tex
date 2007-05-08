@@ -1,0 +1,306 @@
+\documentclass[a4paper,11pt]{article}
+
+%%
+%%
+%%
+%%   SUPER GRAN BIG TODO: Cambiar los R_M por R_{MF} y los U_M por U_{MC} y explicar lo de la 
+%%			  maquina de votar.
+%%			 
+%%			  Numeros de secuencia.
+%%			  Escenarios de compromiso
+%%			  Escenarios man in the middle y perdidas de paquetes
+%%			En Bugs conocidos, como la urna puede saber lo que voto UNA sola persona
+%%			que se halla ido a quejar porque su voto no cuenta, pero que tiene que hacer
+%%			fraude y un monton de cosas más. Y no puede elegir a la persona como target.
+%%
+
+%% Paquetes Adicionales %%
+
+\usepackage[spanish]{babel}
+\selectlanguage{spanish}
+\usepackage{fancyhdr}
+\usepackage[dvips]{graphicx}
+\usepackage[normal]{caption2}
+\usepackage{amsfonts,amssymb,amsmath,amsthm}
+\usepackage[T1]{fontenc}
+\usepackage{url}
+\usepackage{moreverb}
+
+
+%% Declaracion de comandos %%
+
+\newtheorem{lema}{Lema}
+\newtheorem{teor}{Teorema}
+\newtheorem{propos}{Proposici\'on}
+\newtheorem{corol}{Corolario}
+
+
+\newcommand{\mivec}[1]{\mathbf{#1}}
+\newcommand{\vers}[1]{\mivec{\check{#1}}}
+\newcommand{\deriv}[2]{\frac{\mathrm{d}#1}{\mathrm{d}#2}}
+\newcommand{\expo}[1]{~10^{#1}}
+\newcommand{\uni}[1]{\mathrm{#1}} 
+
+\newcommand{\prop}[1]{\begin{propos} #1 \end{propos}}
+\newcommand{\teo}[1]{\begin{teor} #1 \end{teor}}
+\newcommand{\cor}[1]{\begin{corol} #1 \end{corol}}
+\newcommand{\lem}[1]{\begin{lema} #1 \end{lema}}
+
+
+%% Encabezado y Pie de Pagina %%
+
+\pagestyle{fancy}
+\lhead{Criptografía y Seguridad}
+\chead{}
+\rhead{ITBA}
+\cfoot{\thepage}
+\renewcommand{\footrulewidth}{0.4pt}
+
+%% Titulo %%
+
+\title{{\bf Sistema de voto electrónico}}
+\author{M. Besio \and P. García \and E. Gómez Balaguer \and H. Rajchert}
+\date{}
+
+%% Comienzo del documento %%
+
+\begin{document}
+\maketitle
+\thispagestyle{fancy}
+
+\newpage
+
+\tableofcontents
+
+\newpage
+
+%% COMIENZO DEL TEXTO %%
+
+\section{Introducción}
+
+En este trabajo analizamos el diseño e implementación de un sistema de voto electrónico. El mismo garantiza requerimientos de seguridad mediante el uso de primitivas criptográficas, conformando un protocolo.
+
+\section{Diseño}
+
+Para poder garantizar el anonimato de los votos en el sistema, planteamos el diseño separado en tres sub-sistemas. Con esto, logramos que en ninguna de las tres partes en ningún momento se encuentre la información suficiente para que se pueda asociar un voto con un votante. Estos tres sub-sistemas son:
+
+\begin{itemize}
+\item Votante: Esta es la terminal en que el usuario vota. Tiene que ser de su confianza.
+\item Mesa: Se encarga de validar que cada votante esté registrado en el padrón, y le da un grupo de boletas para que envíe la que corresponda a su elección a la urna.
+\item Urna: Tiene como función recibir los votos y llevar la cuenta de los mismos. Entrega al votante el comprobante de votación (ticket).
+\end{itemize}
+
+Este esquema puede apreciarse en la figura \ref{esquema}. Allí también se indica con flechas el envío de mensajes entre sub-sistemas y el orden de los mismos.
+
+\begin{center}
+\begin{figure}
+\includegraphics[scale=0.45]{esquema}
+\caption{Esquema del sistema. Se indica con flechas el envío de mensajes entre sub-sistemas.}
+\label{esquema}
+\end{figure}
+\end{center}
+
+\subsection{Hipótesis}
+
+Partimos de las siguientes hipótesis:
+\begin{itemize}
+\item Todos los votantes poseen claves públicas y privadas. 
+\item Se puede relacionar los DNI de los votantes con su clave pública.
+\item Todos los votantes conocen las claves públicas de los sub-sistemas.
+\item Cada opción de voto (partidos, listas, etc.) posee una clave pública y una privada. La pública es conocida por todos.
+\item La lista de opciones de voto es pública.
+\item Los administradores de mesa y urna son distintos y no tienen manera de contactarse entre sí (no pueden confabular para modificar los resultados). De no cumplirse esta hipótesis el sistema sería muy fácilmente vulnerable ya que a través del entrecruzamiento de los datos que posee cada subsistema se podría relacionar un voto con su respectivo votante.
+\end{itemize}
+
+\subsection{Protocolo}
+
+Con el fin de analizar el protocolo, adoptamos las siguientes convenciones:
+
+\begin{itemize}
+\item $U_M$: Clave pública del sub-sistema \emph{Mesa}.
+\item $R_M$: Clave privada del sub-sistema \emph{Mesa}.
+\item $U_U$: Clave pública del sub-sistema \emph{Urna}.
+\item $R_U$: Clave privada del sub-sistema \emph{Urna}.
+\item $U_{V_i}$: Clave pública del i-ésimo votante.
+\item $R_{V_i}$: Clave privada del i-ésimo votante.
+\item $S_{{VU}_i}$: Secreto compartido entre el i-ésimo votante y la urna.
+\item $S_{{VM}_i}$: Secreto compartido entre el i-ésimo votante y la mesa.
+\item $\text{DNI}$: Documento Nacional de Identidad del votante. Es su clave identificatoria.
+\item $\text{ID}_V$: El ID de votación es una cadena que identifica la votación (única por elección).
+\end{itemize}
+
+Un proceso de votación consta de los siguientes 6 pasos:                                                        
+
+\subsubsection{Paso 1}
+\begin{scriptsize}
+\begin{equation}
+\text{Votante} \rightarrow \text{Mesa}: U_M \biggl[ U_U \left( S_{{VU}_i} \right) +  S_{{VM}_i} + U_{V_i} + R_{V_i} \Bigl[ \text{DNI}+ \text{ID}_V + \text{Hash} \Bigl( U_U \left( S_{{VU}_i} \right) + S_{{VM}_i}\Bigr) \Bigr]\biggr] 
+\end{equation}
+\end{scriptsize}
+
+
+Para ir a votar, la persona le envía al subsistema \emph{Mesa} el siguiente mensaje encriptado con $U_M$ para que sólo la Mesa pueda saber su contenido:
+\begin{itemize}
+ 
+\item Un secreto compartido entre la persona y la urna. Para hacer esto genera un valor aleatorio (como él lo genera, lo conoce) y lo encripta con la clave pública de la urna, para que sólo esta pueda entenderlo. Este secreto va a ser utilizado por la urna para identificar al votante como válido.
+
+\item Un secreto compartido entre la persona y la mesa. Al igual que en el anterior, este secreto es generado por la persona. Sirve para garantizarle a la mesa que el \textbf{hash} siguiente está bien formado y para evitar que la urna
+pueda relacionar $S_{{VU}_i}$ con el DNI de la persona (ver TODO: ATAQUE correspondiente).
+
+\item La clave pública de la persona. Es un primer intento de identificación, en este punto la mesa puede buscar en el patrón el DNI que corresponde a la clave suministrada.
+
+\item Su DNI concatenado con el ID de la votación, un \textbf{hash} y firmado con su clave privada. La mesa ya sabe qué DNI tiene que obtener por el item anterior, y como está firmado con $R_{V_i}$ sabe que sólo pudo haber sido creado por la persona. El ID sirve para que no se pueda utilizar el token en otra votación. El hash sirve para evitar que la mesa trate de generar su propio $S_{{VU}_i}$ (ver TODO: ATAQUE correspondiente). La mesa tiene que guardar este token completo a modo de comprobante de voto y la persona tiene que guardar $S_{{VU}_i}$  y $S_{{VM}_i}$ como la primera parte de su ticket.
+
+
+%\item Su ticket, que está compuesto por el DNI de la persona, concatenado con un string aleatorio y encriptado con su clave pública. El ticket es algo que sólo la persona puede llegar a entender y le va a servir para averiguar si su voto está presente cuando se haga el conteo. Posteriormente, ese ticket será firmado digitalmente por la urna y por la mesa para que tenga validez.
+\end{itemize}
+
+\subsubsection{Paso 2}
+
+\begin{footnotesize}
+\begin{equation}
+\text{Mesa} \rightarrow \text{Urna}: R_M \bigl( U_U \left( S_{{VU}_i} \right) \bigr)  %+ R_M \left( U_{V_i} \left( \text{DNI} + \text{RandA}_i \right) \right)
+\end{equation}
+\end{footnotesize}
+
+%Después de verificar que la persona está registrada en el padrón y no votó, la mesa le envía a la urna el secreto $ U_U \left( S_{{VU}_i} \right)$ y el ticket $U_{V_i} \left( \text{DNI} + \text{RandA}_i \right)$, ambos firmados con su clave privada $R_M$. De esta manera la mesa está diciendo que si bien no sabe el contenido, tanto el secreto como el ticket están autorizados por ella.
+
+Después de verificar que la persona está registrada en el padrón y no votó, la mesa le envía a la urna el secreto $ U_U \left( S_{{VU}_i} \right)$ firmado con su clave privada $R_M$. De esta manera la mesa está diciendo que si bien no sabe el secreto, la persona que lo emitió está autorizada para votar.
+
+\subsubsection{Paso 3}
+
+\begin{footnotesize}
+\begin{equation} \label{Math_boletas}
+\text{Mesa} \rightarrow \text{Votante}: U_{V_i} \left( % R_M \left( U_{V_i} \left( \text{DNI} + \text{RandA}_i \right) \right) + 
+\text{Boletas} \right)
+\end{equation}
+\end{footnotesize} 
+
+\begin{footnotesize}
+\begin{equation}
+\text{Boletas} = \sum_{i=0}^n R_M \left(\text{Opc}_i + \text{RandA}_i \right)
+\end{equation}
+\end{footnotesize}
+\\
+
+
+La mesa le devuelve encriptada con $U_{V_i}$ (para que sólo la persona lo entienda) las distintas opciones que puede elegir - las Boletas. Cada boleta está representada por la opción concatenada a una cadena aleatoria. Están firmadas por la mesa para evitar que otra persona pueda generar una boleta válida.
+
+\subsubsection{Paso 4}
+
+\begin{footnotesize}
+\begin{equation}
+\text{Votante} \rightarrow \text{Urna}: U_U \left( S_{{VU}_i} + \text{Sobre} \right)
+\end{equation}
+\end{footnotesize}
+
+\begin{footnotesize}
+\begin{equation}
+\text{Sobre} = U_{L_1} \circ U_{L_2} \circ \cdots \circ U_{L_n}\bigl( R_M \left(\text{Opc}_i + \text{RandA}_i \right) + \text{RandB}_i  \bigr) 
+\end{equation}
+\end{footnotesize}
+
+%Con la boleta elegida y el ticket firmado, el votante genera un sobre cerrado utilizando las claves públicas de los partidos.
+El votante genera un sobre encriptando con las claves de los partidos la opción elegida concatenada a un valor aleatorio para evitar que la mesa pueda saber a quién votó la persona.
+
+Una vez generado el sobre, el votante procede a depositarlo (enviarlo) en la urna. Para hacerlo tiene que enviar (además del sobre) el secreto que sólo él y la urna conocen. La urna puede verificar que el secreto está autorizado por la mesa y marcar internamente que ese secreto no será valido de aquí en adelante.
+
+\subsubsection{Paso 5}
+
+\begin{footnotesize}
+\begin{equation}
+\text{Urna} \rightarrow \text{Mesa}: U_M \bigl( U_U \left( S_{{VU}_i} \right) \bigr)
+\end{equation}
+\end{footnotesize}
+
+Despúes de almacenar el voto, la urna informa a la mesa que la persona ya votó (para evitar que vuelva a votar) dándole $U_U \left( S_{{VU}_i} \right)$ que es el valor que la mesa utilizó para relacionar al votante. La mesa guarda por ese votante el par de datos $R_{V_i} \Bigl[ \text{DNI} + \text{ID}_V + \text{Hash} \bigl( U_U \left( S_{{VU}_i} \right) + S_{{VM}_i}\bigr) \Bigr]$, $\text{DNI}$ a modo de comprobante de voto.
+
+\subsubsection{Paso 6}
+
+\begin{footnotesize}
+\begin{equation}
+\text{Urna} \rightarrow \text{Votante}: R_U \bigl( \text{Hash} \left( \text{Sobre}\right) \bigr) 
+%R_U \left( R_M \left( U_{V_i} \left( \text{DNI} + \text{RandA}_i \right) \right) \right)
+\end{equation}
+\end{footnotesize}
+
+%La urna firma el ticket previamente firmado por la mesa y se lo envía al votante (como comprobante de la operación).
+La urna le aplica una función de hash al sobre recibido en el paso 4, lo firma y se lo devuelve al votante que lo utilizará como segunda parte de su ticket.
+
+\section{Conteo y detección de fraude}
+El conteo debe ser realizado en una maquina en la cual confien todos los partidos. La urna debe presentar los sobres y la mesa la lista con comprobantes de voto. Para abrir los sobres cada partido tiene que ingresar su clave privada. El conteo se realiza utilizando las cadenas $R_M \left(\text{Opc}_i + \text{RandA}_i \right)$, que como fueron firmadas por la mesa garantizan la validez del sobre. 
+Los partidos tienen que publicar dos listas, una con todos los $\text{Hash} \bigl( U_U \left( S_{{VU}_i} \right) + S_{{VM}_i}\bigr)$ obtenidos de los comprobantes de la Mesa y otro con todos los $\text{Hash} \left( \text{Sobre}\right)$ obtenidos de los sobres de la Urna. De esta manera cada votante puede buscar su ticket en las listas y verificar que realmente participó en la votación sin revelar a quien voto.
+
+%Una vez abiertos los sobres se tiene que publicar un listado con todos los tickets de la forma $R_M \left( U_{V_i} \left( \text{DNI} + \text{RandA}_i \right) \right)$, para que el público en general pueda buscar en el listado su ticket. De esta manera el votante se asegura de que su voto realmente participó en la votación sin revelar a quien voto.
+
+% No se si poner esto porque puse algo siimlar en Escenarios de ataque que sería la detección de fraude.
+% Si una persona tiene un ticket firmado por la urna y la mesa y su ticket no está en la lista, quiere decir que su voto no ha contado. De esta manera se puede detectar fraude.
+
+%\subsection{Escenarios de ataque}
+A continuación se presenta los distintos escenarios de ataque organizados por el sistema comprometido. Se puede notar que la votación puede ser anulada por la Mesa o por la Urna, lo que se trata de lograr es identificar quien fue el responsable del fraude.
+
+\subsection{Ataques cometidos por la Mesa}
+\subsubsection{Utilizar información de un votante para otras elecciones}
+Informalmente: No puede por el ID Votación
+\subsubsection{Anular la votación}
+
+%Informalmente: Sacar un votante de la lista con comprobantes de voto. Supongo que hay N votos según la mesa y M votos segun la urna 
+%Si N < M puede ser que la urna haya agregado votos (obviamente falsos) o que la Mesa haya sacado, como no se puede distinguir cual de los dos
+%hay que verificar si N $\leqslant$ K $\leqslant$ M, siendo K la cantidad de votos válidos (los que pueden ser desencriptados por los partidos). Si N < K, hay votos validos que están en la urna y no en la mesa, pero como solo
+%la mesa puede generar votos validos hubo fraude de su parte. Si N = K = M nadie metio mano. Si N = K < M, o la mesa sacó gente que votó, o la urna agregó boletas (obviamente invalidas). Si N = M
+\subsubsection{Generar votos invalidos}
+
+\subsubsection{Identificar a un votante con un sobre}
+
+
+\subsection{Ataques cometidos por la Urna}
+
+\subsubsection{Anular la votación}
+
+\subsubsection{Saber que votó una persona}
+Informalmente: Si no estuviese $\text{RandB}_i$, la mesa, guardando las opciones firmadas del paso 3 y asociandolas al DNI, podría regenerar el \textbf{hash del sobre} para los distintos sobres posibles y así averiguar quien votó a quien.
+
+
+\begin{itemize}
+\item TODO: Ver si esto esta bien=>
+\item Si no se concatena un string aleatorio, un atacante podría intentar regenerar el voto por fuerza bruta, probando encriptar con la clave del votante todos los DNI posibles. 
+\end{itemize}
+
+\subsection{Ataques cometidos por un Votante}
+\subsubsection{Anular la votación}
+Para este fin, un votante tendría que presentar su ticket firmado y demostrar que no está en la urna. Los encargados de detectar fraude aplicarían  $U_U$ sobre el ticket, esto obtendría una \textbf{cadena ilegible} que al aplicarle la clave privada del votante daría su DNI concatenado a una cadena aleatoria.
+
+\begin{itemize}
+\item \textbf{Si presenta una cadena aleatoria como ticket} se le podria aplicar $U_M$ y $U_U$, pero al utilizar la clave privada $R_{V_i}$ no daría el DNI.
+
+\item \textbf{Si trata de presentar un ticket de la forma} $U_{V_i} \left( \text{DNI} + \text{RandX}_i \right)$\textbf{, donde} $\text{RandX}_i$ \textbf{es distinto a la cadena aleatoria original,} no podría ya que no conoce las claves privadas de la Mesa y de la Urna que son requeridos para validar el ticket.
+
+\item \textbf{Si trata de enviar }$U_{V_i} \left( \text{DNI} + \text{RandA}_i \right)$ \textbf{en el login (paso 1) y }$U_{V_i} \left( \text{DNI} + \text{RandX}_i \right)$ \textbf{en el sobre (paso 4),} no podría debido a que en el sobre tiene que enviar el ticket firmado por la mesa, el cual recivio en el paso 3.
+ 
+\end{itemize}
+en cualquier caso se podría detectar que el voto es invalido y omitirlo (impugnar)
+\subsubsection{Votar varias veces}
+TODO
+
+
+% Mepa que lo explique un poco mas separado
+%\begin{itemize}
+%\item Puesto que el ticket está encriptado para que sólo la persona pueda leerlo, la urna y la mesa están firmando un valor que ellos no pueden entender. En caso de que la persona denuncie fraude, la urna y la mesa se encargarán de revisar que el ticket haya estado firmado y junto con la clave privada de la persona se vea el valor del ticket con su DNI incluido. De no llegar a estar su DNI en el ticket, se considerará que la denuncia de fraude es falsa y no se tendrá en cuenta. Caso contrario, se supondrá que hubo fraude. 
+%\end{itemize}
+
+
+\section{Vulnerabilidades y restricciones conocidas}
+
+\begin{enumerate}
+\item El subsistema mesa puede generar votos que no existen, haciéndose pasar por un votante legítimo. Esto es válido sólo en aquellos casos donde existan abstenciones, es decir que si todo el padrón concurre a votar el fraude se vuelve evidente (sobran votos o alguien concurre a votar y no le es permitido). 
+\item Si se debiera efectuar un recuento de votos se debe contar con el acuerdo y participación de todo el padrón y los partidos que participaron. El sistema funcionará publicando la lista de tickets válidos que cada votante deberá verificar por su cuenta, y de no encontrar su ticket en la lista, podrá presentarse con su ticket sin que su voto pueda ser revelado. Recordemos que el ticket está firmado por la urna y por la mesa, por lo que no podrá ser generado por la persona. 
+\item En caso de desaparición del paquete que la urna envía a la mesa para indicar que el votante ha efectuado su voto (dado que la implementación es sobre TCP esto sólo sería posible en un ataque \emph{man in the middle} el voto se habrá registrado pero dicho votante estará autorizado a votar nuevamente (y tantas veces como se elimine el paquete en cuestión). Esto se resuelve con un número de secuencia que identifique cada paquete que viaje entre la mesa y la urna.
+\item El votante podría mandar un voto cuya primera opción sea distinta a la opción que figurará en el recuento. De esta manera lo único que ganará es cambiar su voto definitivo, pero no podrá en ningún momento quejarse, ya que como su voto definitivo está firmado por las listas, no pudo haber sido cambiado en ningún momento.
+\end{enumerate}
+
+\begin{thebibliography}{99}
+\bibitem{linksecuriteam}``Secure Electronic Voting Over The World Wide Web'', Mark A. Herschberg, \url{http://theory.csail.mit.edu/~cis/theses/herschberg/all.pdf}.
+\end{thebibliography}
+
+
+\end{document} 
