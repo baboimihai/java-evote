@@ -213,7 +213,7 @@ Una vez generado el sobre, el votante procede a depositarlo (enviarlo) en la urn
 \end{equation}
 \end{footnotesize}
 
-Despúes de almacenar el voto, la urna informa a la mesa que la persona ya votó (para evitar que vuelva a votar) dándole $U_U \left( S_{{VU}_i} \right)$ que es el valor que la mesa utilizó para relacionar al votante. La mesa guarda por ese votante el par de datos $R_{V_i} \Bigl[ \text{DNI} + \text{ID}_V + \text{Hash} \bigl( U_U \left( S_{{VU}_i} \right) + S_{{VM}_i}\bigr) \Bigr]$, $\text{DNI}$ a modo de comprobante de voto.
+Despúes de almacenar el voto, la urna informa a la mesa que la persona ya votó (para evitar que vuelva a votar) dándole $U_U \left( S_{{VU}_i} \right)$ que es el valor que la mesa utilizó para relacionar al votante. La mesa guarda por ese votante el par de datos $U_{V_i}$, $R_{V_i} \Bigl[ \text{DNI} + \text{ID}_V + \text{Hash} \bigl( U_U \left( S_{{VU}_i} \right) + S_{{VM}_i}\bigr) \Bigr]$ a modo de comprobante de voto.
 
 \subsubsection{Paso 6}
 
@@ -242,29 +242,27 @@ A continuación se presenta los distintos escenarios de ataque organizados por el
 \subsection{Ataques cometidos por la Mesa}
 \subsubsection{Utilizar información de un votante para otras elecciones}
 Informalmente: No puede por el ID Votación
-\subsubsection{Anular la votación}
 
-%Informalmente: Sacar un votante de la lista con comprobantes de voto. Supongo que hay N votos según la mesa y M votos segun la urna 
-%Si N < M puede ser que la urna haya agregado votos (obviamente falsos) o que la Mesa haya sacado, como no se puede distinguir cual de los dos
-%hay que verificar si N $\leqslant$ K $\leqslant$ M, siendo K la cantidad de votos válidos (los que pueden ser desencriptados por los partidos). Si N < K, hay votos validos que están en la urna y no en la mesa, pero como solo
-%la mesa puede generar votos validos hubo fraude de su parte. Si N = K = M nadie metio mano. Si N = K < M, o la mesa sacó gente que votó, o la urna agregó boletas (obviamente invalidas). Si N = M
-\subsubsection{Generar votos invalidos}
+\subsubsection{Sacar un votante de la lista de comprobantes de voto}
+Informalmente: Si se terminó el proceso de votación, la urna tendría más $R_M \bigl( U_U \left( S_{{VU}_i} \right) \bigr)$ que comprobantes de voto.
+
+\subsubsection{Generar votos inválidos}
+No puede generar los comprobantes del tipo $U_{V_i}$, $R_{V_i} \Bigl[ \text{DNI}+ \text{ID}_V + \text{Hash} \Bigl( U_U \left( S_{{VU}_i} \right) + S_{{VM}_i}\Bigr) \Bigr]$ porque utilizan la clave privada de cada votante.
 
 \subsubsection{Identificar a un votante con un sobre}
 
 
 \subsection{Ataques cometidos por la Urna}
 
-\subsubsection{Anular la votación}
+\subsubsection{Modificar un voto}\label{modif_voto}
+La urna no puede generar un sobre válido, porque la opción tiene que estar firmado por la mesa. Si decide modificar un sobre aleatoriamente lo estaría impugnando, pero como el usuario tiene como ticket un \textbf{hash} de ese sobre sabría que su voto fue modificado y podría denunciarlo.
+
+\subsubsection{Agregar o sacar votos}
+La urna tiene que almacenar los $R_M \bigl( U_U \left( S_{{VU}_i} \right) \bigr)$ recibidos en el paso 2, cuya cantidad debe ser la misma que la cantidad de sobres. Caso cotrario, hubo fraude de parte de la urna. Si saca un sobre, el votante puede darse cuenta por lo explicado en la subsección \ref{modif_voto}. Si agrega un sobre, no va a poder generar un secreto $S_{VU}$ encriptado firmado.
 
 \subsubsection{Saber que votó una persona}
 Informalmente: Si no estuviese $\text{RandB}_i$, la mesa, guardando las opciones firmadas del paso 3 y asociandolas al DNI, podría regenerar el \textbf{hash del sobre} para los distintos sobres posibles y así averiguar quien votó a quien.
 
-
-\begin{itemize}
-\item TODO: Ver si esto esta bien=>
-\item Si no se concatena un string aleatorio, un atacante podría intentar regenerar el voto por fuerza bruta, probando encriptar con la clave del votante todos los DNI posibles. 
-\end{itemize}
 
 \subsection{Ataques cometidos por un Votante}
 \subsubsection{Anular la votación}
@@ -283,19 +281,9 @@ en cualquier caso se podría detectar que el voto es invalido y omitirlo (impugna
 TODO
 
 
-% Mepa que lo explique un poco mas separado
-%\begin{itemize}
-%\item Puesto que el ticket está encriptado para que sólo la persona pueda leerlo, la urna y la mesa están firmando un valor que ellos no pueden entender. En caso de que la persona denuncie fraude, la urna y la mesa se encargarán de revisar que el ticket haya estado firmado y junto con la clave privada de la persona se vea el valor del ticket con su DNI incluido. De no llegar a estar su DNI en el ticket, se considerará que la denuncia de fraude es falsa y no se tendrá en cuenta. Caso contrario, se supondrá que hubo fraude. 
-%\end{itemize}
-
-
 \section{Vulnerabilidades y restricciones conocidas}
 
 \begin{enumerate}
-\item El subsistema mesa puede generar votos que no existen, haciéndose pasar por un votante legítimo. Esto es válido sólo en aquellos casos donde existan abstenciones, es decir que si todo el padrón concurre a votar el fraude se vuelve evidente (sobran votos o alguien concurre a votar y no le es permitido). 
-\item Si se debiera efectuar un recuento de votos se debe contar con el acuerdo y participación de todo el padrón y los partidos que participaron. El sistema funcionará publicando la lista de tickets válidos que cada votante deberá verificar por su cuenta, y de no encontrar su ticket en la lista, podrá presentarse con su ticket sin que su voto pueda ser revelado. Recordemos que el ticket está firmado por la urna y por la mesa, por lo que no podrá ser generado por la persona. 
-\item En caso de desaparición del paquete que la urna envía a la mesa para indicar que el votante ha efectuado su voto (dado que la implementación es sobre TCP esto sólo sería posible en un ataque \emph{man in the middle} el voto se habrá registrado pero dicho votante estará autorizado a votar nuevamente (y tantas veces como se elimine el paquete en cuestión). Esto se resuelve con un número de secuencia que identifique cada paquete que viaje entre la mesa y la urna.
-\item El votante podría mandar un voto cuya primera opción sea distinta a la opción que figurará en el recuento. De esta manera lo único que ganará es cambiar su voto definitivo, pero no podrá en ningún momento quejarse, ya que como su voto definitivo está firmado por las listas, no pudo haber sido cambiado en ningún momento.
 \end{enumerate}
 
 \begin{thebibliography}{99}
