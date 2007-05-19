@@ -15,14 +15,14 @@ public class Desencriptador {
 		return;
 	}
 
-	public List<String> desencriptar (String mensaje) {
-		Vector<String> aVect = new Vector<String>();
+	public List desencriptar (String mensaje) {
+		List aList = new Vector();
 
-		aVect.add("MENSAJE");
-		aVect.add("DESENCRIPTADO");
-		aVect.add("Fin");
+		aList.add("MENSAJE");
+		aList.add("DESENCRIPTADO");
+		aList.add("Fin");
 
-		return aVect;
+		return aList;
 	}
 
 
