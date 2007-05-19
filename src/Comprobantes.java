@@ -8,6 +8,31 @@
 // En otras palabras voy a tener que poder iterar.
 import java.util.*;
 public class Comprobantes {
+	// El constructor es privado para evitar que lo instancien otras clases
+	private Comprobantes() {
+		//TODO Inicializaciones necesarias.
+	}
+
+	// Variable que contiene la única instancia de Comprobantes.
+	private static Comprobantes ref;
+
+	/**
+	 *  Esta clase es singleton y no se puede clonar. 
+	 */
+	  public Object clone()	throws CloneNotSupportedException {
+	    throw new CloneNotSupportedException(); 
+	  }
+	
+	/**
+	 * Devuelve la instancia a la clase.
+	 * @return La instancia de Comprobantes
+	 */
+	public static synchronized Comprobantes getInstance()
+	{
+		if ( ref == null )
+			ref = new Comprobantes();
+		return ref;
+	}
 	
 	/**
 	 * Inserto un comprobante en la base
