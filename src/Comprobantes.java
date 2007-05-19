@@ -49,7 +49,7 @@ public class Comprobantes {
 	 * @param uvi Clave publica del iesimo votante
 	 * @return la lista formada por (usvu, tokenFirmado).
 	 */
-	public List obtenerComprobante(String uvi, String idv) throws Exception {
+	public List<String> obtenerComprobante(String uvi, String idv) throws Exception, ComprobanteNotFoundException {
 		//TODO: Internamente tenes que buscar en la base todos los token que tengan 
 		// el uvi, desencriptarlos (con el uvi) y fijarte si el id es el que te mando
 		// yo.
