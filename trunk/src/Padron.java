@@ -7,6 +7,30 @@ public class Padron
 	private BufferedReader br;
 	private String line;
 	private String group = null;
+	private static Padron ref;
+	
+	
+	/**
+	 * "Constructor" para el Singleton
+	 * @param votantes Path al archivo de votantes
+	 * @param votaciones Path al archivo de votaciones
+	 * @return Instancia de la clase
+	 * @throws IOException 
+	 */
+	public static synchronized Padron getInstance(String votantes, String votaciones) throws IOException
+	{
+		if ( ref == null )
+			ref = new Padron(votantes, votaciones);
+		return ref;
+	}
+	
+	/**
+	 *  Esta clase es singleton y no se puede clonar. 
+	 */
+	  public Object clone()	throws CloneNotSupportedException 
+	  {
+	    throw new CloneNotSupportedException(); 
+	  }
 	
 	/**
 	 * Dado un DNI y un ID de votación consulta si el votante puede votar en dicha elección
@@ -51,7 +75,7 @@ public class Padron
 	 * @param votaciones Path al archivo de votaciones
 	 * @throws IOException
 	 */
-	public Padron(String votantes, String votaciones) throws IOException
+	private Padron(String votantes, String votaciones) throws IOException
 	{
 			br = new BufferedReader(new FileReader(votantes));
 
