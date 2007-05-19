@@ -1,28 +1,33 @@
-/**
- *
- */
 import java.util.List;
 import java.util.Vector;
 
-
 /**
- * @author be
- *
+ * Esta clase implementa el desencriptador de mensajes. Se utiliza para desencriptar
+ * un mensaje con una clave dada.
  */
 public class Desencriptador {
 
-	public Desencriptador (String key) {
+	/**
+	 * Construye un nuevo desencriptador
+	 * @param key Clave privada usada para desencriptar
+	 */
+	public Desencriptador (String key) throws Exception {
 		return;
 	}
 
-	public List desencriptar (String mensaje) {
-		List aList = new Vector();
+	/**
+	 * Desencripta un mensaje
+	 * @param mensaje
+	 * @return
+	 */
+	public List<String> desencriptar (String mensaje) throws Exception {
+		Vector<String> aVect = new Vector<String>();
 
-		aList.add("MENSAJE");
-		aList.add("DESENCRIPTADO");
-		aList.add("Fin");
+		aVect.add("MENSAJE");
+		aVect.add("DESENCRIPTADO");
+		aVect.add("Fin");
 
-		return aList;
+		return aVect;
 	}
 
 
