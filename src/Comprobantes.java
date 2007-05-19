@@ -1,8 +1,9 @@
 /**
+ * @author ebalaguer
+ * @version 0.1a
  * La clase Comprobantes contiene todos los comprobantes de la mesa, utiliza una base de datos
  * 
  */
-
 // TODO Spock, tambien tenes que implementar la interfaz "Iterable".
 // La interfaz Iterator o la implementas aca o haces otra clase que la implemente...
 // En otras palabras voy a tener que poder iterar.

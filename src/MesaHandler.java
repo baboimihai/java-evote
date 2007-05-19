@@ -5,33 +5,54 @@
  * La clase MesaHandler es la encargada de atender a un votante para autenticarlo etc etc.
  *
  */
+
 import java.net.*;
 import java.io.*;
 import java.util.*;
+import java.security.SecureRandom;
 public class MesaHandler extends Thread{
 	
+	// Variables de conexión hacia el votante
 	private Socket votante;
-	private ObjectInputStream in;
-	private ObjectOutputStream out;
+	private ObjectInputStream votanteIn;
+	private ObjectOutputStream votanteOut;
+	
+	// Variables de conexión hacia la urna
+	private Socket urna;
+	private ObjectInputStream urnaIn;
+	private ObjectOutputStream urnaOut;
+	
+	// Propiedades de esta transacción
 	private String usvu;
 	private String uvi;
 	private String svm;
 	private String dni;
 	private String idv;
+	private String challenge;
 	
-	/* Clave privada de la mesa. */
-	private String rm;
+	// Claves puiublicas y privadas que deben ser obtenidas de algun lado
+	private String privadaMesa;
+	private static String publicaUrna = "pepe";
+	
+	// Parametros de conexion a la urna TODO: ponerlos en otro lado
+	private static String HOSTURNA = "localhost";
+	private static int PORTURNA = 4080;
+
+	
 	
 	public MesaHandler(Socket aVotante)	throws IOException {
 		votante = aVotante;
-		in = new ObjectInputStream(votante.getInputStream());
-		out = new ObjectOutputStream(votante.getOutputStream());
+		votanteIn = new ObjectInputStream(votante.getInputStream());
+		votanteOut = new ObjectOutputStream(votante.getOutputStream());
 	}
 	
 	public void run() 
 	{
+		//
+		// TODO: Responder al votante los errores etc.
+		//
 		try {
-			String msg = (String) in.readObject();
+			String msg = (String) votanteIn.readObject();
 			if (this.recPaso1(msg))
 			{
 				this.envPaso2();
@@ -58,7 +79,7 @@ public class MesaHandler extends Thread{
 	 */
 	public boolean recPaso1(String msg)	throws Exception {
 		String token;
-		Desencriptador decrypt = new Desencriptador(this.rm);
+		Desencriptador decrypt = new Desencriptador(privadaMesa);
 		List<String> msg_decrypt;
 		System.out.println(msg);
 		
@@ -80,15 +101,21 @@ public class MesaHandler extends Thread{
 		token = msg_decrypt.get(3);
 
 		// Busco uvi en el padrón y obtengo el dni
-		//TODO esto.
-		this.dni = "30999333";
+		try {
+			this.dni =	Padron.getInstance().getDNI(this.uvi);
+		}
+		catch (Exception e)
+		{
+			// Si no está el dni el usuario no puede votar.
+			return false;
+		}
 		
 		// Valido el token con uvi y obtengo los datos.
 		//Validador valid = new Validador(this.uvi);
-		Desencriptador valid = new Desencriptador(this.uvi);
+		Validador valid = new Validador(this.uvi);
 		
 		try {
-			msg_decrypt = valid.desencriptar(token);
+			msg_decrypt = valid.validar(token);
 
 			// Si no tiene exactamente 3 elementos el mensaje está mal formado.
 			if ( msg_decrypt.size() != 3 ) throw new Exception();
@@ -102,8 +129,10 @@ public class MesaHandler extends Thread{
 		
 		// Verifico que el votante puede votar la elección requerida.
 		this.idv = msg_decrypt.get(1);
-		//if ( !inst_padron.puedeVotar(this.uvi, this.idv )
-		//		return false;
+		if ( !(Padron.getInstance().puedeVotar(this.dni, this.idv)))
+				return false;
+		
+		//TODO Verificar que el hash comprobante sea correcto.
 		
 		// Verifico que no haya votado
 		try {
@@ -112,7 +141,7 @@ public class MesaHandler extends Thread{
 			
 			// Si lo encuentra es porque ya votó o porque tubo problemas al votar.
 			
-			// Si cambio el usvu o el token está tratando de hacer quilombo.
+			// Si cambió el usvu o el token está tratando de hacer quilombo.
 			if ( !Comprobante.get(0).equals(this.usvu) || !Comprobante.get(1).equals(token) )
 				throw new Exception("El votante envio un nuevo usvu o token");
 			
@@ -124,16 +153,19 @@ public class MesaHandler extends Thread{
 		catch (Exception e)
 		{
 			// Si la excepción es porque no lo encontró es porque no voto.
+			// caso contrario devuelvo false porque ya voto o hizo quilombo.
 			if ( !(e instanceof ComprobanteNotFoundException) )
 				return false;
 		}
 		
-		
+		// Agrego el comprobante a la lista de comprobantes.
+		//TODO: Ver que onda con el error aca.
+		Comprobantes.getInstance().insertarComprobante(this.usvu, this.uvi, token);
 		/* TODO 
-		 * - Marco que el usuario ya trató de votar. (tiene que estar serializado esto).
+		 * - Marco que el usuario ya trató de votar. (tiene que estar serializado esto). Ver si con lo de arriba funca.
 		 * - Guardo el comprobante y el usvu
 		 */
-		return false;
+		return true;
 	}
 	
 	/**
@@ -141,35 +173,77 @@ public class MesaHandler extends Thread{
 	 * de error tira excepción
 	 */
 	private void envPaso2()	throws Exception {
-		/* TODO
-		 * - Creo una conexión contra la urna
-		 * - Firmo usvu concatenado a idv
-		 * - Lo encripto con la clave publica de la urna y se lo envio
-		 */
+		// Creo una conexión contra la urna
+		urna = new Socket(HOSTURNA, PORTURNA);
+		urnaIn = new ObjectInputStream(urna.getInputStream());
+		urnaOut = new ObjectOutputStream(urna.getOutputStream());
+ 
+		// Firmo usvu concatenado a idv
+		Firmador firm = new Firmador(privadaMesa);
+		String mensaje2 = firm.firmar(Arrays.asList(usvu, idv));
+		
+		// Lo encripto con la clave publica de la urna
+		Encriptador encrypt = new Encriptador(publicaUrna);
+		String mensaje2_enc = encrypt.encriptar(mensaje2);
+		
+		// Se lo envio
+		urnaOut.writeObject(mensaje2_enc);
 	}
 	private void envPaso3() throws Exception {
-		/* TODO
-		 * - Genero un RandA
-		 * - Busco las opciones para IDV
-		 * - Hago las boletas firmadas
-		 * - Lo encripto con la clave uvi
-		 * - Se lo devuelvo al votante
-		 */
+		
+		// Genero un RandA
+		// TODO Verificar esto de los random
+		SecureRandom random = new SecureRandom();
+		byte bytes[] = random.generateSeed(12);
+		random.nextBytes(bytes);
+		String randA = new String(bytes);
+
+		// Busco las opciones para IDV
+		List<String> opciones =	Padron.getInstance().getOpciones(this.idv);
+	
+		// Hago las boletas firmadas
+		Firmador firm = new Firmador(privadaMesa);
+		List<String> opc_firmadas = new Vector<String>();
+		for (String aOpc : opciones) {
+			String aOpc_firmada = firm.firmar(Arrays.asList(aOpc, this.idv, randA));
+			opc_firmadas.add(aOpc_firmada);
+		}
+		
+		//  Encripto las boletas firmadas con la clave uvi
+		Encriptador encrypt = new Encriptador(this.uvi);
+		String mensaje3 = encrypt.encriptar(opc_firmadas);
+		
+		
+		// Se lo envío al votante
+		votanteOut.writeObject(mensaje3);
 	}
 
 	private void recPaso5() throws Exception {
-		/* TODO
-		 * - Recibir el msg
-		 * - Lo desencripto con mi clave publica 
-		 * - Marco usvu como que ya voto (esto implica tmb al comprobante)
-		 * - Guardo el challenge
-		 */
+		// Recibo el mensaje TODO: mirar por recibir excepciones.
+		String mensaje_enc = (String) urnaIn.readObject();
+		
+		 // Lo desencripto con mi clave privada
+		Desencriptador decrypt = new Desencriptador(privadaMesa);
+		List<String> mensaje = decrypt.desencriptar(mensaje_enc);
+		
+		// Si usvu es el que tengo marco al comprobante como que ya votó
+		if ( !this.usvu.equals(mensaje.get(0)))
+			throw new Exception("Mensaje invalido"); //TODO: Ver a quien informarle esto
+		
+		Comprobantes.getInstance().marcarVotado(usvu); //TODO Ver si atrapar la excepcion
+		
+		this.challenge = mensaje.get(1);
 	}
 	private void envPaso6() throws Exception {
-		/* TODO
-		 * - Firmo el challenge
-		 * - Se lo envio a la urna
-		 */
+		
+		 // Firmo el challenge y lo encripto con la clave publica de la urna.
+		Firmador firm = new Firmador(privadaMesa);
+		Encriptador encrypt = new Encriptador(publicaUrna);
+		
+		String mensaje3 = encrypt.encriptar(firm.firmar(Arrays.asList(challenge)));
+		
+		// Se lo envio a la urna.
+		urnaOut.writeObject(mensaje3);
 	}
 
 }
