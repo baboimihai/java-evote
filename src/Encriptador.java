@@ -3,6 +3,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
@@ -10,6 +11,8 @@ import java.math.BigInteger;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+
 import com.sun.org.apache.xml.internal.security.utils.Base64;
 
 /**
@@ -44,10 +47,15 @@ public class Encriptador {
 	/**
 	 * Construye un nuevo encriptador a partir de una clave
 	 * @param key clave pública usada para encriptar
-	 * @throws Exception si la clave key es inválida
 	 * <h1>nota, voy a revisar el tipo de exception</h1>
+	 * @throws InvalidKeyException si la clave está mal formada
+	 * @throws Exception en cualquier otro error
+	 * <p/>
+	 * <b>Formato de la clave</b>
+	 * <code>public = clave\n
+	 * modulus = modulo\n</code>
 	 */
-	public Encriptador (String key) throws Exception {
+	public Encriptador (String key) throws InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException {
 		BigInteger modulo = null;
 		BigInteger exponente = null;
 
@@ -57,11 +65,10 @@ public class Encriptador {
 
 		if (! match.matches()) {
 			// Si la clave está mal formada, tiramos exception
-			throw new Exception("El formato de la clave es incorrecto"); //TODO cambiar exception
+			throw new InvalidKeyException("El formato de la clave es incorrecto");
 		}
 
-		try
-		{
+		try {
 			// levantamos los tokens de las claves en los bigints
 			exponente = new BigInteger(match.group(1));
 			modulo = new BigInteger(match.group(2));
@@ -72,12 +79,12 @@ public class Encriptador {
 			// e iniciamos el cifrador
 			cifrador.init(Cipher.ENCRYPT_MODE, pubKey);
 			keyLen = cifrador.getOutputSize(1/*cualquier valor es indisinto*/);
-		} catch (NumberFormatException ex) {
-			throw new Exception("La clave no es un número válido"); //TODO cambiar exception
 		} catch (InvalidKeySpecException e) {
-			throw new Exception("La clave no válida"); //TODO cambiar exception
+			throw new InvalidKeyException("La clave no es válida");
 		} catch (InvalidKeyException e) {
-			throw new Exception("No se puede cifrar con esta clave"); //TODO cambiar exception
+			throw new InvalidKeyException("No se puede cifrar con esta clave");
+		} catch (NumberFormatException ex) {
+			throw new InvalidKeyException("La clave no es un número válido");
 		}
 	}
 
@@ -86,26 +93,19 @@ public class Encriptador {
 	 * Core de encriptación: encripta un mensaje que tiene que tener menos largo que la clave RSA
 	 * @param mensaje: el mensaje a encriptar
 	 * @return un arreglo de bytes con el mensaje encriptado
-	 * @throws Exception si el mensaje es muy largo o si la clave es inválida
+	 * @throws BadPaddingException si la clave es inválida
+	 * @throws IllegalBlockSizeException si el mensaje es muy largo
 	 */
-	private byte[] encriptarBase (String mensaje) throws Exception {
-		// primero que nada pedimos los bytes de la cadena
-		byte messBytes[] = mensaje.getBytes();
+	private byte[] encriptarBase (String mensaje) throws BadPaddingException, IllegalBlockSizeException {
 		byte encText[] = null;
 
+		// cifrar el texto
 		try {
-			/* chequeamos que el mensaje sea soportado por el cifrador
-			   if (messBytes.length > cifrador.getOutputSize(messBytes.length) - 11)*/
-
-			// y ciframos el texto
-			encText = cifrador.doFinal(messBytes);
+			encText = cifrador.doFinal(mensaje.getBytes());
 		} catch (IllegalBlockSizeException e) {
-			throw new Exception("Mensaje muy largo");
+			throw new IllegalBlockSizeException("Mensaje muy largo");
 		} catch (BadPaddingException e) {
-			throw new Exception("O la clave era inválida, o realmente hubo un problema raro");
-		} catch (Exception e) {
-			System.out.println("no deberíamos pasar por acá!!!");
-			e.printStackTrace();
+			throw new BadPaddingException();
 		}
 
 		return encText;
@@ -117,14 +117,15 @@ public class Encriptador {
 	 * y encriptados con la clave ingresada en el constructor
 	 * @param messageList Lista de mensajes a encriptar
 	 * @return Retorna un string con el contenido de la lista encriptado
+	 * @throws InvalidKeyException si la clave no es válida
 	 */
-	public String encriptar (List<String> messageList) throws Exception {
+	public String encriptar (List<String> messageList) throws InvalidKeyException {
 		StringBuffer rta = new StringBuffer();
 
 		for (String string : messageList) {
-			rta.append(encriptar(string));
+			rta.append(encriptar("__largo: " + string.length() + "item__" + string));
 		}
-
+		rta.append("__fin");
 		return rta.toString();
 
 	}
@@ -134,8 +135,9 @@ public class Encriptador {
 	 * encripta un string usando la clave del constructor
 	 * @param mensaje mensaje a encriptar
 	 * @return mensaje encriptado
+	 * @throws InvalidKeyException si la clave es inválida
 	 */
-	public String encriptar (String mensaje) throws Exception {
+	public String encriptar (String mensaje) throws InvalidKeyException {
 
 		StringBuffer auxiliar = new StringBuffer(mensaje);
 		int outPutLen = mensaje.length() + RSAoverhead; // largo de la salida
@@ -149,18 +151,26 @@ public class Encriptador {
 		 * finalmente transformar el arreglo de bytes en un base64 encoding para poder guardarlo
 		 * como un string.
 		 */
-		while (auxiliar.length() > keyLen - RSAoverhead) {
+		try {
+			while (auxiliar.length() > keyLen - RSAoverhead) {
 
-			byte[] aux = encriptarBase(auxiliar.substring(0, keyLen - RSAoverhead));
+				byte[] aux = encriptarBase(auxiliar.substring(0, keyLen - RSAoverhead));
+				for ( int i = 0; i < aux.length; i++)
+					rta[pos++] = aux [i];
+
+				auxiliar.delete(0, keyLen - RSAoverhead);
+			}
+
+			byte[] aux = encriptarBase(auxiliar.toString());
 			for ( int i = 0; i < aux.length; i++)
 				rta[pos++] = aux [i];
 
-			auxiliar.delete(0, keyLen - RSAoverhead);
+		} catch (BadPaddingException e) {
+			throw new InvalidKeyException("La clave es inválida, o realmente hubo un problema raro");
+		} catch (IllegalBlockSizeException e) {
+			System.out.println("Esto debería manejarse aquí: " + e.getMessage());
+			e.printStackTrace();
 		}
-
-		byte[] aux = encriptarBase(auxiliar.toString());
-		for ( int i = 0; i < aux.length; i++)
-			rta[pos++] = aux [i];
 
 		return Base64.encode(rta);
 	}
