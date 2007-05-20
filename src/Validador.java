@@ -1,5 +1,9 @@
 import java.util.List;
-import java.util.Vector;
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import javax.crypto.NoSuchPaddingException;
+//import com.sun.org.apache.xml.internal.security.exceptions.Base64DecodingException;
 
 /**
  * Esta clase implementa el validador. Se utiliza para validar que un mensaje firmado
@@ -7,28 +11,41 @@ import java.util.Vector;
  */
 public class Validador {
 
+	private Desencriptador desencriptador;
+
+
 	/**
 	 * Construye un nuevo validador a partir de una clave pública
 	 * @param key clave a usar para el validador
-	 * @throws Exception si la clave es inválida
+	 * @throws NoSuchAlgorithmException
+	 * @throws NoSuchPaddingException
+	 * @throws InvalidKeyException
 	 */
-	public Validador (String key) throws Exception {
-		return;
+	public Validador (String key) throws InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException {
+		desencriptador = new Desencriptador(key);
 	}
+
 
 	/**
 	 * Valida un mensaje
 	 * @param mensaje el mensaje a validar
 	 * @return una lista de string con todos los mensajes validados
-	 * @throws Exception si el mensaje es inválido
+	 * @throws IOException si el mensaje está mal codificado
+	 * @throws InvalidKeyException si no se puede validar contra la firma usada
 	 */
-	public List<String> validar (String mensaje) throws Exception {
-		Vector<String> aVect = new Vector<String>();
-
-		aVect.add("MENSAJE");
-		aVect.add("VALIDO");
-
-		return aVect;
+	public List<String> validar (String mensaje) throws InvalidKeyException, IOException  {
+		return desencriptador.desencriptar(mensaje);
 	}
 
+
+	/**
+	 * Valida un único mensaje
+	 * @param mensaje: el mensaje a validar
+	 * @return una cadena con el mensaje validado
+	 * @throws InvalidKeyException si el mensaje no se pudo validar contra la firma
+	 * @throws IOException si el mensaje tenía un encoding distinto a base64
+	 */
+	public String validarString (String mensaje) throws InvalidKeyException, IOException {
+		return desencriptador.desencriptarString(mensaje);
+	}
 }
