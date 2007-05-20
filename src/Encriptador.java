@@ -3,7 +3,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
@@ -25,21 +24,25 @@ public class Encriptador {
 	private static KeyFactory fact = null;
     private PublicKey pubKey = null;
 	// creamos un cifrador RSA
-	private Cipher cifrador = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+	private static Cipher cifrador = null;
 	// RSAoverhead: bytes que necesita RSA para encriptar. Se descuentan del tamaño máximo
 	// del mensaje que es el tamaño de la clave en bytes.
 	private static int RSAoverhead = 11;
 	private int keyLen = 0;
 	private BASE64Encoder b64 = new BASE64Encoder();
 
+
 	static {
 		try {
 			// inicializo fact
 			fact = KeyFactory.getInstance("RSA");
-		}
-		catch (java.security.NoSuchAlgorithmException e)
-		{
+			cifrador = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+
+		} catch (java.security.NoSuchAlgorithmException e) {
 			System.out.println("No deberíamos pasar por acá!! está cableado RSA");
+			e.printStackTrace();
+		} catch (NoSuchPaddingException e) {
+			System.out.println("No deberíamos pasar por acá!! está cableado RSA/ECB/PKCS1Padding");
 			e.printStackTrace();
 		}
 	}
@@ -56,7 +59,17 @@ public class Encriptador {
 	 * <code>public = clave\n
 	 * modulus = modulo\n</code>
 	 */
-	public Encriptador (String key) throws InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException {
+	public Encriptador (String key) throws InvalidKeyException {
+		startEncriptador(key);
+	}
+
+
+	/**
+	 * Parsea la clave e inicializa el cifrador
+	 * @param key clave a usar
+	 * @throws InvalidKeyException si la clave está mal formada
+	 */
+	private void startEncriptador (String key) throws InvalidKeyException {
 		BigInteger modulo = null;
 		BigInteger exponente = null;
 
@@ -89,6 +102,13 @@ public class Encriptador {
 		}
 	}
 
+	/**
+	 * Construye un nuevo encriptador sin clave
+	 */
+	public Encriptador () {
+
+	}
+
 
 	/**
 	 * Core de encriptación: encripta un mensaje que tiene que tener menos largo que la clave RSA
@@ -96,8 +116,9 @@ public class Encriptador {
 	 * @return un arreglo de bytes con el mensaje encriptado
 	 * @throws BadPaddingException si la clave es inválida
 	 * @throws IllegalBlockSizeException si el mensaje es muy largo
+	 * @throws InvalidKeyException si el cifrador no funca
 	 */
-	private byte[] encriptarBase (String mensaje) throws BadPaddingException, IllegalBlockSizeException {
+	private byte[] encriptarBase (String mensaje) throws BadPaddingException, IllegalBlockSizeException, InvalidKeyException {
 		byte encText[] = null;
 
 		// cifrar el texto
@@ -107,6 +128,8 @@ public class Encriptador {
 			throw new IllegalBlockSizeException("Mensaje muy largo");
 		} catch (BadPaddingException e) {
 			throw new BadPaddingException();
+		} catch (IllegalStateException e) {
+			throw new InvalidKeyException("No se ha incializado el cifrador");
 		}
 
 		return encText;
@@ -175,86 +198,32 @@ public class Encriptador {
 
 		return b64.encode(rta);
 	}
+
+
+	/**
+	 * Encripta una lista de strings con una clave dada
+	 * @param msgList lista de mensajes a encriptar
+	 * @param key clave a utilizar
+	 * @return un String con el contenido de la lista encriptado
+	 * @throws InvalidKeyException si la clave que se recibió es inválida
+	 */
+	public String encriptar(List<String> msgList, String key) throws InvalidKeyException {
+		startEncriptador(key);
+		return encriptar(msgList);
+	}
+
+
+	/**
+	 * Encripta un string con una clave dada
+	 * @param msg mensaje a encriptar
+	 * @param key clave a utilizar
+	 * @return un string con el mensaje encriptado
+	 * @throws InvalidKeyException si la clave es inválida
+	 */
+	public String encriptar(String msg, String key) throws InvalidKeyException {
+		startEncriptador(key);
+		return encriptar(msg);
+	}
 }
 
 
-/* Aquí comienza el código robado :D */
-/*
-	SecureRandom random = new SecureRandom();
-byte bytes[] = random.generateSeed(12);
-random.nextBytes(bytes);
-String RandA = new String(bytes);
-*/
-
-/*
-/**
-* Encrypt a text using public key.
-* @param text The original unencrypted text
-* @param key The public key
-* @return Encrypted text
-* @throws java.lang.Exception
-*
-public static byte[] encrypt(byte[] text, PublicKey key) throws Exception
-{
-
-byte[] cipherText = null;
-// get an RSA cipher object and print the provider
-Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-
-System.out.println("nProvider is: " + cipher.getProvider().getInfo());
-
-// encrypt the plaintext using the public key
-cipher.init(Cipher.ENCRYPT_MODE, key);
-cipherText = cipher.doFinal(text);
-return cipherText;
-
-}*/
-
-/*/**
-* Decrypt text using private key
-* @param text The encrypted text
-* @param key The private key
-* @return The unencrypted text
-* @throws java.lang.Exception
-*
-public static byte[] decrypt(byte[] text, PrivateKey key) throws Exception
-{
-
-byte[] dectyptedText = null;
-// decrypt the text using the private key
-Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-cipher.init(Cipher.DECRYPT_MODE, key);
-dectyptedText = cipher.doFinal(text);
-return dectyptedText;
-
-}*/
-
-//import com.sun.org.apache.xml.internal.security.utils.Base64;
-/*private String encoded = new String(Base64.encode("test".getBytes()));*/
-
-/*/**
-* Encode bytes array to BASE64 string
-* @param bytes
-* @return Encoded string
-*
-private static String encodeBASE64(byte[] bytes)
-{
-
-BASE64Encoder b64 = new BASE64Encoder();
-return b64.encode(bytes);
-
-}
-*//*
-/**
-* Decode BASE64 encoded string to bytes array
-* @param text The string
-* @return Bytes array
-* @throws IOException
-*
-private static byte[] decodeBASE64(String text) throws IOException
-{
-
-BASE64Decoder b64 = new BASE64Decoder();
-return b64.decodeBuffer(text);
-
-}*/
