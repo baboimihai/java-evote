@@ -1,8 +1,6 @@
 import java.util.List;
 import java.io.IOException;
 import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import javax.crypto.NoSuchPaddingException;
 //import com.sun.org.apache.xml.internal.security.exceptions.Base64DecodingException;
 
 /**
@@ -12,6 +10,7 @@ import javax.crypto.NoSuchPaddingException;
 public class Validador {
 
 	private Desencriptador desencriptador;
+	//firmar en este programa es lo mismo que encriptar. No se usan hashes.
 
 
 	/**
@@ -21,7 +20,7 @@ public class Validador {
 	 * @throws NoSuchPaddingException
 	 * @throws InvalidKeyException
 	 */
-	public Validador (String key) throws InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException {
+	public Validador (String key) throws InvalidKeyException {
 		desencriptador = new Desencriptador(key);
 	}
 

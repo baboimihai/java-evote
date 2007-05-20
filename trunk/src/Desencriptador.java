@@ -4,7 +4,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.security.InvalidKeyException;
 import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPrivateKeySpec;
@@ -28,18 +27,23 @@ public class Desencriptador {
 	// la clave que usará este desencriptador
 	private static KeyFactory fact = null;
 	// creamos un cifrador RSA
-	private Cipher cifrador = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+	private static Cipher cifrador = null;
 	private int keyLen = 0;
     private PrivateKey privKey = null;
     private BASE64Decoder b64 = new BASE64Decoder();
+
 
 	static {
 		try {
 			// inicializo fact
 			fact = KeyFactory.getInstance("RSA");
-		}
-		catch (java.security.NoSuchAlgorithmException e)
-		{
+			cifrador = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+
+		} catch (java.security.NoSuchAlgorithmException e) {
+			System.out.println("No deberíamos pasar por acá!! está cableado RSA");
+			e.printStackTrace();
+		} catch (NoSuchPaddingException e) {
+			System.out.println("No deberíamos pasar por acá!! está cableado RSA/ECB/PKCS1Padding");
 			e.printStackTrace();
 		}
 	}
@@ -54,7 +58,24 @@ public class Desencriptador {
 	 * <code>private = clave\n
 	 * modulus = modulo\n</code>
 	 */
-	public Desencriptador (String key) throws InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException{
+	public Desencriptador (String key) throws InvalidKeyException {
+		startDesencriptador(key);
+	}
+
+
+	/**
+	 * Construye un nuevo desencriptador sin clave
+	 */
+	public Desencriptador() {
+
+	}
+
+	/**
+	 * Inicializa el desencriptador parseando el string con la clave e iniciando el cifrador
+	 * @param key clave a usar
+	 * @throws InvalidKeyException si la clave es inválida
+	 */
+	private void startDesencriptador (String key) throws InvalidKeyException {
 		BigInteger modulo = null;
 		BigInteger exponente = null;
 
@@ -96,7 +117,6 @@ public class Desencriptador {
 	 * @throws IllegalBlockSizeException si el mensaje era muy largo
 	 * @throws InvalidKeyException si la clave no es válida
 	 */
-	@SuppressWarnings("unused")
 	private String desencriptarBase (byte[] mensaje) throws IllegalBlockSizeException, InvalidKeyException {
 		byte desencText[] = null;
 
@@ -141,6 +161,7 @@ public class Desencriptador {
 		return rta.toString();
 	}
 
+
 	/**
 	 * Desencripta un String conteniendo una lista de strings
 	 * @param mensaje: mensaje a desencriptar
@@ -179,4 +200,31 @@ public class Desencriptador {
 
 	}
 
+
+	/**
+	 * Desencripta un mensaje con una clave dada y retorna una lista de mensajes
+	 * @param msg mensaje a desencriptar
+	 * @param key clave a usar
+	 * @return una lista de mensajes
+	 * @throws InvalidKeyException si la clave es inválida
+	 * @throws IOException si no está bien codificado
+	 */
+	public List<String> desencriptar (String msg, String key) throws InvalidKeyException, IOException {
+		startDesencriptador(key);
+		return desencriptar(msg);
+	}
+
+
+	/**
+	 * Desencripta un mensaje con una clave dada y retorna el mensaje desencriptado
+	 * @param msg mensaje a desencripta
+	 * @param key clave a utilizar
+	 * @return un String con el mensaje desencriptado
+	 * @throws InvalidKeyException si la clave es inválida
+	 * @throws IOException si está mal codificado
+	 */
+	public String desencriptarString (String msg, String key) throws InvalidKeyException, IOException {
+		startDesencriptador(key);
+		return desencriptarString(msg);
+	}
 }

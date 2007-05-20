@@ -1,8 +1,5 @@
 import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
-
-import javax.crypto.NoSuchPaddingException;
 
 /**
  * Esta clase implementa el firmador. Se utiliza para firmar mensajes con una
@@ -11,6 +8,8 @@ import javax.crypto.NoSuchPaddingException;
 public class Firmador {
 
 	private Encriptador encriptador;
+	//firmar en este programa es lo mismo que encriptar. No se usan hashes.
+
 
 	/**
 	 * Construye un nuevo firmador a partir de una clave privada
@@ -20,9 +19,10 @@ public class Firmador {
 	 * @throws InvalidKeyException
 	 * @throws Exception si la clave es inválida
 	 */
-	public Firmador (String key) throws InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException {
+	public Firmador (String key) throws InvalidKeyException {
 		encriptador = new Encriptador(key);
 	}
+
 
 	/**
 	 * Firma una lista de mensajes
@@ -33,6 +33,7 @@ public class Firmador {
 	public String firmar (List<String> messageList) throws InvalidKeyException {
 		return encriptador.encriptar(messageList);
 	}
+
 
 	/**
 	 * Firma un mensaje
