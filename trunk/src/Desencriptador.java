@@ -8,14 +8,15 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPrivateKeySpec;
+import java.io.IOException;
 import java.math.BigInteger;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
-
-import com.sun.org.apache.xml.internal.security.exceptions.Base64DecodingException;
-import com.sun.org.apache.xml.internal.security.utils.Base64;
+import sun.misc.BASE64Decoder;
+//import com.sun.org.apache.xml.internal.security.exceptions.Base64DecodingException;
+//import com.sun.org.apache.xml.internal.security.utils.Base64;
 
 
 /**
@@ -30,6 +31,7 @@ public class Desencriptador {
 	private Cipher cifrador = Cipher.getInstance("RSA/ECB/PKCS1Padding");
 	private int keyLen = 0;
     private PrivateKey privKey = null;
+    private BASE64Decoder b64 = new BASE64Decoder();
 
 	static {
 		try {
@@ -113,12 +115,12 @@ public class Desencriptador {
 	 * @param mensaje: mensaje a desencriptar
 	 * @return un String con el mensaje desencriptado
 	 * @throws InvalidKeyException si la clave no pudo desencriptar el mensaje
-	 * @throws Base64DecodingException si el mensaje no tiene codificación base64 (léase: lo tocaron)
+	 * @throws IOException si el mensaje no tiene codificación base64 (léase: lo tocaron)
 	 */
-	public String desencriptarString (String mensaje) throws InvalidKeyException, Base64DecodingException {
+	public String desencriptarString (String mensaje) throws InvalidKeyException, IOException {
 
 		StringBuffer rta = new StringBuffer();
-		byte[] mess = Base64.decode(mensaje);
+		byte[] mess = b64.decodeBuffer(mensaje);
 		int pos = 0;
 
 		/* Algoritmo: descodear de base64 y partir los bytes en bloques del tamaño de la clave
@@ -139,7 +141,14 @@ public class Desencriptador {
 		return rta.toString();
 	}
 
-	public List<String> desencriptar (String mensaje) throws InvalidKeyException, Base64DecodingException {
+	/**
+	 * Desencripta un String conteniendo una lista de strings
+	 * @param mensaje: mensaje a desencriptar
+	 * @return Una lista con Strings desencriptados
+	 * @throws InvalidKeyException si la clave no pudo desencriptar el mensaje
+	 * @throws IOException si el mensaje no tiene codificación base64 (léase: lo tocaron)
+	 */
+	public List<String> desencriptar (String mensaje) throws InvalidKeyException, IOException {
 
 		// lista = destino
 		List<String> lista = new Vector<String>();

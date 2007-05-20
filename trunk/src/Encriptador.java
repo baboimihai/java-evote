@@ -12,8 +12,8 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
-
-import com.sun.org.apache.xml.internal.security.utils.Base64;
+import sun.misc.BASE64Encoder;
+//import com.sun.org.apache.xml.internal.security.utils.Base64;
 
 /**
  * Esta clase implementa el encriptador. Se utiliza para encriptar una lista de mensajes
@@ -30,6 +30,7 @@ public class Encriptador {
 	// del mensaje que es el tamaño de la clave en bytes.
 	private static int RSAoverhead = 11;
 	private int keyLen = 0;
+	private BASE64Encoder b64 = new BASE64Encoder();
 
 	static {
 		try {
@@ -172,7 +173,7 @@ public class Encriptador {
 			e.printStackTrace();
 		}
 
-		return Base64.encode(rta);
+		return b64.encode(rta);
 	}
 }
 
