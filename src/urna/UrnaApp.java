@@ -1,4 +1,4 @@
-package Urna;
+package urna;
 /**
  * 
  * @author hrajchert
@@ -7,7 +7,6 @@ package Urna;
  *
  */
 
-import Desencriptador;
 
 import java.net.*;
 import java.nio.channels.SelectionKey;
@@ -16,6 +15,8 @@ import java.nio.channels.ServerSocketChannel;
 import java.io.*;
 import java.security.InvalidKeyException;
 import java.util.*;
+
+import Criptografia.Desencriptador;
 
 public class UrnaApp {
 	public static final int PUERTO1 = 4080;

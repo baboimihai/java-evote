@@ -1,4 +1,4 @@
-package Urna;
+package urna;
 
 /**
  * @author hrajchert

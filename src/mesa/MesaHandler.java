@@ -1,4 +1,4 @@
-package Mesa;
+package mesa;
 /**
  * 
  * @author hrajchert
@@ -7,18 +7,15 @@ package Mesa;
  *
  */
 
-import ComprobanteNotFoundException;
-import Comprobantes;
-import Desencriptador;
-import Encriptador;
-import Firmador;
-import Padron;
-import Validador;
 
 import java.net.*;
 import java.io.*;
 import java.util.*;
 import java.security.SecureRandom;
+
+import eleccion.*;
+
+import Criptografia.*;
 public class MesaHandler extends Thread{
 	
 	// Variables de conexión hacia el votante
