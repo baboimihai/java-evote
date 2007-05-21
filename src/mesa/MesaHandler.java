@@ -147,7 +147,7 @@ public class MesaHandler extends Thread{
 		// Verifico que no haya votado
 		try {
 			List<String> Comprobante;
-			Comprobante = Comprobantes.getInstance().obtenerComprobante(uvi, idv);
+			Comprobante = ComprobantesMesa.getInstance().obtenerComprobante(uvi, idv);
 			
 			// Si lo encuentra es porque ya votó o porque tubo problemas al votar.
 			
@@ -156,7 +156,7 @@ public class MesaHandler extends Thread{
 				throw new Exception("El votante envio un nuevo usvu o token");
 			
 			// Me fijo si ya votó
-			if ( !Comprobantes.getInstance().yaVoto(this.usvu) )
+			if ( !ComprobantesMesa.getInstance().yaVoto(this.usvu) )
 				throw new Exception("El votante ya votó");
 			
 		}
@@ -170,7 +170,7 @@ public class MesaHandler extends Thread{
 		
 		// Agrego el comprobante a la lista de comprobantes.
 		//TODO: Ver que onda con el error aca.
-		Comprobantes.getInstance().insertarComprobante(this.usvu, this.uvi, token);
+		ComprobantesMesa.getInstance().insertarComprobante(this.usvu, this.uvi, token);
 		/* TODO 
 		 * - Marco que el usuario ya trató de votar. (tiene que estar serializado esto). Ver si con lo de arriba funca.
 		 * - Guardo el comprobante y el usvu
@@ -240,7 +240,7 @@ public class MesaHandler extends Thread{
 		if ( !this.usvu.equals(mensaje.get(0)))
 			throw new Exception("Mensaje invalido"); //TODO: Ver a quien informarle esto
 		
-		Comprobantes.getInstance().marcarVotado(usvu); //TODO Ver si atrapar la excepcion
+		ComprobantesMesa.getInstance().marcarVotado(usvu); //TODO Ver si atrapar la excepcion
 		
 		this.challenge = mensaje.get(1);
 	}

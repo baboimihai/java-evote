@@ -10,14 +10,37 @@ package eleccion;
 // En otras palabras voy a tener que poder iterar.
 import java.util.*;
 
-public class Comprobantes {
+import java.lang.Iterable;
+import java.util.Iterator;
+
+class ComprobantesMesaIterador implements Iterator<String> {
+	public ComprobantesMesaIterador() {
+		// TODO Auto-generated constructor stub
+	}
+	
+	public boolean hasNext() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	public String next() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	public void remove() {
+		throw new UnsupportedOperationException();
+		
+	}
+	
+}
+
+public class ComprobantesMesa implements Iterable {
 	// El constructor es privado para evitar que lo instancien otras clases
-	private Comprobantes() {
+	private ComprobantesMesa() {
 		//TODO Inicializaciones necesarias.
 	}
 
 	// Variable que contiene la única instancia de Comprobantes.
-	private static Comprobantes ref;
+	private static ComprobantesMesa ref;
 
 	/**
 	 *  Esta clase es singleton y no se puede clonar. 
@@ -30,10 +53,10 @@ public class Comprobantes {
 	 * Devuelve la instancia a la clase.
 	 * @return La instancia de Comprobantes
 	 */
-	public static synchronized Comprobantes getInstance()
+	public static synchronized ComprobantesMesa getInstance()
 	{
 		if ( ref == null )
-			ref = new Comprobantes();
+			ref = new ComprobantesMesa();
 		return ref;
 	}
 	
@@ -71,4 +94,7 @@ public class Comprobantes {
 		return true;
 	}
 
+	public Iterator<String> iterator(){
+		return new ComprobantesMesaIterador();
+	}
 }
