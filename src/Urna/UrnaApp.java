@@ -1,3 +1,4 @@
+package Urna;
 /**
  * 
  * @author hrajchert
@@ -5,6 +6,8 @@
  * La clase UrnaApp es la encargada de ofrecer los servicios de la clase Urna
  *
  */
+
+import Desencriptador;
 
 import java.net.*;
 import java.nio.channels.SelectionKey;
