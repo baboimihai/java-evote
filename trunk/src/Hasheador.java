@@ -28,7 +28,8 @@ public class Hasheador {
 	 * @return un string con el hash del string recibido como parámetro
 	 */
 	public static String hashear(String string) {
-		return new BigInteger(md.digest(string.getBytes())).toString(16);
+		return new BigInteger(1/* para el unsigned, pucha que costó encontrarlo y estaba debajo de mis narices eh */,
+							  md.digest(string.getBytes())).toString(16);
 	}
 
 

@@ -147,9 +147,8 @@ public class Encriptador {
 		StringBuffer rta = new StringBuffer();
 
 		for (String string : messageList) {
-			rta.append(encriptar("__largo: " + string.length() + "item__" + string));
+			rta.append(encriptar("__largo:" + string.length() + "item__" + string));
 		}
-		rta.append("__fin");
 		return rta.toString();
 
 	}

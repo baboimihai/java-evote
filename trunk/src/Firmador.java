@@ -20,7 +20,7 @@ public class Firmador {
 	 * @throws Exception si la clave es inválida
 	 */
 	public Firmador (String key) throws InvalidKeyException {
-		encriptador = new Encriptador(key);
+		encriptador = new Encriptador(key.replaceFirst("private", "public"));
 	}
 
 
