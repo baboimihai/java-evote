@@ -21,7 +21,7 @@ public class Validador {
 	 * @throws InvalidKeyException
 	 */
 	public Validador (String key) throws InvalidKeyException {
-		desencriptador = new Desencriptador(key);
+		desencriptador = new Desencriptador(key.replaceFirst("public", "private"));
 	}
 
 
