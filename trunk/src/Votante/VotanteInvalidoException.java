@@ -1,3 +1,4 @@
+package Votante;
 
 /**
  * @author pagarcia
