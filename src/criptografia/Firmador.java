@@ -1,4 +1,4 @@
-package Criptografia;
+package criptografia;
 import java.security.InvalidKeyException;
 import java.util.List;
 

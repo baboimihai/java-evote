@@ -1,4 +1,4 @@
-package Criptografia;
+package criptografia;
 import java.util.List;
 import java.util.Vector;
 import java.util.regex.Matcher;

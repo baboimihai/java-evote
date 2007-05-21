@@ -13,9 +13,10 @@ import java.io.*;
 import java.util.*;
 import java.security.SecureRandom;
 
+import criptografia.*;
+
 import eleccion.*;
 
-import Criptografia.*;
 public class MesaHandler extends Thread{
 	
 	// Variables de conexión hacia el votante

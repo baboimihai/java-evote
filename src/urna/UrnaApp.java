@@ -16,7 +16,8 @@ import java.io.*;
 import java.security.InvalidKeyException;
 import java.util.*;
 
-import Criptografia.Desencriptador;
+import criptografia.Desencriptador;
+
 
 public class UrnaApp {
 	public static final int PUERTO1 = 4080;
