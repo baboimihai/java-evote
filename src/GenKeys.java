@@ -2,8 +2,10 @@ import java.io.*;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
-
-
+/**
+ * Clase para generar claves. //TODO revisar el exponente público
+ * @author be
+ */
 public class GenKeys {
 
 	/**
@@ -16,7 +18,7 @@ public class GenKeys {
 		int bitsLargo = new Integer(args[0]);
 		if (bitsLargo == 0)
 			bitsLargo = 1024;
-		
+
 		BigInteger one      = new BigInteger("1");
 		SecureRandom random = new SecureRandom();
 
@@ -27,7 +29,7 @@ public class GenKeys {
 		BigInteger publicKeyN = new BigInteger("65537");     // common value in practice = 2^16 + 1
 		BigInteger privateKeyN = publicKeyN.modInverse(phi);
 		BigInteger modulus = p.multiply(q);
-		
+
 
 		DataOutputStream priv = new DataOutputStream(
 				 new BufferedOutputStream( new FileOutputStream("privada.key")));

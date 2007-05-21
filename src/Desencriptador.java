@@ -21,6 +21,7 @@ import sun.misc.BASE64Decoder;
 /**
  * Esta clase implementa el desencriptador de mensajes. Se utiliza para desencriptar
  * un mensaje con una clave dada.
+ * @author be
  */
 public class Desencriptador {
 
