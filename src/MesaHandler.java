@@ -1,7 +1,7 @@
 /**
  * 
  * @author hrajchert
- * @version 0.1a
+ * @version 0.2a
  * La clase MesaHandler es la encargada de atender a un votante para autenticarlo etc etc.
  *
  */
@@ -46,6 +46,9 @@ public class MesaHandler extends Thread{
 		votanteOut = new ObjectOutputStream(votante.getOutputStream());
 	}
 	
+	/**
+	 * El run sirve para correr el thread.
+	 */
 	public void run() 
 	{
 		//
@@ -200,7 +203,7 @@ public class MesaHandler extends Thread{
 
 		// Busco las opciones para IDV
 		List<String> opciones =	Padron.getInstance().getOpciones(this.idv);
-	
+		
 		// Hago las boletas firmadas
 		Firmador firm = new Firmador(privadaMesa);
 		List<String> opc_firmadas = new Vector<String>();
