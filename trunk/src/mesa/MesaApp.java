@@ -1,4 +1,4 @@
-package Mesa;
+package mesa;
 /**
  * 
  * @author hrajchert

@@ -1,18 +1,15 @@
-package Votante;
+package votante;
 
-import Desencriptador;
-import Encriptador;
-import Firmador;
-import FraudeException;
-import Hasheador;
-import InfoServidores;
-import Padron;
-import Validador;
 
 import java.io.*;
 import java.net.*;
 import java.security.*;
 import java.util.*;
+
+import eleccion.*;
+
+import Criptografia.*;
+
 
 /**
  * 
