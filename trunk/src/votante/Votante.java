@@ -6,9 +6,10 @@ import java.net.*;
 import java.security.*;
 import java.util.*;
 
+import criptografia.*;
+
 import eleccion.*;
 
-import Criptografia.*;
 
 
 /**
