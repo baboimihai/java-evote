@@ -1,3 +1,4 @@
+package Mesa;
 /**
  * 
  * @author hrajchert
@@ -5,6 +6,14 @@
  * La clase MesaHandler es la encargada de atender a un votante para autenticarlo etc etc.
  *
  */
+
+import ComprobanteNotFoundException;
+import Comprobantes;
+import Desencriptador;
+import Encriptador;
+import Firmador;
+import Padron;
+import Validador;
 
 import java.net.*;
 import java.io.*;
