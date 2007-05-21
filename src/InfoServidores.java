@@ -10,12 +10,17 @@ public abstract class InfoServidores
 	/**
 	 * Host de la urna.
 	 */
-	public static final String HOSTURNA = "localhost";
+	public static final String hostUrna = "localhost";
 	
 	/**
-	 * Puerto de la urna.
+	 * Puerto de la urna para la mesa.
 	 */
-	public static final int PORTURNA = 4080;
+	public static final int puertoUrnaDesdeMesa = 4080;
+	
+	/**
+	 * Puerto de la urna para el votante.
+	 */
+	public static final int puertoUrnaDesdeVotante = 4081;
 	
 	/**
 	 * Clave pública de la urna.
@@ -25,12 +30,22 @@ public abstract class InfoServidores
 	/**
 	 * Host de la mesa.
 	 */
-	public static final String HOSTMESA = "localhost";
+	public static final String hostMesa = "localhost";
 	
 	/**
-	 * Puerto de la mesa.
+	 * Puerto de la mesa para la mesa.
 	 */
-	public static final int PORTMESA = 4034;
+	public static final int puertoMesaDesdeUrna = 4034;
+	
+	/**
+	 * Puerto de la mesa para el votante.
+	 */
+	public static final int puertoMesaDesdeVotante = 4035;
+
+	/**
+	 * Puerto de la mesa que responde preguntas de Estado de Votaciones.
+	 */
+	public static final int puertoMesaEV = 4036;
 	
 	/**
 	 * Clave pública de la mesa.
