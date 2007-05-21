@@ -4,6 +4,7 @@ import java.util.List;
 /**
  * Esta clase implementa el firmador. Se utiliza para firmar mensajes con una
  * clave dada.
+ * @author be
  */
 public class Firmador {
 

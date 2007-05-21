@@ -6,6 +6,7 @@ import java.security.InvalidKeyException;
 /**
  * Esta clase implementa el validador. Se utiliza para validar que un mensaje firmado
  * sea válido.
+ * @author be
  */
 public class Validador {
 

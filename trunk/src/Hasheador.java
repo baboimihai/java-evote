@@ -5,6 +5,7 @@ import java.math.BigInteger;
 
 /**
  * Esta clase permite hashear cosas :P (el mejor javadoc de mi vida :D)
+ * @author be
  */
 public class Hasheador {
 

@@ -17,6 +17,7 @@ import sun.misc.BASE64Encoder;
 /**
  * Esta clase implementa el encriptador. Se utiliza para encriptar una lista de mensajes
  * con una clave dada.
+ * @author be
  */
 public class Encriptador {
 
