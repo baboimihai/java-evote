@@ -3,7 +3,7 @@
 1,Hernan Rajchert,2345678,claveingui
 1,Pablo Garcia,3456789,clavespectro
 1,Carlucci,REPUTO,clavereputo
-0,Normales
+0,aNormales
 1,Ezequiel Gomez Balaguer,31469330,clavegrosa
 0,Cerdos miserables que hay que matar
 1,Coffey,Bernard,clavebernard
