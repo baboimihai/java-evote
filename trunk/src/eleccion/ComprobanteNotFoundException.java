@@ -1,6 +1,6 @@
 package eleccion;
 /**
- * 
+ *
  */
 
 /**
@@ -10,7 +10,7 @@ package eleccion;
 public class ComprobanteNotFoundException extends Exception {
 
 	/**
-	 * 
+	 *
 	 */
 	public ComprobanteNotFoundException() {
 		// TODO Auto-generated constructor stub
