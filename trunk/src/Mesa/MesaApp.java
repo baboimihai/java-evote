@@ -1,3 +1,4 @@
+package Mesa;
 /**
  * 
  * @author hrajchert
@@ -5,6 +6,7 @@
  * La clase MesaApp es la encargada de ofrecer los servicios de la clase Mesa
  *
  */
+
 import java.io.IOException;
 import java.net.*;
 import java.nio.channels.SelectionKey;
