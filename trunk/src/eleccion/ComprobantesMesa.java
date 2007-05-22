@@ -71,9 +71,10 @@ public class ComprobantesMesa implements Iterable
 	 * Inserto un comprobante en la base
 	 * @param usvu Secreto compartido entre el votante y la urna encriptado con Uu
 	 * @param uvi Clave publica del iesimo votante
+	 * @param idv El id de la votación
 	 * @param tokenFirmado Es el comprobante en si.
 	 */
-	public boolean insertarComprobante(String usvu, String uvi, String tokenFirmado) throws SQLException 
+	public boolean insertarComprobante(String usvu, String uvi, String idv, String tokenFirmado) throws SQLException 
 	{
 		b.doQuery("insert into ");
 		return false;
