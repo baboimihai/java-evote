@@ -32,17 +32,16 @@ public class GenKeys {
 		BigInteger modulus = p.multiply(q);
 
 
-		DataOutputStream priv = new DataOutputStream(
-				 new BufferedOutputStream( new FileOutputStream("privada.key")));
-		DataOutputStream pub = new DataOutputStream(
-				 new BufferedOutputStream( new FileOutputStream("publica.key")));
-
+		BufferedWriter priv = new BufferedWriter(new FileWriter("privada.key"));
+		BufferedWriter pub = new BufferedWriter(new FileWriter("publica.key"));
+				 
 		String publica = new String("public = " + publicKeyN + "\nmodulus = " + modulus);
 		String privada = new String("private = " + privateKeyN + "\nmodulus = " + modulus);
+		
 		System.out.println(publica);
 		System.out.println(privada);
-		pub.writeChars(publica);
-		priv.writeChars(privada);
+		pub.write(publica);
+		priv.write(privada);
 		pub.close();
 		priv.close();
 	}
