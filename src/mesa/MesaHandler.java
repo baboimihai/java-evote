@@ -170,7 +170,7 @@ public class MesaHandler extends Thread{
 		
 		// Agrego el comprobante a la lista de comprobantes.
 		//TODO: Ver que onda con el error aca.
-		ComprobantesMesa.getInstance().insertarComprobante(this.usvu, this.uvi, token);
+		ComprobantesMesa.getInstance().insertarComprobante(this.usvu, this.uvi,this.idv, token);
 		/* TODO 
 		 * - Marco que el usuario ya trató de votar. (tiene que estar serializado esto). Ver si con lo de arriba funca.
 		 * - Guardo el comprobante y el usvu
