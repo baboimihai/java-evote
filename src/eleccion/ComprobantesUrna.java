@@ -7,7 +7,7 @@ import java.lang.Iterable;
 import java.util.Iterator;
 
 class ComprobantesUrnaIterador implements Iterator<String> {
-	public ComprobantesUrnaIterador() {
+	public ComprobantesUrnaIterador(String idv) {
 		// TODO Auto-generated constructor stub
 	}
 	
@@ -26,6 +26,8 @@ class ComprobantesUrnaIterador implements Iterator<String> {
 	
 }
 public class ComprobantesUrna implements Iterable {
+	private String idv;
+
 	private ComprobantesUrna() {
 		//TODO Inicializaciones necesarias.
 	}
@@ -55,11 +57,22 @@ public class ComprobantesUrna implements Iterable {
 	 * Inserto un comprobante en la base
 	 * @param comprobante Es el comprobante en si.
 	 */
-	public boolean insertarComprobante(String comprobante) throws Exception {
-		return false;
+	public void insertarComprobante(String svu, String idv, String tokenFirmado) throws Exception 
+	{
 	}
 	
-	public Iterator<String> iterator(){
-		return new ComprobantesMesaIterador();
+	public String getComprobante(String svu)
+	{
+		return null;
+	}
+	
+	public void setIteratorIdv(String idv)
+	{
+		this.idv = idv;
+	}
+	
+	public Iterator<String> iterator()
+	{
+		return new ComprobantesUrnaIterador(idv);
 	}
 }

@@ -1,59 +1,66 @@
 package eleccion;
 /**
- * @author ebalaguer
+ * @author ezequiel85
  * @version 0.1a
  * La clase Comprobantes contiene todos los comprobantes de la mesa, utiliza una base de datos
  * 
  */
-// TODO Spock, tambien tenes que implementar la interfaz "Iterable".
-// La interfaz Iterator o la implementas aca o haces otra clase que la implemente...
-// En otras palabras voy a tener que poder iterar.
+
 import java.util.*;
+import java.sql.*;
 
-import java.lang.Iterable;
-import java.util.Iterator;
-
-class ComprobantesMesaIterador implements Iterator<String> {
-	public ComprobantesMesaIterador() {
+class ComprobantesMesaIterador implements Iterator<String> 
+{
+	public ComprobantesMesaIterador(String idv) 
+	{
 		// TODO Auto-generated constructor stub
 	}
 	
-	public boolean hasNext() {
+	public boolean hasNext() 
+	{
 		// TODO Auto-generated method stub
 		return false;
 	}
-	public String next() {
+	public String next() 
+	{
 		// TODO Auto-generated method stub
 		return null;
 	}
-	public void remove() {
+	public void remove() 
+	{
 		throw new UnsupportedOperationException();
-		
 	}
 	
 }
 
-public class ComprobantesMesa implements Iterable {
-	// El constructor es privado para evitar que lo instancien otras clases
-	private ComprobantesMesa() {
-		//TODO Inicializaciones necesarias.
-	}
-
+public class ComprobantesMesa implements Iterable 
+{
 	// Variable que contiene la única instancia de Comprobantes.
 	private static ComprobantesMesa ref;
+	private Baseconn b;
+	private String idv;
+	
+	// El constructor es privado para evitar que lo instancien otras clases
+	private ComprobantesMesa() throws ClassNotFoundException, SQLException 
+	{
+		this.b = Baseconn.getInstance();
+	}
 
 	/**
 	 *  Esta clase es singleton y no se puede clonar. 
 	 */
-	  public Object clone()	throws CloneNotSupportedException {
+	  public Object clone()	throws CloneNotSupportedException 
+	  {
 	    throw new CloneNotSupportedException(); 
 	  }
 	
 	/**
 	 * Devuelve la instancia a la clase.
 	 * @return La instancia de Comprobantes
+	 * @throws SQLException 
+	 * @throws ClassNotFoundException 
 	 */
-	public static synchronized ComprobantesMesa getInstance()
+	public static synchronized ComprobantesMesa getInstance() throws ClassNotFoundException, SQLException
 	{
 		if ( ref == null )
 			ref = new ComprobantesMesa();
@@ -66,7 +73,9 @@ public class ComprobantesMesa implements Iterable {
 	 * @param uvi Clave publica del iesimo votante
 	 * @param tokenFirmado Es el comprobante en si.
 	 */
-	public boolean insertarComprobante(String usvu, String uvi, String tokenFirmado) throws Exception {
+	public boolean insertarComprobante(String usvu, String uvi, String tokenFirmado) throws SQLException 
+	{
+		b.doQuery("insert into ");
 		return false;
 	}
 	/**
@@ -75,7 +84,8 @@ public class ComprobantesMesa implements Iterable {
 	 * @param uvi Clave publica del iesimo votante
 	 * @return la lista formada por (usvu, tokenFirmado).
 	 */
-	public List<String> obtenerComprobante(String uvi, String idv) throws Exception, ComprobanteNotFoundException {
+	public List<String> obtenerComprobante(String uvi, String idv) throws Exception, ComprobanteNotFoundException 
+	{
 		//TODO: Internamente tenes que buscar en la base todos los token que tengan 
 		// el uvi, desencriptarlos (con el uvi) y fijarte si el id es el que te mando
 		// yo.
@@ -85,16 +95,26 @@ public class ComprobantesMesa implements Iterable {
 	 * Marca a un votante como que ya votó
 	 * @param usvu Secreto compartido entre el votante y la urna encriptado con Uu
 	 */
-	public void marcarVotado(String usvu) throws Exception {}
+	public void marcarVotado(String usvu) throws Exception 
+	{
+		
+	}
 	
 	/**
 	 * Devuelve si está marcado como que votó o no.
 	 */
-	public boolean yaVoto(String usvu) throws Exception {
+	public boolean yaVoto(String usvu) throws Exception 
+	{
 		return true;
 	}
+	
+	public void setIteratorIdv(String idv)
+	{
+		this.idv = idv;
+	}
 
-	public Iterator<String> iterator(){
-		return new ComprobantesMesaIterador();
+	public Iterator<String> iterator()
+	{
+		return new ComprobantesMesaIterador(idv);
 	}
 }

@@ -6,7 +6,7 @@ import java.lang.Iterable;
 import java.util.Iterator;
 
 class BoletasIterador implements Iterator<String> {
-	public BoletasIterador() {
+	public BoletasIterador(String idv) {
 		// TODO Auto-generated constructor stub
 	}
 	
@@ -26,6 +26,8 @@ class BoletasIterador implements Iterator<String> {
 }
 
 public class Boletas implements Iterable{
+	
+	private String idv;
 	// El constructor es privado para evitar que lo instancien otras clases
 	private Boletas() {
 		//TODO Inicializaciones necesarias.
@@ -51,9 +53,24 @@ public class Boletas implements Iterable{
 			ref = new Boletas();
 		return ref;
 	}
+	public void setIteratorIdv(String idv)
+	{
+		this.idv = idv;
+	}
 	
-	public Iterator<String> iterator(){
-		return new BoletasIterador();
+	public Iterator<String> iterator()
+	{
+		return new BoletasIterador(idv);
+	}
+	
+	public void insertarBoleta(String idv, String svu, String boleta) throws Exception
+	{
+		
+	}
+	
+	public String getBoleta(String svu) throws Exception
+	{
+		return null;
 	}
 	
 }
