@@ -1,5 +1,17 @@
 package eleccion;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+
 /**
  * Clase abstracta que define parámetros para comunicarse
  * exitosamente con los serviores de votación.
@@ -26,7 +38,7 @@ public abstract class InfoServidores
 	/**
 	 * Clave pública de la urna.
 	 */
-	public static final String publicaUrna = "pepe";
+	public static String publicaUrna = null;
 	
 	/**
 	 * Host de la mesa.
@@ -51,5 +63,36 @@ public abstract class InfoServidores
 	/**
 	 * Clave pública de la mesa.
 	 */
-	public static final String publicaMesa = "pedro";
+	public static String publicaMesa = null;
+	
+	private static final String resources = "../resources/"; 
+	public static final String privadaMesaPath = resources + "mesa/mesa_privada.key";
+	public static final String privadaUrnaPath = resources + "urna/urna_privada.key";
+	
+	public static String readKey(String path) throws IOException {
+		// Buffer para levantar el string
+		char [] cbuf;
+
+		// Abro los archivos de las clases.
+		BufferedReader br = new BufferedReader(new FileReader(path));
+
+		// Reservo la cantidad de bytes que ocupa el archivo
+		cbuf = new char[(int)(new File(path)).length()];
+		
+		// Lo leo en un char[]
+		br.read(cbuf);
+		return new String(cbuf);
+	}
+	
+	public static void inicializarClaves() throws IOException {
+		// Lo guardo como String
+		publicaUrna = readKey(resources + "general/urna_publica.key");
+		publicaMesa = readKey(resources + "general/mesa_publica.key");
+		
+	}
+	
+	//TODO Borrar este main
+	public static void main(String args[]) throws IOException {
+		inicializarClaves();
+	}
 }

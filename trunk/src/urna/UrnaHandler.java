@@ -49,9 +49,9 @@ public class UrnaHandler extends Thread {
 	}	
 	
 	
-	public void recPaso2() {
+	public void recPaso2() throws Exception {
 		// Levanto el mensaje del socket mesa
-		//String msg = (String) mesaIn.readObject();
+		String msg = (String) mesaIn.readObject();
 		
 		// Lo desencripto con la clave publica de la urna
 		//Desencriptador

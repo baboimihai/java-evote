@@ -37,9 +37,9 @@ public class MesaHandler extends Thread{
 	private String idv;
 	private String challenge;
 	
-	// Claves puiublicas y privadas que deben ser obtenidas de algun lado
+	// Claves privada de la mesa
 	private String privadaMesa;
-	private static String publicaUrna = "pepe";
+
 	
 	// Parametros de conexion a la urna TODO: ponerlos en otro lado
 	private static String HOSTURNA = "localhost";
@@ -51,6 +51,8 @@ public class MesaHandler extends Thread{
 		votante = aVotante;
 		votanteIn = new ObjectInputStream(votante.getInputStream());
 		votanteOut = new ObjectOutputStream(votante.getOutputStream());
+		
+		privadaMesa = InfoServidores.readKey(InfoServidores.privadaMesaPath);
 	}
 	
 	/**
@@ -193,7 +195,7 @@ public class MesaHandler extends Thread{
 		String mensaje2 = firm.firmar(Arrays.asList(usvu, idv));
 		
 		// Lo encripto con la clave publica de la urna
-		Encriptador encrypt = new Encriptador(publicaUrna);
+		Encriptador encrypt = new Encriptador(InfoServidores.publicaUrna);
 		String mensaje2_enc = encrypt.encriptar(mensaje2);
 		
 		// Se lo envio
@@ -248,7 +250,7 @@ public class MesaHandler extends Thread{
 		
 		 // Firmo el challenge y lo encripto con la clave publica de la urna.
 		Firmador firm = new Firmador(privadaMesa);
-		Encriptador encrypt = new Encriptador(publicaUrna);
+		Encriptador encrypt = new Encriptador(InfoServidores.publicaUrna);
 		
 		String mensaje3 = encrypt.encriptar(firm.firmar(Arrays.asList(challenge)));
 		
