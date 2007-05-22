@@ -19,8 +19,6 @@ public class Validador {
 	/**
 	 * Construye un nuevo validador a partir de una clave pública
 	 * @param key clave a usar para el validador
-	 * @throws NoSuchAlgorithmException
-	 * @throws NoSuchPaddingException
 	 * @throws InvalidKeyException
 	 */
 	public Validador (String key) throws InvalidKeyException {
