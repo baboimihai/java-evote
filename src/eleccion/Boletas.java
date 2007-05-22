@@ -1,0 +1,59 @@
+package eleccion;
+//
+// TODO: Falta definir pero tengo noni
+//
+import java.lang.Iterable;
+import java.util.Iterator;
+
+class BoletasIterador implements Iterator<String> {
+	public BoletasIterador() {
+		// TODO Auto-generated constructor stub
+	}
+	
+	public boolean hasNext() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	public String next() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	public void remove() {
+		throw new UnsupportedOperationException();
+		
+	}
+	
+}
+
+public class Boletas implements Iterable{
+	// El constructor es privado para evitar que lo instancien otras clases
+	private Boletas() {
+		//TODO Inicializaciones necesarias.
+	}
+
+	// Variable que contiene la única instancia de Boletas.
+	private static Boletas ref;
+
+	/**
+	 *  Esta clase es singleton y no se puede clonar. 
+	 */
+	  public Object clone()	throws CloneNotSupportedException {
+	    throw new CloneNotSupportedException(); 
+	  }
+	
+	/**
+	 * Devuelve la instancia a la clase.
+	 * @return La instancia de Boletas
+	 */
+	public static synchronized Boletas getInstance()
+	{
+		if ( ref == null )
+			ref = new Boletas();
+		return ref;
+	}
+	
+	public Iterator<String> iterator(){
+		return new BoletasIterador();
+	}
+	
+}
