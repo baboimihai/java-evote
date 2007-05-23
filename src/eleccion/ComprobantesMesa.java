@@ -3,28 +3,69 @@ package eleccion;
  * @author ezequiel85
  * @version 0.1a
  * La clase Comprobantes contiene todos los comprobantes de la mesa, utiliza una base de datos
- * 
+ * Los comprobantes comprueban la homosexualidad del que lee
  */
 
 import java.util.*;
 import java.sql.*;
+import oracle.sql.*;
+import oracle.jdbc.*;
+import criptografia.Hasheador;
 
 class ComprobantesMesaIterador implements Iterator<String> 
 {
-	public ComprobantesMesaIterador(String idv) 
+	ResultSet r;
+	Baseconn b;
+	boolean last = false;
+	
+	public ComprobantesMesaIterador(String idv)
 	{
-		// TODO Auto-generated constructor stub
+		PreparedStatement pstmt;
+		
+		try
+		{
+			b = Baseconn.getInstance();
+			pstmt = b.prepare("select comprobante from cripto_comprobantes where idv = ?");
+			pstmt.setString(1, idv);
+			r = pstmt.executeQuery();
+			r.next();
+		} catch (ClassNotFoundException e)
+		{
+			e.printStackTrace();
+		} catch (SQLException e)
+		{
+			e.printStackTrace();
+		}
 	}
 	
 	public boolean hasNext() 
 	{
-		// TODO Auto-generated method stub
-		return false;
+		boolean a = false;
+		
+		try
+		{
+			a = r.isAfterLast();
+		} catch (SQLException e)
+		{
+			e.printStackTrace();
+		}
+		return !a;
 	}
 	public String next() 
 	{
-		// TODO Auto-generated method stub
-		return null;
+		String s = null;
+		CLOB c;
+		
+		try
+		{
+			c = ((OracleResultSet)r).getCLOB(1);
+			s = c.getSubString((long)1, (int)c.length());
+			r.next();
+		} catch (SQLException e)
+		{
+			e.printStackTrace();
+		}
+		return s;
 	}
 	public void remove() 
 	{
@@ -35,6 +76,46 @@ class ComprobantesMesaIterador implements Iterator<String>
 
 public class ComprobantesMesa implements Iterable 
 {
+	public static void main(String[] args)
+	{
+		ComprobantesMesa dick = null;
+		
+		try
+		{
+			dick = ComprobantesMesa.getInstance();
+		} catch (ClassNotFoundException e)
+		{
+			e.printStackTrace();
+		} catch (SQLException e)
+		{
+			e.printStackTrace();
+		}
+		try
+		{
+			//dick.insertarComprobante("yo", "tu", "el", "nosotros");
+			dick.setIteratorIdv("jiji");
+			Iterator i = dick.iterator();
+			while(i.hasNext())
+			{
+				System.out.println(i.next());
+			}
+			System.out.println("da end");
+			}
+			//System.out.println(dick.obtenerComprobante("jeje", "jiji"));
+//		} catch (SQLException e)
+//		{
+//			e.printStackTrace();
+//		} catch (ComprobanteNotFoundException e)
+//		{
+//			e.printStackTrace();
+//		} 
+			catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		return;
+	}
+	
 	// Variable que contiene la única instancia de Comprobantes.
 	private static ComprobantesMesa ref;
 	private Baseconn b;
@@ -74,10 +155,26 @@ public class ComprobantesMesa implements Iterable
 	 * @param idv El id de la votación
 	 * @param tokenFirmado Es el comprobante en si.
 	 */
-	public boolean insertarComprobante(String usvu, String uvi, String idv, String tokenFirmado) throws SQLException 
+	public void insertarComprobante(String usvu, String uvi, String idv, String tokenFirmado) throws SQLException 
 	{
-		b.doQuery("insert into ");
-		return false;
+		String usvu_hash, uvi_hash;
+		
+		usvu_hash = Hasheador.hashear(usvu);
+		uvi_hash = Hasheador.hashear(uvi);
+
+		PreparedStatement pstmt;
+		
+		pstmt = b.prepare("Insert into cripto_comprobantes values(?,?,?,?,?,?)");
+		pstmt.setString(1,usvu_hash);
+		pstmt.setString(2,usvu);
+		pstmt.setString(3, uvi_hash);
+		pstmt.setString(4,tokenFirmado);
+		pstmt.setString(5,idv);
+		pstmt.setInt(6, 0);
+		
+		pstmt.executeUpdate();
+		
+		return;
 	}
 	/**
 	 * Devuelve el comprobantes como listas.
@@ -87,10 +184,28 @@ public class ComprobantesMesa implements Iterable
 	 */
 	public List<String> obtenerComprobante(String uvi, String idv) throws Exception, ComprobanteNotFoundException 
 	{
-		//TODO: Internamente tenes que buscar en la base todos los token que tengan 
-		// el uvi, desencriptarlos (con el uvi) y fijarte si el id es el que te mando
-		// yo.
-		return null;
+		String uvi_hash = Hasheador.hashear(uvi), token, usvu;
+		PreparedStatement pstmt;
+		ResultSet r;
+		CLOB c;
+		CLOB d;
+		
+		pstmt = b.prepare("select usvu_orig, comprobante from cripto_comprobantes where uvi = ? and idv = ?");
+		pstmt.setString(1, uvi_hash);
+		pstmt.setString(2, idv);
+		
+		r = pstmt.executeQuery();
+		if (r.next() == false)
+			throw new ComprobanteNotFoundException("Comprobante no encontrado");
+		c = ((OracleResultSet) r).getCLOB(1); // Usvu
+		d = ((OracleResultSet) r).getCLOB(2); //Comprobante
+			
+		token = d.getSubString((long)1, (int)d.length());
+		usvu = c.getSubString((long)1, (int)c.length());
+		
+		pstmt.close();
+		
+		return Arrays.asList(usvu, token);
 	}
 	/**
 	 * Marca a un votante como que ya votó
@@ -98,7 +213,14 @@ public class ComprobantesMesa implements Iterable
 	 */
 	public void marcarVotado(String usvu) throws Exception 
 	{
+		String usvu_hash;
+		PreparedStatement pstmt;
 		
+		usvu_hash = Hasheador.hashear(usvu);
+		pstmt = b.prepare("update cripto_comprobates set voto = 1 where usvu = ?");
+		pstmt.setString(1, usvu_hash);
+		pstmt.executeUpdate();
+		pstmt.close();
 	}
 	
 	/**
@@ -106,7 +228,25 @@ public class ComprobantesMesa implements Iterable
 	 */
 	public boolean yaVoto(String usvu) throws Exception 
 	{
-		return true;
+		String usvu_hash;
+		PreparedStatement pstmt;
+		ResultSet r;
+		int a;
+		
+		usvu_hash = Hasheador.hashear(usvu);
+		pstmt = b.prepare("select voto from cripto_comprobantes where usvu = ?");
+		pstmt.setString(1, usvu_hash);
+		r = pstmt.executeQuery();
+		if (r.next() == false)
+			throw new Exception("El votante no existe");
+		a = r.getInt(1);
+		
+		r.close();
+		
+		if (a == 1)
+			return true;
+		else
+			return false;
 	}
 	
 	public void setIteratorIdv(String idv)
