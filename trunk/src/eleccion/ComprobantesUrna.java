@@ -54,14 +54,45 @@ public class ComprobantesUrna implements Iterable {
 	}
 	
 	/**
-	 * Inserto un comprobante en la base
-	 * @param comprobante Es el comprobante en si.
+	 * Inserto un comprobante en la base. El estado inicial es "no voto".
+	 * @param svu El secreto compartido entre la urna y el votante (único).
+	 * @param idv El id de la votación
+	 * @param tokenFirmado El comprobante en si.
+	 * @throws Exception Si no se pudo insertar el comprobante.
 	 */
 	public void insertarComprobante(String svu, String idv, String tokenFirmado) throws Exception 
 	{
 	}
 	
-	public String getComprobante(String svu)
+	/**
+	 * Devuelve el comprobante para un svu dado.
+	 * @param svu El secreto compartido entre la urna y el votante (único). 
+	 * @return El token firmado asociado a ese svu.
+	 * @throws ComprobanteNotFoundException Si no se encontró el comprobante.
+	 */
+	public String getComprobante(String svu) throws ComprobanteNotFoundException
+	{
+		return null;
+	}
+	
+	/**
+	 * Cambia el estado de la votacion de svu.
+	 * @param svu El secreto compartido entre la urna y el votante (único).
+	 * @param estado Puede ser "no voto", "en proceso" o "ya voto".
+	 * @throws ComprobanteNotFoundException Si no se encontró el comprobante.
+	 */
+	public void setEstado(String svu, String estado) throws ComprobanteNotFoundException
+	{
+		
+	}
+	
+	/**
+	 * Devuelve el estado de svu.
+	 * @param svu El secreto compartido entre la urna y el votante (único).
+	 * @return El estado del svu. Puede ser "no voto", "en proceso" o "ya voto".
+	 * @throws ComprobanteNotFoundException Si no se encontró el comprobante.
+	 */
+	public String getEstado(String svu) throws ComprobanteNotFoundException
 	{
 		return null;
 	}
