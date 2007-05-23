@@ -17,18 +17,28 @@ import java.security.InvalidKeyException;
 import java.util.*;
 
 import criptografia.Desencriptador;
+import eleccion.InfoServidores;
 
 
 public class UrnaApp {
 	public static final int PUERTO1 = 4080;
 	public static final int PUERTO2 = 4081;
 	public static void main (String args[]) {
+
+		// Inicializo el infoservidor
+		try {
+			InfoServidores.inicializarClaves();
+		} catch (IOException e) {
+			System.err.println("Hubo un problema al inicializar las claves privadas: " + e.getMessage());
+			System.exit(1);
+		}
+
+		
 		
 		// Me creo la instancia de desencriptador encargada de resolver los pedidos del votante.
-		
 		Desencriptador decrypt = null;
 		try {
-			decrypt = new Desencriptador("pepe");
+			decrypt = new Desencriptador(InfoServidores.privadaUrnaPath);
 		} catch (InvalidKeyException e1) {
 			e1.printStackTrace();
 			System.exit(1);
