@@ -5,6 +5,8 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.net.*;
 
+import eleccion.ComprobantesUrna;
+
 /**
  * @author hrajchert
  * @version 0.1a
@@ -12,7 +14,7 @@ import java.net.*;
  * un socket que recibe la clase UrnaApp.
  */
 public class UrnaManager {
-	private Map<String, List> socketMap;
+	private Map<String, List> votanteMap;
     
 	// Lock del mapa y variable de condicion
 	final Lock MapLock;
@@ -22,7 +24,7 @@ public class UrnaManager {
 	 * Constructor privado de la clase para evitar que lo creen.
 	 */
 	private UrnaManager() {
-		socketMap = new HashMap<String, List>();
+		votanteMap = new HashMap<String, List>();
 		MapLock = new ReentrantLock();
 		MapCond = MapLock.newCondition();
 	}
@@ -47,19 +49,34 @@ public class UrnaManager {
 	    throw new CloneNotSupportedException(); 
 	  }
 	
-	  public void setSocket(String svu,  List l)
+	  /**
+	   * Crea un votante y lo pone en el mapa de votantes 
+	   * @param svu El secreto compartido entre el votante y la urna.
+	   * @param l Lista formada por socket y sobre.
+	   * @throws Exception Si el svu es invalido
+	   */
+	  public void setVotante(String svu,  List l) throws Exception
 	  {
 		  MapLock.lock();
 		  try {
-			  socketMap.put(svu, l);
+			  // Me fijo que el svu sea valido.
+			  if ( !ComprobantesUrna.getInstance().getEstado(svu).equals("no voto")) throw new Exception();
+			  // Marco que está en proceso de votación
+			  ComprobantesUrna.getInstance().setEstado(svu, new String("en proceso"));
+			  
+			  votanteMap.put(svu, l);
 			  MapCond.signalAll();
+		  }
+		  catch (Exception e) {
+			  // Tiro excepcion si no se encontró el comprobante o si ya votó.
+			  throw new Exception("El svu es invalido");
 		  }
 		  finally {
 			  MapLock.unlock();
 		  }
 	  }
 	  
-	  public List getSocket(String svu) throws InterruptedException {
+	  public List getVotante(String svu) throws InterruptedException {
 		  
 		  List rta = null;
 		  MapLock.lock();
@@ -68,8 +85,8 @@ public class UrnaManager {
 		  try {
 			  do {
 				  MapCond.awaitUntil(new Date(now.getTime() + 31000 ));
-			  } while (socketMap.containsKey(svu));
-			  rta = socketMap.get(svu);
+			  } while (votanteMap.containsKey(svu));
+			  rta = votanteMap.get(svu);
 		  }
 		  
 		  finally {

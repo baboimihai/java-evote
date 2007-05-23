@@ -113,7 +113,7 @@ public class UrnaApp {
 							String svu = paso2.get(0);
 							// Le aviso al UrnaManager que hay una nueva conexion con la lista formada
 							// por el socket y el sobre (porque ya lo lei)
-							UrnaManager.getInstance().setSocket(svu, Arrays.asList(s,paso2.get(1)));
+							UrnaManager.getInstance().setVotante(svu, Arrays.asList(s,paso2.get(1)));
 						}
 						catch (Exception e)
 						{
