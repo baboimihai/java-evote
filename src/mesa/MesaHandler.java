@@ -123,7 +123,6 @@ public class MesaHandler extends Thread{
 		}
 		
 		// Valido el token con uvi y obtengo los datos.
-		//Validador valid = new Validador(this.uvi);
 		Validador valid = new Validador(this.uvi);
 		
 		try {
@@ -144,7 +143,12 @@ public class MesaHandler extends Thread{
 		if ( !(Padron.getInstance().puedeVotar(this.dni, this.idv)))
 				return false;
 		
-		//TODO Verificar que el hash comprobante sea correcto.
+		
+		// Verifico que el hash comprobante sea correcto.
+		String hashVotante = msg_decrypt.get(2);
+		 
+		String hashMesa = Hasheador.hashear(Arrays.asList(usvu, svm));
+		if ( !hashVotante.equals(hashMesa)) throw new Exception("No coincide el hash del votante con el de la mesa");
 		
 		// Verifico que no haya votado
 		try {

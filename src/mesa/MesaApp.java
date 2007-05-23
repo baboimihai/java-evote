@@ -13,12 +13,18 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 
+import eleccion.InfoServidores;
+
 
 public class MesaApp {
 
-	public static final int PUERTO1 = 4034;
-	public static final int PUERTO2 = 4035;
 	public static void main (String args[]) {
+		// Inicializo el infoservidor
+		try {
+			InfoServidores.inicializarClaves();
+		} catch (IOException e) {
+			System.err.println("Hubo un problema al inicializar las claves privadas: " + e.getMessage());	
+		}
 		
 		Selector selector = null;
 		ServerSocketChannel canalVotacion = null;
@@ -30,12 +36,12 @@ public class MesaApp {
 			// Creo el ServerSocket encargado de escuchar los pedidos de una votación
 			canalVotacion = ServerSocketChannel.open();
 			canalVotacion.configureBlocking(false);
-			canalVotacion.socket().bind(new InetSocketAddress(PUERTO1));
+			canalVotacion.socket().bind(new InetSocketAddress(InfoServidores.puertoMesaDesdeVotante));
 			
 			// Creo el ServerSocket encargado de escuchar los pedidos de ver que voto.
 			canalVotoConsulta = ServerSocketChannel.open();
 			canalVotoConsulta.configureBlocking(false);
-			canalVotoConsulta.socket().bind(new InetSocketAddress(PUERTO2));
+			canalVotoConsulta.socket().bind(new InetSocketAddress(InfoServidores.puertoMesaEV));
 			
 			// Registro los Canales en el selector
 			canalVotacion.register(selector, SelectionKey.OP_ACCEPT);
