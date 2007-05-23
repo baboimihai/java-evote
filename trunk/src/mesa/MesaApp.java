@@ -23,7 +23,8 @@ public class MesaApp {
 		try {
 			InfoServidores.inicializarClaves();
 		} catch (IOException e) {
-			System.err.println("Hubo un problema al inicializar las claves privadas: " + e.getMessage());	
+			System.err.println("Hubo un problema al inicializar las claves privadas: " + e.getMessage());
+			System.exit(1);
 		}
 		
 		Selector selector = null;
