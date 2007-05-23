@@ -13,8 +13,8 @@ public class Baseconn
 	 */
 	private Baseconn() throws ClassNotFoundException, SQLException
 	{	
-		Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
-		conn = DriverManager.getConnection("jdbc:odbc:oracle", "mbesio", "NaN");
+		Class.forName("oracle.jdbc.driver.OracleDriver");
+		conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:11521:ITBA", "mbesio", "NaN");
 	}
 	
 	/**
@@ -36,6 +36,15 @@ public class Baseconn
 	  public Object clone()	throws CloneNotSupportedException 
 	  {
 	    throw new CloneNotSupportedException(); 
+	  }
+	  
+	  public PreparedStatement prepare(String query) throws SQLException
+	  {
+		  PreparedStatement pstmt;
+		  
+		  pstmt = conn.prepareStatement(query, ResultSet.TYPE_SCROLL_INSENSITIVE,
+                  ResultSet.CONCUR_READ_ONLY);
+		  return pstmt;
 	  }
 	  
 	  public ResultSet doQuery(String query) throws SQLException
