@@ -1,45 +1,97 @@
 package eleccion;
-//
-// TODO: Falta definir pero tengo noni
-//
+/**
+ * @author ezequiel85
+ * @version 23.3.5
+ * Esta clase sirve para que Ingui sea boleta
+ * SALUD, Y PESETAS!!!
+ */
 import java.lang.Iterable;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Iterator;
 
-class BoletasIterador implements Iterator<String> {
-	public BoletasIterador(String idv) {
-		// TODO Auto-generated constructor stub
+import criptografia.Hasheador;
+
+class BoletasIterador implements Iterator<String> 
+{
+	ResultSet r;
+	Baseconn b;
+	boolean last = false;
+	
+	public BoletasIterador(String idv) 
+	{
+		PreparedStatement pstmt;
+		
+		try
+		{
+			b = Baseconn.getInstance();
+			pstmt = b.prepare("select boleta from cripto_boletas where idv = ?");
+			pstmt.setString(1, idv);
+			r = pstmt.executeQuery();
+			r.next();
+		} catch (ClassNotFoundException e)
+		{
+			e.printStackTrace();
+		} catch (SQLException e)
+		{
+			e.printStackTrace();
+		}
 	}
 	
-	public boolean hasNext() {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean hasNext() 
+	{
+		boolean a = false;
+		
+		try
+		{
+			a = r.isAfterLast();
+		} catch (SQLException e)
+		{
+			e.printStackTrace();
+		}
+		return !a;
 	}
-	public String next() {
-		// TODO Auto-generated method stub
-		return null;
+	public String next() 
+	{
+		String s = null;
+		
+		try
+		{
+			s = r.getString(1);
+			r.next();
+		} catch (SQLException e)
+		{
+			e.printStackTrace();
+		}
+		return s;
 	}
-	public void remove() {
+	public void remove() 
+	{
 		throw new UnsupportedOperationException();
 		
 	}
 	
 }
 
-public class Boletas implements Iterable{
-	
-	private String idv;
-	// El constructor es privado para evitar que lo instancien otras clases
-	private Boletas() {
-		//TODO Inicializaciones necesarias.
-	}
-
+public class Boletas implements Iterable
+{
 	// Variable que contiene la única instancia de Boletas.
 	private static Boletas ref;
+	private String idv;
+	private Baseconn b;
+	
+	// El constructor es privado para evitar que lo instancien otras clases
+	private Boletas() 
+	{
+		//TODO Inicializaciones necesarias.
+	}
 
 	/**
 	 *  Esta clase es singleton y no se puede clonar. 
 	 */
-	  public Object clone()	throws CloneNotSupportedException {
+	  public Object clone()	throws CloneNotSupportedException 
+	  {
 	    throw new CloneNotSupportedException(); 
 	  }
 	
@@ -53,6 +105,7 @@ public class Boletas implements Iterable{
 			ref = new Boletas();
 		return ref;
 	}
+	
 	public void setIteratorIdv(String idv)
 	{
 		this.idv = idv;
@@ -65,12 +118,41 @@ public class Boletas implements Iterable{
 	
 	public void insertarBoleta(String idv, String svu, String boleta) throws Exception
 	{
+		String svu_hash;
 		
+		svu_hash = Hasheador.hashear(svu);
+		
+		PreparedStatement pstmt;
+		
+		pstmt = b.prepare("Insert into cripto_boletas values(?,?,?)");
+		pstmt.setString(1,svu_hash);
+		pstmt.setString(2,idv);
+		pstmt.setString(3, boleta);
+		
+		pstmt.executeUpdate();
+		
+		return;
 	}
 	
 	public String getBoleta(String svu) throws Exception
 	{
-		return null;
+		String svu_hash = Hasheador.hashear(svu);
+		ResultSet r;
+		
+		PreparedStatement pstmt;
+		pstmt = b.prepare("select boleta from cripto_boletas where svu = ?");
+		pstmt.setString(1,svu_hash);
+		
+		r = pstmt.executeQuery();
+		if (r.next() == false)
+		{
+			r.close();
+			throw new Exception("Boleta no encontrada");
+		}
+		
+		r.close();
+		
+		return r.getString(1); // Comprobante;
 	}
 	
 }

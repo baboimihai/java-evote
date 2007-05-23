@@ -196,14 +196,17 @@ public class ComprobantesMesa implements Iterable
 		
 		r = pstmt.executeQuery();
 		if (r.next() == false)
+		{
+			pstmt.close();
 			throw new ComprobanteNotFoundException("Comprobante no encontrado");
+		}
 		c = ((OracleResultSet) r).getCLOB(1); // Usvu
 		d = ((OracleResultSet) r).getCLOB(2); //Comprobante
 			
 		token = d.getSubString((long)1, (int)d.length());
 		usvu = c.getSubString((long)1, (int)c.length());
 		
-		pstmt.close();
+		r.close();
 		
 		return Arrays.asList(usvu, token);
 	}
@@ -220,7 +223,6 @@ public class ComprobantesMesa implements Iterable
 		pstmt = b.prepare("update cripto_comprobates set voto = 1 where usvu = ?");
 		pstmt.setString(1, usvu_hash);
 		pstmt.executeUpdate();
-		pstmt.close();
 	}
 	
 	/**
