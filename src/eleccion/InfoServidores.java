@@ -1,16 +1,6 @@
 package eleccion;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 
 /**
  * Clase abstracta que define parámetros para comunicarse
@@ -65,9 +55,13 @@ public abstract class InfoServidores
 	 */
 	public static String publicaMesa = null;
 	
+	// Nombres de archivo
 	private static final String resources = "../resources/"; 
 	public static final String privadaMesaPath = resources + "mesa/mesa_privada.key";
 	public static final String privadaUrnaPath = resources + "urna/urna_privada.key";
+	public static final String archVotantes = resources + "votantes/votantes.txt";
+	public static final String archVotaciones = resources + "votaciones/votaciones.txt";
+	
 	
 	public static String readKey(String path) throws IOException {
 		// Buffer para levantar el string
