@@ -14,6 +14,7 @@ import java.util.Vector;
 import criptografia.Desencriptador;
 import criptografia.Hasheador;
 import criptografia.Validador;
+import eleccion.Boletas;
 import eleccion.InfoServidores;
 import eleccion.Padron;
 
@@ -112,8 +113,10 @@ public class Contador {
 			System.exit(1);
 		}
 
-		//para que el compilador no llore: Vector<String> sobres = new Vector<String>();
+
 		/* ahora que estoy listo para contar, procedo con la cuenta */
+		// pido los sobres. Acá hay un tema con los nombres :( TODO ver
+		Boletas sobres = Boletas.getInstance();
 
 		for (Iterator<String> iter = sobres.iterator(); iter.hasNext();) {
 
