@@ -63,7 +63,7 @@ public class UrnaManager {
 			  if ( !ComprobantesUrna.getInstance().getEstado(svu).equals("no voto")) throw new Exception();
 			  // Marco que está en proceso de votación
 			  ComprobantesUrna.getInstance().setEstado(svu, new String("en proceso"));
-			  
+//			  System.out.println("Pongo el dato " + svu);
 			  votanteMap.put(svu, l);
 			  MapCond.signalAll();
 		  }
@@ -84,9 +84,16 @@ public class UrnaManager {
 		  
 		  try {
 			  do {
-				  MapCond.awaitUntil(new Date(now.getTime() + 31000 ));
-			  } while (votanteMap.containsKey(svu));
-			  rta = votanteMap.get(svu);
+//				  System.out.println(Thread.currentThread().getId() + ": Me fijo si esta mi dato (" + svu + ")");
+				  MapCond.awaitUntil(new Date(now.getTime() + 10000 ));
+/*				  System.out.print("Keys: ");
+				  for (String aKey : votanteMap.keySet()) {
+					System.out.print(aKey + " ");
+				}
+				  System.out.println();*/
+			  } while (!votanteMap.containsKey(svu));
+		    rta = votanteMap.get(svu);
+		    votanteMap.remove(svu);
 		  }
 		  
 		  finally {
