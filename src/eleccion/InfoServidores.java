@@ -60,7 +60,7 @@ public abstract class InfoServidores
 	public static final String privadaMesaPath = resources + "mesa/mesa_privada.key";
 	public static final String privadaUrnaPath = resources + "urna/urna_privada.key";
 	public static final String archVotantes = resources + "votantes/votantes.txt";
-	public static final String archVotaciones = resources + "votaciones/votaciones.txt";
+	public static final String archVotaciones = resources + "votacion/votaciones.txt";
 	
 	
 	public static String readKey(String path) throws IOException {

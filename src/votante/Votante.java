@@ -1,30 +1,27 @@
 package votante;
 
-
 import java.io.*;
 import java.net.*;
 import java.security.*;
 import java.util.*;
 
 import criptografia.*;
-
 import eleccion.*;
 
 
-
 /**
- * 
- * @author pagarcia
- * @version 0.1a
  * La clase Votante representa una persona que se conecta al sistema para depositar votos.
- *
+ * @author pabloggarcia
+ * @version 0.1a
  */
 public class Votante
 {
+	
 	// Propiedades de este votante
 	private String dni; // Documento Nacional de Identidad
 	private String rvi; // Clave privada
 	private String uvi; // Clave pública
+	private List<List<Object>> estadoVotaciones; // Estado de sus votaciones
 	
 	// Propiedades de la votación en curso para este votante
 	private String idv; // ID de la votación
@@ -43,13 +40,14 @@ public class Votante
 	private ObjectInputStream urnaIn;
 	private ObjectOutputStream urnaOut;
 	
+	
 	/**
 	 * Crea un votante asociado a un DNI con una clave privada.
 	 * @param dni Documento Nacional de Identidad del votante a crear.
-	 * @param contrasenia Contraseña del votante. En particular, su clave privada.
+	 * @param clavePriv Clave privada del votante.
 	 * @throws Exception Si hubo un problema en la creación.
 	 */
-	public Votante(String dni, String contrasenia) throws Exception, IOException, VotanteInvalidoException
+	public Votante(String dni, String clavePriv) throws Exception, IOException, VotanteInvalidoException
 	{
 		try
 		{
@@ -63,12 +61,12 @@ public class Votante
 		}
 		
 		// Chequeo la contraseña que me dio
-		if (!esValidaContrasenia(dni, contrasenia))
+		if (!esValidaContrasenia(dni, clavePriv))
 			throw new VotanteInvalidoException("DNI o contraseña inválidos.");
 		
 		// Guardo propiedades del votante
 		this.dni = dni;
-		this.rvi = contrasenia;
+		this.rvi = clavePriv;
 		
 		// Creo una conexión a la mesa
 		mesa = new Socket(InfoServidores.hostMesa, InfoServidores.puertoMesaDesdeVotante);
@@ -80,6 +78,7 @@ public class Votante
 		urnaIn = new ObjectInputStream(urna.getInputStream());
 		urnaOut = new ObjectOutputStream(urna.getOutputStream());
 	}
+	
 	
 	/**
 	 * Chequea si una contrasenia es valida para un DNI dado.
@@ -103,30 +102,59 @@ public class Votante
 			return false;
 	}
 
+	
 	/**
 	 * Pide a la mesa el estado de las votaciones en que puede participar.
 	 * @param dni El DNI del votante.
 	 * @return Una tabla donde se encuentran los pares "nombre de la votación" y "votó / no votó".
 	 */
-	public Hashtable getEstadoVotaciones(String dni) throws Exception, IOException
+	public List<List<Object>> getEstadoVotaciones() throws Exception, IOException
 	{
-		Hashtable estadoVot;
+		List<List<Object>> estadoVotacionesActual;
 
 		// Envío a la mesa mi dni para saber mi estado de votaciones
 		mesaOut.writeObject(dni);
-		
+					
 		// Recibo el estado de votaciones
-		estadoVot = (Hashtable) mesaIn.readObject();
-		
+		estadoVotacionesActual = (List<List<Object>>) mesaIn.readObject();
+			
 		// Chequeo que las votaciones en las que la mesa asegura que puedo votar
 		// sean realmente las de público conocimiento
 		List<String> votacionesLocal = Padron.getInstance().getVotaciones(dni);
-		if (votacionesLocal.size() != estadoVot.size() ||
-				!votacionesLocal.containsAll(estadoVot.keySet()))
-			throw new FraudeException("Las votaciones enviadas por la mesa no son exactamente las que le corresponden a este votante.");
-				
-		return estadoVot;
+
+		// Chequeo cantidad
+		if (votacionesLocal.size() != estadoVotacionesActual.size())
+			throw new FraudeException("Las cantidad de votaciones disponibles enviadas por la mesa no igual a las que corresponden públicamente a este votante.");
+		
+		// Chequeo calidad
+		for (List<Object> estado : estadoVotacionesActual)
+		{
+			if (!votacionesLocal.contains(estado.get(0)))
+				throw new FraudeException("Las votaciones enviadas por la mesa no son exactamente las que le corresponden a este votante.");
+		}
+		
+		this.estadoVotaciones = estadoVotacionesActual;
+
+		return this.estadoVotaciones;
 	}
+	
+	
+	/**
+	 * Chequea si tiene votaciones en las que todavía no participó. 
+	 * @param estadoVotaciones
+	 */
+	public boolean tieneVotacionesPendientes(List<List<Object>> estadoVotaciones) throws Exception, IOException
+	{
+		if (this.estadoVotaciones == null)
+			getEstadoVotaciones();
+		
+		for (List<Object> estado : this.estadoVotaciones)
+			if ((Boolean)estado.get(1) == false)
+				return true;
+		
+		return false;
+	}
+	
 	
 	/**
 	 * Envía el Paso 1 del protocolo [Identificación para una votación].
@@ -181,6 +209,7 @@ public class Votante
 		this.idv = idv;
 	}
 	
+	
 	/**
 	 * Envía el Paso 4 del protocolo [Mete boleta en Urna].
 	 * @param opcion
@@ -230,6 +259,7 @@ public class Votante
 		// Lo envío a la urna
 		urnaOut.writeObject(msg);
 	}
+	
 	
 	/**
 	 * Recibe el Paso 3 del protocolo [Recibe boletas con opciones posibles].
@@ -292,6 +322,7 @@ public class Votante
 		// Devuelvo las IDs de votación
 		return opcionesBoletasLocal;
 	}
+	
 	
 	/**
 	 * Recibe el Paso 7 del protocolo [Recibe el ticket de la votación].
