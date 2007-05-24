@@ -1,15 +1,15 @@
-0,Trolos
-1,Mariano Besio,123456,clavebesio
-1,Hernan Rajchert,2345678,claveingui
-1,Pablo Garcia,3456789,clavespectro
-1,Carlucci,REPUTO,clavereputo
-0,aNormales
-1,Ezequiel Gomez Balaguer,31469330,clavegrosa
-0,Cerdos miserables que hay que matar
-1,Coffey,Bernard,clavebernard
-1,Bigio,Shaggy,claveshaggy
-0,Lacra innombrable
-1,Carlucci,REPUTO,clavereputo
-0,Feos
-1,Diego Marques,muyfeo,clavefea
-1,Hernan Rajchert,2345678,claveingui
+0,Grupo 1
+1,Mariano Besio,30111000
+1,Hernan Rajchert,30111001
+1,Pablo Garcia,30111002
+1,Carlucci,30111003
+0,Grupo 2
+1,Ezequiel Gomez Balaguer,30111004
+0,Grupo 3
+1,Coffey,30111005
+1,Bigio,30111006
+0,Grupo 4
+1,Carlucci,30111003
+0,Grupo 5
+1,Diego Marques,30111007
+1,Hernan Rajchert,30111001

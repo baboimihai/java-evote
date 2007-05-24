@@ -97,7 +97,8 @@ public class Padron
 			}
 			else // Si no, insertamos un nuevo votante
 			{
-				votante_list.put(splitted[2], new Votante(splitted[2],splitted[1], splitted[3], group));
+				String svu = InfoServidores.readKey(InfoServidores.resources + "votantes/" + splitted[2] + "_publica.key");
+				votante_list.put(splitted[2], new Votante(splitted[2],splitted[1], svu, group));
 			}
 		}		
 	}
