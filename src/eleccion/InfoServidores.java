@@ -56,7 +56,7 @@ public abstract class InfoServidores
 	public static String publicaMesa = null;
 	
 	// Nombres de archivo
-	private static final String resources = "../resources/"; 
+	public static final String resources = "../resources/"; 
 	public static final String privadaMesaPath = resources + "mesa/mesa_privada.key";
 	public static final String privadaUrnaPath = resources + "urna/urna_privada.key";
 	public static final String archVotantes = resources + "votantes/votantes.txt";
