@@ -60,7 +60,9 @@ public class Padron
 			if (line.charAt(0) == '1') //Nueva lista
 			{
 				v = votacion_list.get(nombre);
-				v.addOpcion(splitted[1], splitted[2]);
+				
+				String uvi = InfoServidores.readKey(InfoServidores.resources + "votacion/" + splitted[2] + "_publica.key");
+				v.addOpcion(splitted[1], uvi);
 				votacion_list.put(nombre, v);
 			}
 			else // Nuevo grupo que participa en la votacion

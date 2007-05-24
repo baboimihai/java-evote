@@ -28,7 +28,7 @@ public class MesaApp {
 		}
 
 		try {
-			Padron.getInstance().cargarPadron(InfoServidores.archVotantes, InfoServidores.archVotantes);
+			Padron.getInstance().cargarPadron(InfoServidores.archVotantes, InfoServidores.archVotaciones);
 		} catch (IOException e) {
 			System.err.println("Hubo un problema incializando al padron: " + e.getMessage());
 			System.exit(1);
@@ -75,6 +75,7 @@ public class MesaApp {
 				System.exit(1);
 			}
 			
+			System.out.println("Recibo una conexion");
 			// Itero por los canales aceptados
 			for (SelectionKey aSel : selector.selectedKeys()) {
 				if (aSel.isAcceptable())
@@ -88,6 +89,7 @@ public class MesaApp {
 					if ( aChannel.equals(canalVotacion) )
 					{
 						try {
+							System.out.println("Creo un thread de mesahandler");
 							Socket s = aChannel.accept().socket();
 							(new MesaHandler(s)).start();
 						} catch (Exception e) {
@@ -96,6 +98,7 @@ public class MesaApp {
 					}
 					else{
 						try {
+							System.out.println("Creo un thread de EstadoVotacion");
 							Socket s = aChannel.accept().socket();
 							(new EstadoVotacion(s)).start();
 						} catch (Exception e) {
