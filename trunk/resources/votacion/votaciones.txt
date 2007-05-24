@@ -1,22 +1,20 @@
-0,Ingui se la come?
-1,Si,clavesi
-1,No,clavano
-2,Trolos
-2,Feos
-0,Carlucci merece ser empalado en Plaza de Mayo?
-1,Probablemente,claveprob
-1,DE-NINGUNA-MANERA,clavediaz
-1,CHE BOLUDO ESTA OBVIEDAD ES UNA PREGUNTA???,claveobvio
-1,Obvio nabin, o vivis en una empanada?,clavempanada
-2,aNormales
-2,Lacra innombrable
-2,Feos
-2,Trolos
-0,Como mataria Ud a Bigio y a Coffey?
-1,Los esposo y los tiro a la hoguera,clavehoguera
-1,Paredon,claveparedon
-1,69 y que se atraganten con la verga del amigo,clave69
-1,Encerramos a Coffey con Purple Tentacle y a Bigio lo metemos en un dibujo animado de Scooby Doo y que se muera de inanicion,clavejoya
-2,Trolos
-2,aNormales
-2,Cerdos miserables que hay que matar
+0,Rojo o azul?
+1,Rojo, vot1
+1,Azul, vot2
+2,Grupo 1
+2,Grupo 2
+0,A B o C
+1,A, vot3
+1,B, vot4
+1,C, vot5
+2,Grupo 3
+2,Grupo 1
+2,Grupo 5
+2,Grupo 4
+0,Jefe de gobierno
+1,Telerman, vot6
+1,Macri, vot7
+1,Filmus, vot8
+2,Grupo 3
+2,Grupo 4
+2,Grupo 5
