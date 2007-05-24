@@ -9,6 +9,11 @@ public class FraudeException extends Exception
 	/**
 	 * 
 	 */
+	private static final long serialVersionUID = -6801678648949263046L;
+
+	/**
+	 * 
+	 */
 	public FraudeException()
 	{
 

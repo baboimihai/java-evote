@@ -10,6 +10,11 @@ package eleccion;
 public class ComprobanteNotFoundException extends Exception {
 
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 8289544384678077516L;
+
+	/**
 	 *
 	 */
 	public ComprobanteNotFoundException() {
