@@ -36,8 +36,9 @@ public class UrnaApp {
 		// Me creo la instancia de desencriptador encargada de resolver los pedidos del votante.
 		Desencriptador decrypt = null;
 		try {
-			decrypt = new Desencriptador(InfoServidores.privadaUrnaPath);
-		} catch (InvalidKeyException e1) {
+			String privadaUrna = InfoServidores.readKey(InfoServidores.privadaUrnaPath);
+			decrypt = new Desencriptador(privadaUrna);
+		} catch (Exception e1) {
 			e1.printStackTrace();
 			System.exit(1);
 		} 
