@@ -155,7 +155,7 @@ public class VotanteApp {
 		}
 		catch (Exception e)
 		{
-			System.out.println("Ha habido un error: " + e.getMessage());
+			System.out.println("ERROR: " + e.getMessage());
 			System.exit(1);
 		}
 
