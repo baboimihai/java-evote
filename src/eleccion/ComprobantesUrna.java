@@ -131,6 +131,7 @@ public class ComprobantesUrna implements Iterable {
 		pstmt.setString(3, tokenFirmado);
 		pstmt.setString(4,idv);
 		
+		
 		pstmt.executeUpdate();
 		
 		return;
@@ -183,7 +184,7 @@ public class ComprobantesUrna implements Iterable {
 		String svu_hash = Hasheador.hashear(svu);
 		int cant;
 		
-		pstmt = b.prepare("update cripto_comprobantes_urna set estado = ? where svu = ?");
+		pstmt = b.prepare("update cripto_comprobantes_urna set voto = ? where svu = ?");
 		pstmt.setString(1, estado);
 		pstmt.setString(2, svu_hash);
 		
@@ -206,7 +207,7 @@ public class ComprobantesUrna implements Iterable {
 		String svu_hash = Hasheador.hashear(svu);
 		ResultSet r;
 		
-		pstmt = b.prepare("select estado from cripto_comprobantes_urna where svu = ?");
+		pstmt = b.prepare("select voto from cripto_comprobantes_urna where svu = ?");
 		pstmt.setString(1, svu_hash);
 		
 		r = pstmt.executeQuery();

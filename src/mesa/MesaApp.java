@@ -14,7 +14,7 @@ import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 
 import eleccion.InfoServidores;
-
+import eleccion.Padron;
 
 public class MesaApp {
 
@@ -26,6 +26,14 @@ public class MesaApp {
 			System.err.println("Hubo un problema al inicializar las claves privadas: " + e.getMessage());
 			System.exit(1);
 		}
+
+		try {
+			Padron.getInstance().cargarPadron(InfoServidores.archVotantes, InfoServidores.archVotantes);
+		} catch (IOException e) {
+			System.err.println("Hubo un problema incializando al padron: " + e.getMessage());
+			System.exit(1);
+		}
+
 		
 		Selector selector = null;
 		ServerSocketChannel canalVotacion = null;
@@ -87,7 +95,13 @@ public class MesaApp {
 						}
 					}
 					else{
-						 // TODO Aceptar pedidos de chequeo de votación.
+						try {
+							Socket s = aChannel.accept().socket();
+							(new EstadoVotacion(s)).start();
+						} catch (Exception e) {
+							System.err.println("Hubo un problema creando el thread de EstadoVotacion: " + e.getMessage());
+						}
+						 
 					}
 				}
 			}
