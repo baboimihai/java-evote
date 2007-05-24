@@ -1,7 +1,7 @@
 package votante;
 
 import java.io.*;
-import java.util.List;
+import java.util.*;
 import eleccion.*;
 
 
@@ -33,7 +33,7 @@ public class VotanteApp {
 		catch (IOException e)
 		{
 			System.out.println("ERROR: Problema en la inicialización. Verifique que existan los archivos de claves de servidores, votantes y votaciones.\n" + e.getMessage());
-			//System.exit(1);
+			System.exit(1);
 		}
 
 		try
@@ -47,17 +47,14 @@ public class VotanteApp {
 			System.out.print("Ingrese su DNI: ");
 			String dni = lector.readLine();
 
-			
-			// Pido su archivo de clave privada
-			String nombreArchivoClavePrivada;
-			File archivoClavePrivada;
-			do
-			{
-				System.out.print("Ingrese la ubicación del archivo con su clave privada: ");
-				nombreArchivoClavePrivada = lector.readLine();
-				archivoClavePrivada = new File(nombreArchivoClavePrivada);
-				
-			} while (!archivoClavePrivada.canRead());
+
+			// Obtengo su clave privada
+			String nombreArchivoClavePrivada = "../resources/votantes/" + dni + "_privada.key";
+			File archivoClavePrivada = new File(nombreArchivoClavePrivada);
+
+			// Chequeo que pueda leerse
+			if (!archivoClavePrivada.canRead())
+				throw new Exception("No se encontró el archivo de clave privada asociado a su DNI. Colóquelo en la carpeta resources/votantes.");
 			
 			String clavePrivada = obtenerClave(archivoClavePrivada);
 			
@@ -94,8 +91,8 @@ public class VotanteApp {
 				System.out.println("Usted ya no tiene votaciones pendientes.");
 				System.exit(0);
 			}
-			
-			
+
+
 			// Pido que elija una votación para votar
 			int opcionVot = obtenerOpcion(1, estadoVotaciones.size(), "Ingrese el número de la votación de la que desea participar: ");
 			
@@ -185,6 +182,7 @@ public class VotanteApp {
 		br.read(cbuf);
 		return new String(cbuf);
 	}
+	
 	
 	/**
 	 * Almacena un ticket en un archivo.
