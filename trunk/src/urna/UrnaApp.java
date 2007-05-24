@@ -21,8 +21,6 @@ import eleccion.InfoServidores;
 
 
 public class UrnaApp {
-	public static final int PUERTO1 = 4080;
-	public static final int PUERTO2 = 4081;
 	public static void main (String args[]) {
 
 		// Inicializo el infoservidor
@@ -54,12 +52,12 @@ public class UrnaApp {
 			// Creo el ServerSocket encargado de escuchar los pedidos de la Mesa.
 			canalMesa = ServerSocketChannel.open();
 			canalMesa.configureBlocking(false);
-			canalMesa.socket().bind(new InetSocketAddress(PUERTO1));
+			canalMesa.socket().bind(new InetSocketAddress(InfoServidores.puertoUrnaDesdeMesa));
 			
 			// Creo el ServerSocket encargado de escuchar los pedidos del Votante.
 			canalVotante = ServerSocketChannel.open();
 			canalVotante.configureBlocking(false);
-			canalVotante.socket().bind(new InetSocketAddress(PUERTO2));
+			canalVotante.socket().bind(new InetSocketAddress(InfoServidores.puertoUrnaDesdeVotante));
 			
 			// Registro los Canales en el selector
 			canalMesa.register(selector, SelectionKey.OP_ACCEPT);

@@ -41,12 +41,6 @@ public class MesaHandler extends Thread{
 	private String privadaMesa;
 
 	
-	// Parametros de conexion a la urna TODO: ponerlos en otro lado
-	private static String HOSTURNA = "localhost";
-	private static int PORTURNA = 4080;
-
-	
-	
 	public MesaHandler(Socket aVotante)	throws IOException {
 		votante = aVotante;
 		votanteIn = new ObjectInputStream(votante.getInputStream());
@@ -190,7 +184,7 @@ public class MesaHandler extends Thread{
 	 */
 	private void envPaso2()	throws Exception {
 		// Creo una conexión contra la urna
-		urna = new Socket(HOSTURNA, PORTURNA);
+		urna = new Socket(InfoServidores.hostUrna, InfoServidores.puertoUrnaDesdeMesa);
 		urnaIn = new ObjectInputStream(urna.getInputStream());
 		urnaOut = new ObjectOutputStream(urna.getOutputStream());
  
