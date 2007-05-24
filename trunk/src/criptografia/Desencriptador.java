@@ -29,7 +29,7 @@ public class Desencriptador {
 	// la clave que usará este desencriptador
 	private static KeyFactory fact = null;
 	// creamos un cifrador RSA
-	private static Cipher cifrador = null;
+	private Cipher cifrador = null;
 	private int keyLen = 0;
     private PrivateKey privKey = null;
     private BASE64Decoder b64 = new BASE64Decoder();
@@ -39,13 +39,8 @@ public class Desencriptador {
 		try {
 			// inicializo fact
 			fact = KeyFactory.getInstance("RSA");
-			cifrador = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-
 		} catch (java.security.NoSuchAlgorithmException e) {
 			System.out.println("No deberíamos pasar por acá!! está cableado RSA");
-			e.printStackTrace();
-		} catch (NoSuchPaddingException e) {
-			System.out.println("No deberíamos pasar por acá!! está cableado RSA/ECB/PKCS1Padding");
 			e.printStackTrace();
 		}
 	}
@@ -100,6 +95,7 @@ public class Desencriptador {
 			privKey = fact.generatePrivate(new RSAPrivateKeySpec(modulo, exponente));
 
 			// e iniciamos el cifrador
+			cifrador = Cipher.getInstance("RSA/ECB/PKCS1Padding");
 			cifrador.init(Cipher.DECRYPT_MODE, privKey);
 			keyLen = cifrador.getOutputSize(1/*indisinto para RSA*/);
 		} catch (NumberFormatException ex) {
@@ -108,6 +104,12 @@ public class Desencriptador {
 			throw new InvalidKeyException("La clave no válida");
 		} catch (InvalidKeyException e) {
 			throw new InvalidKeyException("No se puede descifrar con esta clave");
+		} catch (java.security.NoSuchAlgorithmException e) {
+			System.out.println("No deberíamos pasar por acá!! está cableado RSA");
+			e.printStackTrace();
+		} catch (NoSuchPaddingException e) {
+			System.out.println("No deberíamos pasar por acá!! está cableado RSA/ECB/PKCS1Padding");
+			e.printStackTrace();
 		}
 	}
 

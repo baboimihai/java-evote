@@ -26,7 +26,7 @@ public class Encriptador {
 	private static KeyFactory fact = null;
     private PublicKey pubKey = null;
 	// creamos un cifrador RSA
-	private static Cipher cifrador = null;
+	private Cipher cifrador = null;
 	// RSAoverhead: bytes que necesita RSA para encriptar. Se descuentan del tamaño máximo
 	// del mensaje que es el tamaño de la clave en bytes.
 	private static int RSAoverhead = 11;
@@ -38,13 +38,9 @@ public class Encriptador {
 		try {
 			// inicializo fact
 			fact = KeyFactory.getInstance("RSA");
-			cifrador = Cipher.getInstance("RSA/ECB/PKCS1Padding");
 
 		} catch (java.security.NoSuchAlgorithmException e) {
 			System.out.println("No deberíamos pasar por acá!! está cableado RSA");
-			e.printStackTrace();
-		} catch (NoSuchPaddingException e) {
-			System.out.println("No deberíamos pasar por acá!! está cableado RSA/ECB/PKCS1Padding");
 			e.printStackTrace();
 		}
 	}
@@ -93,6 +89,7 @@ public class Encriptador {
 			pubKey = fact.generatePublic(new RSAPublicKeySpec(modulo, exponente));
 
 			// e iniciamos el cifrador
+			cifrador = Cipher.getInstance("RSA/ECB/PKCS1Padding");
 			cifrador.init(Cipher.ENCRYPT_MODE, pubKey);
 			keyLen = cifrador.getOutputSize(1/*cualquier valor es indisinto*/);
 		} catch (InvalidKeySpecException e) {
@@ -101,6 +98,12 @@ public class Encriptador {
 			throw new InvalidKeyException("No se puede cifrar con esta clave");
 		} catch (NumberFormatException ex) {
 			throw new InvalidKeyException("La clave no es un número válido");
+		} catch (NoSuchPaddingException e) {
+			System.out.println("No deberíamos pasar por acá!! está cableado RSA/ECB/PKCS1Padding");
+			e.printStackTrace();
+		} catch (java.security.NoSuchAlgorithmException e) {
+			System.out.println("No deberíamos pasar por acá!! está cableado RSA");
+			e.printStackTrace();
 		}
 	}
 
