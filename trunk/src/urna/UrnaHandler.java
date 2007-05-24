@@ -26,7 +26,7 @@ public class UrnaHandler extends Thread {
 
 	// Variables de conexión hacia el votante
 	private Socket votante;
-	private ObjectInputStream votanteIn;
+	//private ObjectInputStream votanteIn; TODO Ver porque no se usa
 	private ObjectOutputStream votanteOut;
 	
 	// Variables de conexión hacia la urna
@@ -112,7 +112,7 @@ public class UrnaHandler extends Thread {
 		
 		// Guardo el socket del votante
 		votante = (Socket) aList.get(0);
-		votanteIn = new ObjectInputStream(votante.getInputStream());
+		//votanteIn = new ObjectInputStream(votante.getInputStream());
 		votanteOut = new ObjectOutputStream(votante.getOutputStream());
 
 		// Guardo el sobre
