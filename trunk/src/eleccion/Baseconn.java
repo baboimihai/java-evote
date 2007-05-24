@@ -15,8 +15,15 @@ public class Baseconn
 	{	
 		Class.forName("oracle.jdbc.driver.OracleDriver");
 		conn = DriverManager.getConnection("jdbc:oracle:thin:@localhost:11521:ITBA", "mbesio", "NaN");
+		conn.setAutoCommit(true);
+
 	}
-	
+	@Override
+	protected void finalize() throws Throwable {
+		// TODO Auto-generated method stub
+		super.finalize();
+		conn.close();
+	}	
 	/**
 	 * "Constructor" para el Singleton
 	 * @return Instancia de la clase

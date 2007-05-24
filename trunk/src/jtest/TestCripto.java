@@ -61,14 +61,14 @@ public class TestCripto extends TestCase {
 		 System.out.println(msg_enc);
 		 assertEquals(msgLargo, decrypt.desencriptarString(msg_enc));
 		
-/*		 String aux= null;
+		 String aux= null;
 		 try {
 			 aux = decrypt_err.desencriptarString(msg_enc);
 			 fail("tiene que fallar");
 		 }catch (Exception e) {
 			assertNull(aux);
 		}
-	*/	
+		
 	}
 	
 	public final void testEncriptarListOfString() throws Exception {
