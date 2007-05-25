@@ -1,5 +1,6 @@
 package jtest;
 
+import java.security.SecureRandom;
 import java.util.*;
 
 import criptografia.Desencriptador;
@@ -24,18 +25,18 @@ public class TestCripto extends TestCase {
 	private List<String> lista3;
 	private String clavePrivada;
 	private String clavePublica;
-	private String clavePrivadaErr;
+	private String clavePrivadaUrna;
 	protected void setUp() throws Exception {
 		super.setUp();
 		InfoServidores.inicializarClaves();
 		clavePrivada = InfoServidores.readKey(InfoServidores.privadaMesaPath);
-		clavePrivadaErr = InfoServidores.readKey(InfoServidores.privadaUrnaPath);
+		clavePrivadaUrna = InfoServidores.readKey(InfoServidores.privadaUrnaPath);
 		clavePublica = InfoServidores.publicaMesa;
 		
 		encrypt = new Encriptador(clavePublica);
 		decrypt = new Desencriptador(clavePrivada);
 
-		decrypt_err = new Desencriptador(clavePrivadaErr);
+		decrypt_err = new Desencriptador(clavePrivadaUrna);
 		
 		encrypt_str = new Encriptador();
 		decrypt_str = new Desencriptador();
@@ -76,6 +77,15 @@ public class TestCripto extends TestCase {
 		 assertEquals(lista1, decrypt.desencriptar(msg_enc));
 		 assertEquals(lista2, decrypt.desencriptar(msg_enc));
 		 assertEquals(lista3, decrypt.desencriptar(msg_enc));
+
+		 SecureRandom random = new SecureRandom();
+		byte bytes[] = random.generateSeed(12);
+		random.nextBytes(bytes);
+		String svu = new String(bytes);
+		String usvu = encrypt_str.encriptar(svu, InfoServidores.publicaUrna);
+		 lista1 = Arrays.asList(usvu, msg1, msg2, msgLargo);
+		 msg_enc = encrypt.encriptar(lista1);
+		 assertEquals(lista1, decrypt.desencriptar(msg_enc));
 	}
 
 	public final void testEncriptarListOfStringString() throws Exception {
