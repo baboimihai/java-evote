@@ -105,12 +105,11 @@ public class Votante
 		// Si no lo había hecho antes, creo la conexión al puerto de preguntas de estado de votaciones
 		// de la mesa
 		if (mesa == null)
-		{
 			mesa = new Socket(InfoServidores.hostMesa, InfoServidores.puertoMesaEV);
-			mesaOutEV = new ObjectOutputStream(mesa.getOutputStream());
-			mesaInEV = new ObjectInputStream(mesa.getInputStream());
-		}
-				
+		
+		mesaOutEV = new ObjectOutputStream(mesa.getOutputStream());
+		mesaInEV = new ObjectInputStream(mesa.getInputStream());
+						
 		List<List<Object>> estadoVotacionesActual;
 
 		// Envío a la mesa mi dni para saber mi estado de votaciones
@@ -136,6 +135,10 @@ public class Votante
 		
 		this.estadoVotaciones = estadoVotacionesActual;
 
+		// Cierro los streams
+		mesaOutEV.close();
+		mesaInEV.close();
+		
 		return this.estadoVotaciones;
 	}
 	
@@ -211,7 +214,10 @@ public class Votante
 		
 		// Lo envío a la mesa
 		mesaOut.writeObject(msg);
-				
+		
+		// Cierro el stream de salida
+		mesaOut.close();
+		
 		// Defino esta votación como la actual
 		this.idv = idv;
 	}
@@ -271,6 +277,9 @@ public class Votante
 
 		// Lo envío a la urna
 		urnaOut.writeObject(msg);
+		
+		// Cierro el stream de salida
+		urnaOut.close();
 	}
 	
 	
@@ -335,6 +344,9 @@ public class Votante
 				!opcionesBoletasLocal.containsAll(opcBoletas.keySet()))
 			throw new FraudeException("Las boletas enviadas por la mesa no son exactamente las que le corresponden a este votante.");
 		
+		// Cierro el stream de entrada
+		mesaIn.close();
+		
 		// Devuelvo las IDs de votación
 		return opcionesBoletasLocal;
 	}
@@ -369,6 +381,9 @@ public class Votante
 		
 		if (!Hasheador.hashear(ticketSinFirmar).equals(sobreHasheado))
 			throw new FraudeException("La urna hasheó un sobre distinto al que se le entregó.");
+		
+		// Cierro el stream de entrada
+		urnaIn.close();
 		
 		return ticket;
 	}
