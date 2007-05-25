@@ -20,8 +20,10 @@ public class EstadoVotacion extends Thread {
 	
 	public EstadoVotacion(Socket aVotante) throws IOException {
 	votante = aVotante;
-	votanteIn = new ObjectInputStream(votante.getInputStream());
+	System.out.println(Thread.currentThread().getId() + ": Obteniendo outputStream");
 	votanteOut = new ObjectOutputStream(votante.getOutputStream());
+	System.out.println(Thread.currentThread().getId() + ": Obteniendo inputStream");
+	votanteIn = new ObjectInputStream(votante.getInputStream());
 }
 /**
  * El run sirve para correr el thread.
@@ -35,27 +37,29 @@ public void run() {
 			// Leo el dni desde el votante
 			String dni = (String) votanteIn.readObject();
 			
+			System.out.println(Thread.currentThread().getId() + ": Me llego el dni = " + dni);
 			// Cargo la lista de votaciones en las que está habilitado el votante.
 			List<String> votacionesPosibles = Padron.getInstance().getVotaciones(dni);
 			String uvi = Padron.getInstance().getUvi(dni);
 			// Itero por los idv, me fijo si no está, si esta lo saco
 			for (String idv : votacionesPosibles) {
-				boolean puedeVotar;
+				boolean yaVoto;
 				try {
 					ComprobantesMesa.getInstance().obtenerComprobante(uvi, idv);
 					// Si esta 
-					puedeVotar = false;
+					yaVoto = true;
 					
 				} catch (ComprobanteNotFoundException e){
 					// Si no esta
-					puedeVotar = true;
+					yaVoto = false;
 				}
 				// Agrego la tupla
 				List<Object> aux = new Vector<Object>();
 				aux.add((Object)idv);
-				aux.add(puedeVotar);
+				aux.add(yaVoto);
 				rta.add(aux);
 			}
+			System.out.println(Thread.currentThread().getId() + ": Devuelvo rta = " + rta);
 			votanteOut.writeObject(rta);
 		
 		} catch (Exception e) {

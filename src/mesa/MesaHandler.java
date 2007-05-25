@@ -43,8 +43,9 @@ public class MesaHandler extends Thread{
 	
 	public MesaHandler(Socket aVotante)	throws IOException {
 		votante = aVotante;
-		votanteIn = new ObjectInputStream(votante.getInputStream());
 		votanteOut = new ObjectOutputStream(votante.getOutputStream());
+		votanteIn = new ObjectInputStream(votante.getInputStream());
+		
 		
 		privadaMesa = InfoServidores.readKey(InfoServidores.privadaMesaPath);
 	}
