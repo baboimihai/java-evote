@@ -34,6 +34,8 @@ public class Votante
 	private Socket mesa;
 	private ObjectInputStream mesaIn;
 	private ObjectOutputStream mesaOut;
+	private ObjectInputStream mesaInEV;
+	private ObjectOutputStream mesaOutEV;
 	
 	// Variables de conexión hacia la urna
 	private Socket urna;
@@ -51,12 +53,12 @@ public class Votante
 	{
 		try
 		{
-			// Obtengo la clave publica del votante
+			// Obtengo la clave pública del votante
 			this.uvi = Padron.getInstance().getUvi(dni);
 		}
 		catch (Exception e)
 		{
-			// No se encontro el DNI en el padron
+			// No se encontró el DNI en el padrón
 			throw new VotanteInvalidoException("DNI o contraseña inválidos.");
 		}
 		
@@ -68,15 +70,20 @@ public class Votante
 		this.dni = dni;
 		this.rvi = clavePriv;
 		
-		// Creo una conexión a la mesa
+		// Creo una conexión a la mesa para los pasos de votación
 		mesa = new Socket(InfoServidores.hostMesa, InfoServidores.puertoMesaDesdeVotante);
-		mesaIn = new ObjectInputStream(mesa.getInputStream());
 		mesaOut = new ObjectOutputStream(mesa.getOutputStream());
+		mesaIn = new ObjectInputStream(mesa.getInputStream());
+
+		// Creo una conexión a la mesa para los estados de votación
+		mesa = new Socket(InfoServidores.hostMesa, InfoServidores.puertoMesaEV);
+		mesaOutEV = new ObjectOutputStream(mesa.getOutputStream());
+		mesaInEV = new ObjectInputStream(mesa.getInputStream());
 		
 		// Creo una conexión a la urna
 		urna = new Socket(InfoServidores.hostUrna, InfoServidores.puertoUrnaDesdeVotante);
-		urnaIn = new ObjectInputStream(urna.getInputStream());
 		urnaOut = new ObjectOutputStream(urna.getOutputStream());
+		//urnaIn = new ObjectInputStream(urna.getInputStream());
 	}
 	
 	
@@ -113,10 +120,10 @@ public class Votante
 		List<List<Object>> estadoVotacionesActual;
 
 		// Envío a la mesa mi dni para saber mi estado de votaciones
-		mesaOut.writeObject(dni);
+		mesaOutEV.writeObject(dni);
 					
 		// Recibo el estado de votaciones
-		estadoVotacionesActual = (List<List<Object>>) mesaIn.readObject();
+		estadoVotacionesActual = (List<List<Object>>) mesaInEV.readObject();
 			
 		// Chequeo que las votaciones en las que la mesa asegura que puedo votar
 		// sean realmente las de público conocimiento

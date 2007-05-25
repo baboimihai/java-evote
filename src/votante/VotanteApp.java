@@ -77,11 +77,11 @@ public class VotanteApp {
 			}
 			
 			List<Object> votacion;
-			System.out.println("Nro.   Votación\tVotó?");
+			System.out.println("Estado de Votaciones");
 			for (int i = 0; i < estadoVotaciones.size(); i++)
 			{
 				votacion = estadoVotaciones.get(i);
-				System.out.println((i+1) + "-" + votacion.get(0) + "\t" + ((((Boolean)votacion.get(1)) == true)? "Sí" : "No"));
+				System.out.println((i+1) + " - " + votacion.get(0) + "\t" + ((((Boolean)votacion.get(1)) == true)? "Participó" : "No participó"));
 			}
 			
 			
