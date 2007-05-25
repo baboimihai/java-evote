@@ -215,9 +215,6 @@ public class Votante
 		// Lo envío a la mesa
 		mesaOut.writeObject(msg);
 		
-		// Cierro el stream de salida
-		mesaOut.close();
-		
 		// Defino esta votación como la actual
 		this.idv = idv;
 	}
@@ -277,9 +274,6 @@ public class Votante
 
 		// Lo envío a la urna
 		urnaOut.writeObject(msg);
-		
-		// Cierro el stream de salida
-		urnaOut.close();
 	}
 	
 	
@@ -344,7 +338,8 @@ public class Votante
 				!opcionesBoletasLocal.containsAll(opcBoletas.keySet()))
 			throw new FraudeException("Las boletas enviadas por la mesa no son exactamente las que le corresponden a este votante.");
 		
-		// Cierro el stream de entrada
+		// Cierro los streams con la mesa
+		mesaOut.close();
 		mesaIn.close();
 		
 		// Devuelvo las IDs de votación
@@ -382,7 +377,8 @@ public class Votante
 		if (!Hasheador.hashear(ticketSinFirmar).equals(sobreHasheado))
 			throw new FraudeException("La urna hasheó un sobre distinto al que se le entregó.");
 		
-		// Cierro el stream de entrada
+		// Cierro los stream con la urna
+		urnaOut.close();
 		urnaIn.close();
 		
 		return ticket;
