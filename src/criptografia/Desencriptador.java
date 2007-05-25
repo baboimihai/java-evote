@@ -188,7 +188,7 @@ public class Desencriptador {
 		 * y pido la misma expresión regular para el resto del texto
 		 * ESTO DEBERÍA SER RECURSIVO, pero así es más rápido de codear :(
 		 */
-		Pattern p = Pattern.compile("__largo:([1-9][0-9]*)item__(.*)");
+		Pattern p = Pattern.compile("__largo:([1-9][0-9]*)item__((.*\n*)*)");
 		Matcher m = p.matcher(desencriptado);
 
 		try {
