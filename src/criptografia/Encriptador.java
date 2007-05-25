@@ -168,10 +168,10 @@ public class Encriptador {
 	public String encriptar (String mensaje) throws InvalidKeyException {
 
 		StringBuffer auxiliar = new StringBuffer(mensaje);
-		int outPutLen = mensaje.length() + RSAoverhead; // largo de la salida
+		int outPutLen = (int)Math.ceil((double)mensaje.length() / (keyLen - RSAoverhead)) * keyLen; // largo de la salida
 
 		// buscamos el próximo múltiplo del largo de la clave para el tamaño del mensaje
-		byte[] rta = new byte[outPutLen + keyLen - outPutLen % keyLen ];
+		byte[] rta = new byte[outPutLen];
 		int pos = 0;
 
 		/* Algoritmo: partir en pedazos de keyLen - RSAoverhead (el tamaño máximo del mensaje
