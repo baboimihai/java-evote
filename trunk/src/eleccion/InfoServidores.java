@@ -13,7 +13,7 @@ public abstract class InfoServidores
 	/**
 	 * Host de la urna.
 	 */
-	public static final String hostUrna = "192.1.1.75";
+	public static final String hostUrna = "localhost";
 	
 	/**
 	 * Puerto de la urna para la mesa.
@@ -33,7 +33,7 @@ public abstract class InfoServidores
 	/**
 	 * Host de la mesa.
 	 */
-	public static final String hostMesa = "192.1.1.145";
+	public static final String hostMesa = "localhost";
 	
 	/**
 	 * Puerto de la mesa para la mesa.
