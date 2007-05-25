@@ -81,7 +81,7 @@ public class VotanteApp {
 			for (int i = 0; i < estadoVotaciones.size(); i++)
 			{
 				votacion = estadoVotaciones.get(i);
-				System.out.println((i+1) + " - " + votacion.get(0) + "\t" + ((((Boolean)votacion.get(1)) == true)? "Participó" : "No participó"));
+				System.out.println((i+1) + " - " + votacion.get(0) + " -- " + ((((Boolean)votacion.get(1)) == true)? "[Participó]" : "[No participó]"));
 			}
 			
 			
