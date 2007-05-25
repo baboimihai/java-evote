@@ -69,21 +69,6 @@ public class Votante
 		// Guardo propiedades del votante
 		this.dni = dni;
 		this.rvi = clavePriv;
-		
-		// Creo una conexión a la mesa para los pasos de votación
-		mesa = new Socket(InfoServidores.hostMesa, InfoServidores.puertoMesaDesdeVotante);
-		mesaOut = new ObjectOutputStream(mesa.getOutputStream());
-		mesaIn = new ObjectInputStream(mesa.getInputStream());
-
-		// Creo una conexión a la mesa para los estados de votación
-		mesa = new Socket(InfoServidores.hostMesa, InfoServidores.puertoMesaEV);
-		mesaOutEV = new ObjectOutputStream(mesa.getOutputStream());
-		mesaInEV = new ObjectInputStream(mesa.getInputStream());
-		
-		// Creo una conexión a la urna
-		urna = new Socket(InfoServidores.hostUrna, InfoServidores.puertoUrnaDesdeVotante);
-		urnaOut = new ObjectOutputStream(urna.getOutputStream());
-		//urnaIn = new ObjectInputStream(urna.getInputStream());
 	}
 	
 	
@@ -117,6 +102,15 @@ public class Votante
 	 */
 	public List<List<Object>> getEstadoVotaciones() throws Exception, IOException
 	{
+		// Si no lo había hecho antes, creo la conexión al puerto de preguntas de estado de votaciones
+		// de la mesa
+		if (mesa == null)
+		{
+			mesa = new Socket(InfoServidores.hostMesa, InfoServidores.puertoMesaEV);
+			mesaOutEV = new ObjectOutputStream(mesa.getOutputStream());
+			mesaInEV = new ObjectInputStream(mesa.getInputStream());
+		}
+				
 		List<List<Object>> estadoVotacionesActual;
 
 		// Envío a la mesa mi dni para saber mi estado de votaciones
@@ -164,11 +158,17 @@ public class Votante
 	
 	
 	/**
-	 * Envía el Paso 1 del protocolo [Identificación para una votación].
+	 * Envía el Paso 1 del protocolo a la mesa [Identificación para una votación].
 	 * @throws Exception Si hubo algún problema en la encriptación o envío.
 	 */
 	public void envPaso1(String idv) throws Exception, IOException
 	{
+		// Creo una conexión a la mesa para los pasos de votación
+		mesa = new Socket(InfoServidores.hostMesa, InfoServidores.puertoMesaDesdeVotante);
+		
+		// Creo stream de salida con la mesa
+		mesaOut = new ObjectOutputStream(mesa.getOutputStream());
+		
 		String msg; // Mensaje
 		// Términos del mensaje:
 		String t1, t2, t3, t4; // Nivel 0
@@ -218,12 +218,18 @@ public class Votante
 	
 	
 	/**
-	 * Envía el Paso 4 del protocolo [Mete boleta en Urna].
+	 * Envía el Paso 4 del protocolo a la urna [Mete boleta en Urna].
 	 * @param opcion
 	 * @throws Exception Si hubo algún problema en la encriptación o envío.
 	 */
 	public void envPaso4(String opcion) throws Exception, IOException
 	{
+		// Creo una conexión a la urna
+		urna = new Socket(InfoServidores.hostUrna, InfoServidores.puertoUrnaDesdeVotante);
+		
+		// Creo stream de salida con la urna
+		urnaOut = new ObjectOutputStream(urna.getOutputStream());
+		
 		String msg; // Mensaje
 		// Términos del mensaje
 		String t1, t2; // Nivel 0
@@ -269,7 +275,7 @@ public class Votante
 	
 	
 	/**
-	 * Recibe el Paso 3 del protocolo [Recibe boletas con opciones posibles].
+	 * Recibe el Paso 3 del protocolo de la mesa [Recibe boletas con opciones posibles].
 	 * @return Una enumeración de las opciones posibles para la votación elegida.
 	 * @throws Exception Si falla la desencriptación o las boletas no son válidas.
 	 */
@@ -277,6 +283,9 @@ public class Votante
 	{
 		List<String> boletasFirmadas;
 		List<String> opcionesBoletasLocal;
+		
+		// Creo stream de entrada con la mesa
+		mesaIn = new ObjectInputStream(mesa.getInputStream());
 		
 		// Recibo el mensaje con las boletas
 		String msg = (String) mesaIn.readObject();
@@ -332,12 +341,15 @@ public class Votante
 	
 	
 	/**
-	 * Recibe el Paso 7 del protocolo [Recibe el ticket de la votación].
+	 * Recibe el Paso 7 del protocolo de la urna [Recibe el ticket de la votación].
 	 * @return El ticket de votación.
 	 * @throws Exception
 	 */
 	public String recPaso7() throws Exception, IOException, FraudeException
 	{
+		// Creo stream de entrada con la urna
+		urnaIn = new ObjectInputStream(urna.getInputStream());
+		
 		// Recibo el ticket
 		String ticket = (String) urnaIn.readObject();
 		
