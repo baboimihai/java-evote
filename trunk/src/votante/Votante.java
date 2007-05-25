@@ -204,7 +204,7 @@ public class Votante
 		//Término 4
 		t4_1 = dni;
 		t4_2 = idv;
-		t4_3_1 = eUrna.encriptar(svu);
+		t4_3_1 = t1;
 		t4_3_2 = svm;
 		t4_3 = Hasheador.hashear(Arrays.asList(t4_3_1, t4_3_2));
 		t4 = firmador.firmar(Arrays.asList(t4_1, t4_2, t4_3));
