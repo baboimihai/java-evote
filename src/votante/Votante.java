@@ -16,33 +16,33 @@ import eleccion.*;
  */
 public class Votante
 {
-	
+
 	// Propiedades de este votante
 	private String dni; // Documento Nacional de Identidad
 	private String rvi; // Clave privada
 	private String uvi; // Clave pública
 	private List<List<Object>> estadoVotaciones; // Estado de sus votaciones
-	
+
 	// Propiedades de la votación en curso para este votante
 	private String idv; // ID de la votación
 	private String svu; // Secreto compartido entre el votante y la urna
 	private String svm; // Secreto compartido entre el votante y la mesa
 	private Hashtable<String, String> opcBoletas; // Opciones con sus boletas asociadas
 	private String sobreHasheado; // El sobre que envia a la urna, hasheado
-	
+
 	// Variables de conexión hacia la mesa
 	private Socket mesa;
 	private ObjectInputStream mesaIn;
 	private ObjectOutputStream mesaOut;
 	private ObjectInputStream mesaInEV;
 	private ObjectOutputStream mesaOutEV;
-	
+
 	// Variables de conexión hacia la urna
 	private Socket urna;
 	private ObjectInputStream urnaIn;
 	private ObjectOutputStream urnaOut;
-	
-	
+
+
 	/**
 	 * Crea un votante asociado a un DNI con una clave privada.
 	 * @param dni Documento Nacional de Identidad del votante a crear.
@@ -61,17 +61,17 @@ public class Votante
 			// No se encontró el DNI en el padrón
 			throw new VotanteInvalidoException("DNI o contraseña inválidos.");
 		}
-		
+
 		// Chequeo la contraseña que me dio
 		if (!esValidaContrasenia(dni, clavePriv))
 			throw new VotanteInvalidoException("DNI o contraseña inválidos.");
-		
+
 		// Guardo propiedades del votante
 		this.dni = dni;
 		this.rvi = clavePriv;
 	}
-	
-	
+
+
 	/**
 	 * Chequea si una contrasenia es valida para un DNI dado.
 	 * @param dni El DNI del votante.
@@ -84,7 +84,7 @@ public class Votante
 		// Creo el encriptador y desencriptador para chequear la validez
 		Encriptador encriptador = new Encriptador(uvi);
 		Desencriptador desencriptador = new Desencriptador(contrasenia);
-		
+
 		// Encripto su DNI con su clave publica
 		// Si logro obtenerlo nuevamente desencriptandolo con su contrasenia,
 		// es porque era su clave privada
@@ -94,7 +94,7 @@ public class Votante
 			return false;
 	}
 
-	
+
 	/**
 	 * Pide a la mesa el estado de las votaciones en que puede participar.
 	 * @param dni El DNI del votante.
@@ -106,18 +106,18 @@ public class Votante
 		// de la mesa
 		if (mesa == null)
 			mesa = new Socket(InfoServidores.hostMesa, InfoServidores.puertoMesaEV);
-		
+
 		mesaOutEV = new ObjectOutputStream(mesa.getOutputStream());
 		mesaInEV = new ObjectInputStream(mesa.getInputStream());
-						
+
 		List<List<Object>> estadoVotacionesActual;
 
 		// Envío a la mesa mi dni para saber mi estado de votaciones
 		mesaOutEV.writeObject(dni);
-					
+
 		// Recibo el estado de votaciones
 		estadoVotacionesActual = (List<List<Object>>) mesaInEV.readObject();
-			
+
 		// Chequeo que las votaciones en las que la mesa asegura que puedo votar
 		// sean realmente las de público conocimiento
 		List<String> votacionesLocal = Padron.getInstance().getVotaciones(dni);
@@ -125,41 +125,41 @@ public class Votante
 		// Chequeo cantidad
 		if (votacionesLocal.size() != estadoVotacionesActual.size())
 			throw new FraudeException("Las cantidad de votaciones disponibles enviadas por la mesa no igual a las que corresponden públicamente a este votante.");
-		
+
 		// Chequeo calidad
 		for (List<Object> estado : estadoVotacionesActual)
 		{
 			if (!votacionesLocal.contains(estado.get(0)))
 				throw new FraudeException("Las votaciones enviadas por la mesa no son exactamente las que le corresponden a este votante.");
 		}
-		
+
 		this.estadoVotaciones = estadoVotacionesActual;
 
 		// Cierro los streams
 		mesaOutEV.close();
 		mesaInEV.close();
-		
+
 		return this.estadoVotaciones;
 	}
-	
-	
+
+
 	/**
-	 * Chequea si tiene votaciones en las que todavía no participó. 
+	 * Chequea si tiene votaciones en las que todavía no participó.
 	 * @param estadoVotaciones
 	 */
 	public boolean tieneVotacionesPendientes(List<List<Object>> estadoVotaciones) throws Exception, IOException
 	{
 		if (this.estadoVotaciones == null)
 			getEstadoVotaciones();
-		
+
 		for (List<Object> estado : this.estadoVotaciones)
 			if ((Boolean)estado.get(1) == false)
 				return true;
-		
+
 		return false;
 	}
-	
-	
+
+
 	/**
 	 * Envía el Paso 1 del protocolo a la mesa [Identificación para una votación].
 	 * @throws Exception Si hubo algún problema en la encriptación o envío.
@@ -168,16 +168,16 @@ public class Votante
 	{
 		// Creo una conexión a la mesa para los pasos de votación
 		mesa = new Socket(InfoServidores.hostMesa, InfoServidores.puertoMesaDesdeVotante);
-		
+
 		// Creo stream de salida con la mesa
 		mesaOut = new ObjectOutputStream(mesa.getOutputStream());
-		
+
 		String msg; // Mensaje
 		// Términos del mensaje:
 		String t1, t2, t3, t4; // Nivel 0
 		String t4_1, t4_2, t4_3; // Nivel 1
 		String t4_3_1, t4_3_2; // Nivel 2
-		
+
 		// Genero SVU y SVM
 		SecureRandom random = new SecureRandom();
 		byte bytes[] = random.generateSeed(12);
@@ -185,22 +185,22 @@ public class Votante
 		this.svu = new String(bytes);
 		random.nextBytes(bytes);
 		this.svm = new String(bytes);
-		
+
 		// Inicializo encriptadores y firmador
 		Encriptador eMesa = new Encriptador(InfoServidores.publicaMesa);
 		Encriptador eUrna = new Encriptador(InfoServidores.publicaUrna);
 		Firmador firmador = new Firmador(rvi);
-		
+
 		// Obtengo los términos del mensaje
 		// Término 1
 		t1 = eUrna.encriptar(svu);
-		
+
 		// Término 2
 		t2 = svm;
-		
+
 		// Término 3
 		t3 = uvi;
-		
+
 		//Término 4
 		t4_1 = dni;
 		t4_2 = idv;
@@ -213,15 +213,15 @@ public class Votante
 		System.out.println("Hash = " + t4_3);
 		// Obtengo el mensaje final
 		msg = eMesa.encriptar(Arrays.asList(t1, t2, t3, t4));
-		
+
 		// Lo envío a la mesa
 		mesaOut.writeObject(msg);
-		
+
 		// Defino esta votación como la actual
 		this.idv = idv;
 	}
-	
-	
+
+
 	/**
 	 * Envía el Paso 4 del protocolo a la urna [Mete boleta en Urna].
 	 * @param opcion
@@ -231,33 +231,33 @@ public class Votante
 	{
 		// Creo una conexión a la urna
 		urna = new Socket(InfoServidores.hostUrna, InfoServidores.puertoUrnaDesdeVotante);
-		
+
 		// Creo stream de salida con la urna
 		urnaOut = new ObjectOutputStream(urna.getOutputStream());
-		
+
 		String msg; // Mensaje
 		// Términos del mensaje
 		String t1, t2; // Nivel 0
 		String t2_1, t2_2; // Nivel 1
-		
+
 		// Genero randB
 		SecureRandom random = new SecureRandom();
 		byte bytes[] = random.generateSeed(12);
 		random.nextBytes(bytes);
 		String randB = new String(bytes);
-		
+
 		// Obtengo las claves públicas de las opciones para esta votación
 		Enumeration<String> uOpc = Padron.getInstance().getUOpc(idv).elements();
 
 		// Inicializo encriptadores
 		Encriptador eUrna = new Encriptador(InfoServidores.publicaUrna);
 		Encriptador eOpciones = new Encriptador();
-		
-		
+
+
 		// Obtengo los términos del mensaje
 		// Término 1
 		t1 = svu;
-		
+
 		//Término 2
 		t2_1 = opcBoletas.get(opcion);
 		t2_2 = randB;
@@ -267,18 +267,18 @@ public class Votante
 		// Con el resto
 		while (uOpc.hasMoreElements())
 				t2 = eOpciones.encriptar(t2, uOpc.nextElement());
-		
+
 		// Guardo el hash del sobre para chequear luego contra el ticket
 		this.sobreHasheado = Hasheador.hashear(t2);
-		
+
 		// Obtengo el mensaje final
 		msg = eUrna.encriptar(Arrays.asList(t1, t2));
 
 		// Lo envío a la urna
 		urnaOut.writeObject(msg);
 	}
-	
-	
+
+
 	/**
 	 * Recibe el Paso 3 del protocolo de la mesa [Recibe boletas con opciones posibles].
 	 * @return Una enumeración de las opciones posibles para la votación elegida.
@@ -288,29 +288,29 @@ public class Votante
 	{
 		List<String> boletasFirmadas;
 		List<String> opcionesBoletasLocal;
-		
+
 		// Creo stream de entrada con la mesa
 		mesaIn = new ObjectInputStream(mesa.getInputStream());
-		
+
 		// Recibo el mensaje con las boletas
 		String msg = (String) mesaIn.readObject();
-		
+
 		// Inicializo desencriptadores y validador
 		Desencriptador desencriptador = new Desencriptador(rvi);
 		Validador validador = new Validador(InfoServidores.publicaMesa);
-		
+
 		// Lo desencripto
 		boletasFirmadas = desencriptador.desencriptar(msg);
-		
+
 		// Valido la firma en cada una y luego de chequear el ID de la votación,
 		// guardo un hash indexado por las opciones junto a sus respectivas boletas
-		
+
 		this.opcBoletas = new Hashtable<String, String>();
-		
+
 		List<String> boleta;
 		String opcBoleta;
 		String idvBoleta;
-		
+
 		for (String boletaStr : boletasFirmadas)
 		{
 			try
@@ -330,25 +330,25 @@ public class Votante
 			// Almaceno las opciones con su boleta correspondiente
 			opcBoletas.put(opcBoleta, boletaStr);
 		}
-		
+
 		// Chequeo que la lista de opciones que me envió la mesa sean
 		// las de conocimiento público para esta votación
 		opcionesBoletasLocal = Padron.getInstance().getOpciones(idv);
-		
-		
+
+
 		if (opcionesBoletasLocal.size() != opcBoletas.size() ||
 				!opcionesBoletasLocal.containsAll(opcBoletas.keySet()))
 			throw new FraudeException("Las boletas enviadas por la mesa no son exactamente las que le corresponden a este votante.");
-		
+
 		// Cierro los streams con la mesa
 		mesaOut.close();
 		mesaIn.close();
-		
+
 		// Devuelvo las IDs de votación
 		return opcionesBoletasLocal;
 	}
-	
-	
+
+
 	/**
 	 * Recibe el Paso 7 del protocolo de la urna [Recibe el ticket de la votación].
 	 * @return El ticket de votación.
@@ -358,32 +358,32 @@ public class Votante
 	{
 		// Creo stream de entrada con la urna
 		urnaIn = new ObjectInputStream(urna.getInputStream());
-		
+
 		// Recibo el ticket
 		String ticket = (String) urnaIn.readObject();
-		
+
 		// Inicializo validador
 		Validador validador = new Validador(InfoServidores.publicaUrna);
-		
+
 		// Chequeo firma de la urna
 		String ticketSinFirmar;
 		try
 		{
-			ticketSinFirmar = validador.validarString(ticket);			
+			ticketSinFirmar = validador.validarString(ticket);
 		}
 		catch (Exception e)
 		{
 			throw new FraudeException("La urna no firmó correctamente el ticket.");
 		}
-		
-		if (!Hasheador.hashear(ticketSinFirmar).equals(sobreHasheado))
+
+		if (!ticketSinFirmar.equals(sobreHasheado))
 			throw new FraudeException("La urna hasheó un sobre distinto al que se le entregó.");
-		
+
 		// Cierro los stream con la urna
 		urnaOut.close();
 		urnaIn.close();
-		
+
 		return ticket;
 	}
-	
+
 }
