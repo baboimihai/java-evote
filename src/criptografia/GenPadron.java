@@ -1,3 +1,4 @@
+package criptografia;
 /**
  * Esta clase sirve para parsear mi existencia
  */
@@ -5,43 +6,42 @@
 import java.io.*;
 import java.util.Hashtable;
 
-import criptografia.GenKeys;
 import eleccion.InfoServidores;
 
-public class Parser
+public class GenPadron
 {
 	private BufferedReader r_votante;
 	private BufferedReader r_votacion;
 	private BufferedWriter w_votante;
 	private BufferedWriter w_votacion;
 	long dni = 30240000;
-	
+
 	/**
-	 * 
+	 *
 	 * @param args, primer parametro archivo de votantes, segundo de votaciones
-	 * NO VALIDO NADA, asi que si esta mal, AGUA Y AJO
+	 * NO VALIDO NADA, asi que si esta mal, AJO Y AGUA
 	 */
 	public static void main(String[] args)
 	{
 		@SuppressWarnings("unused")
-		Parser p;
-		
+		GenPadron p;
+
 		try
 		{
-			p = new Parser("C:/Documents and Settings/Ezequ/workspace/Evote/src/votantes.txt", "C:/Documents and Settings/Ezequ/workspace/Evote/src/votaciones.txt");
+			p = new GenPadron(args[0], args[1]);
 		} catch (Exception e)
 		{
 			e.printStackTrace();
 		}
 	}
-	
-	public Parser(String votante, String votacion) throws Exception
+
+	public GenPadron(String votante, String votacion) throws Exception
 	{
 		this.r_votante = new BufferedReader(new FileReader(votante));
 		this.r_votacion = new BufferedReader(new FileReader(votacion));
 		this.w_votante = new BufferedWriter(new FileWriter("votante_parsed.txt"));
 		this.w_votacion = new BufferedWriter(new FileWriter("votacion_parsed.txt"));
-		
+
 		parse_votante(this.r_votante, this.w_votante);
 		parse_votacion(this.r_votacion, this.w_votacion);
 	}
@@ -55,12 +55,12 @@ public class Parser
 		//String path = "";
 		String val;
 		Hashtable<String, String> tablita;
-		
+
 		tablita = new Hashtable<String, String>();
-		
+
 		while((line = votante.readLine()) != null)
 		{
-			splitted = line.split(",");			
+			splitted = line.split(",");
 			if (line.charAt(0) == '1')
 			{
 				val = tablita.get(splitted[1]);
@@ -94,8 +94,8 @@ public class Parser
 		//String path = "";
 		int vot_num = 0, opc_num = 0;
 		String vot_num_s, opc_num_s;
-		
-		
+
+
 		while((line = votante.readLine()) != null)
 		{
 			splitted = line.split(",");
@@ -106,7 +106,7 @@ public class Parser
 			}
 			else if (line.charAt(0) == '1')
 				opc_num++;
-			
+
 			if (line.charAt(0) == '1')
 			{
 				vot_num_s = (new Long(vot_num)).toString();
