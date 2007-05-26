@@ -208,9 +208,7 @@ public class Votante
 		t4_3_2 = svm;
 		t4_3 = Hasheador.hashear(Arrays.asList(t4_3_1, t4_3_2));
 		t4 = firmador.firmar(Arrays.asList(t4_1, t4_2, t4_3));
-		System.out.println("usvu = " + t4_3_1);
-		System.out.println("svm = " + t4_3_2);
-		System.out.println("Hash = " + t4_3);
+
 		// Obtengo el mensaje final
 		msg = eMesa.encriptar(Arrays.asList(t1, t2, t3, t4));
 
