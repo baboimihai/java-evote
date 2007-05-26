@@ -152,9 +152,10 @@ public class Encriptador {
 		StringBuffer rta = new StringBuffer();
 
 		for (String string : messageList) {
-			rta.append(encriptar("__largo:" + string.length() + "item__" + string));
+			String aux = b64.encode(string.getBytes()); // asquerosidad porque unicode apesta
+			rta.append("__largo:" + aux.length() + "item__" + aux );
 		}
-		return rta.toString();
+		return encriptar(rta.toString());
 
 	}
 
