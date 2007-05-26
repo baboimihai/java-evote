@@ -61,7 +61,7 @@ public abstract class InfoServidores
 	public static final String privadaUrnaPath = resources + "urna/urna_privada.key";
 	public static final String archVotantes = resources + "votantes/votantes.txt";
 	public static final String archVotaciones = resources + "votacion/votaciones.txt";
-	
+	public static final String log4jconf = resources + "log4j.properties";
 	
 	public static String readKey(String path) throws IOException {
 		// Buffer para levantar el string

@@ -11,6 +11,8 @@ import java.util.*;
 import java.io.*;
 import java.net.*;
 
+import org.apache.log4j.Logger;
+
 import criptografia.Desencriptador;
 import criptografia.Encriptador;
 import criptografia.Firmador;
@@ -22,6 +24,7 @@ import eleccion.ComprobanteNotFoundException;
 import eleccion.ComprobantesUrna;
 import eleccion.InfoServidores;
 
+import org.apache.log4j.*;
 public class UrnaHandler extends Thread {
 
 	// Variables de conexión hacia el votante
@@ -36,13 +39,21 @@ public class UrnaHandler extends Thread {
 
 	// Propiedades de esta transacción
 	private String svu;
+	private String usvu;
 	private String idv;
 	private String sobre;
 	private String challenge;
 
 	// Clave privada de la urna
 	private String privadaUrna;
+	// Clase de log
+	private Logger logger;
+	
 	public UrnaHandler(Socket aMesa)	throws IOException {
+		// Accedo al log del urna handler
+		logger=Logger.getLogger("evote.urna.handler");
+		PropertyConfigurator.configure(InfoServidores.log4jconf);
+		
 		mesa = aMesa;
 		mesaOut = new ObjectOutputStream(mesa.getOutputStream());
 		mesaIn = new ObjectInputStream(mesa.getInputStream());
@@ -67,12 +78,13 @@ public class UrnaHandler extends Thread {
 //			TODO: Si no se completa el paso6 se tiene que volver a habilitar el svu
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			logger.error("Fallo la votacion",e );
 		}
 	}
 
 
 	public void recPaso2() throws Exception {
+		logger.info("Recibo un pedido de la mesa");
 		// Levanto el mensaje del socket mesa
 		String msg_enc = (String) mesaIn.readObject();
 
@@ -89,8 +101,11 @@ public class UrnaHandler extends Thread {
 		// Guardo el id de la votacion.
 		this.idv = token.get(1);
 
-		// Desencripto el svu con mi clave privada
-		this.svu = decrypt.desencriptarString(token.get(0));
+		// Guardo el usvu para mandarselo a la mesa despues
+		this.usvu = token.get(0);
+		
+		// Desencripto el usvu con mi clave privada
+		this.svu = decrypt.desencriptarString(this.usvu);
 
 		// Me fijo si existe el comprobante, si no lo inserto
 		try {
@@ -104,12 +119,14 @@ public class UrnaHandler extends Thread {
 			// Guardo el token firmado como comprobante
 			ComprobantesUrna.getInstance().insertarComprobante(svu, idv, tokenFirmado);
 		}
-
+		logger.debug("Termino el paso 2");
 	}
 	public void recPaso4() throws Exception  {
+		logger.info("Espero al votante");
 		// Le pido a UrnaManager por el mensaje 4 (bloqueante).
 		List aList = UrnaManager.getInstance().getVotante(svu);
-
+		logger.info("Llego el votante");
+		
 		// Guardo el socket del votante
 		votante = (Socket) aList.get(0);
 		//votanteIn = new ObjectInputStream(votante.getInputStream());
@@ -117,29 +134,31 @@ public class UrnaHandler extends Thread {
 
 		// Guardo el sobre
 		sobre = (String) aList.get(1);
+		logger.debug("Termino el paso 4");
 	}
 
 	public void envPaso5() throws Exception {
+		logger.info("Le aviso a la mesa que el votante ya voto");
 		// Creo un string aleatorio challenge
 		SecureRandom random = new SecureRandom();
 		byte bytes[] = random.generateSeed(20);
 		random.nextBytes(bytes);
 		this.challenge = new String(bytes);
 
-		// Encripto svu con mi clave publica
-		Encriptador encrypt = new Encriptador();
-		String usvu = encrypt.encriptar(this.svu, InfoServidores.publicaUrna);
-
 		// Encripto con la clave publica de la mesa el svu encriptado y el challenge
+		Encriptador encrypt = new Encriptador();
 		String msg = encrypt.encriptar(Arrays.asList(usvu, challenge), InfoServidores.publicaMesa);
 
 		// Envio el mensaje a la mesa.
 		mesaOut.writeObject(msg);
+		logger.debug("Termino el paso 5");
 	}
 	public void recPaso6() throws Exception{
+		logger.debug("Espero el ACK de la mesa");
 		// Agarro el msg de la mesa
 		String msg_enc = (String) mesaIn.readObject();
-
+		logger.info("Llego el ACK de la mesa");
+		
 		// Lo desencripto con mi clave privada
 		Desencriptador decrypt = new Desencriptador(privadaUrna);
 		String msg = decrypt.desencriptarString(msg_enc);
@@ -151,9 +170,10 @@ public class UrnaHandler extends Thread {
 		// Guardo al sobre en la base y marco que ya votó.
 		Boletas.getInstance().insertarBoleta(idv, svu, sobre);
 		ComprobantesUrna.getInstance().setEstado(svu, new String("ya voto"));
-
+		logger.debug("Termino el paso6");
 	}
 	public void envPaso7() throws InvalidKeyException, IOException {
+		logger.info("Envio el comprobante al votante");
 		// Hago un hash del sobre
 		String msg_hash = Hasheador.hashear(sobre);
 
@@ -163,6 +183,7 @@ public class UrnaHandler extends Thread {
 
 		// Lo envio al votante
 		votanteOut.writeObject(msg7);
+		logger.debug("Termino el paso 7");
 	}
 
 }

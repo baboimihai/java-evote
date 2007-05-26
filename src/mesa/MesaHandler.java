@@ -12,6 +12,7 @@ import java.net.*;
 import java.io.*;
 import java.util.*;
 import java.security.SecureRandom;
+import org.apache.log4j.*;
 
 import criptografia.*;
 
@@ -40,8 +41,14 @@ public class MesaHandler extends Thread{
 	// Claves privada de la mesa
 	private String privadaMesa;
 
+	// Clase de log
+	private Logger logger;
 	
 	public MesaHandler(Socket aVotante)	throws IOException {
+		// Accedo al log de la mesa
+		logger=Logger.getLogger("evote.mesa.handler");
+		PropertyConfigurator.configure(InfoServidores.log4jconf);
+		
 		votante = aVotante;
 		votanteOut = new ObjectOutputStream(votante.getOutputStream());
 		votanteIn = new ObjectInputStream(votante.getInputStream());
@@ -69,11 +76,11 @@ public class MesaHandler extends Thread{
 			}
 			else
 			{
-				System.out.println("Trato de votar un usuario no valido");
+				logger.warn("Trato de votar un usuario no valido");
 			}
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			logger.error("Fallo la votacion", e);
 		}
 	}	
 
@@ -88,8 +95,8 @@ public class MesaHandler extends Thread{
 		String token;
 		Desencriptador decrypt = new Desencriptador(privadaMesa);
 		List<String> msg_decrypt;
-		System.out.println(msg);
 		
+		logger.info("Atendiendo a un votante");
 		// Desencripto msg con la clave privada de la mesa.
 		try	{
 			msg_decrypt = decrypt.desencriptar(msg);
@@ -116,6 +123,7 @@ public class MesaHandler extends Thread{
 			// Si no está el dni el usuario no puede votar.
 			return false;
 		}
+		logger.debug("dni = " + dni);
 		
 		// Valido el token con uvi y obtengo los datos.
 		Validador valid = new Validador(this.uvi);
@@ -176,6 +184,7 @@ public class MesaHandler extends Thread{
 		 * - Marco que el usuario ya trató de votar. (tiene que estar serializado esto). Ver si con lo de arriba funca.
 		 * - Guardo el comprobante y el usvu
 		 */
+		logger.info(dni + " esta habilitado para votar en" + idv);
 		return true;
 	}
 	
@@ -184,6 +193,7 @@ public class MesaHandler extends Thread{
 	 * de error tira excepción
 	 */
 	private void envPaso2()	throws Exception {
+		logger.info("Informandole a la urna que " + dni + " puede votar en " + idv );
 		// Creo una conexión contra la urna
 		urna = new Socket(InfoServidores.hostUrna, InfoServidores.puertoUrnaDesdeMesa);
 		urnaIn = new ObjectInputStream(urna.getInputStream());
@@ -199,9 +209,10 @@ public class MesaHandler extends Thread{
 		
 		// Se lo envio
 		urnaOut.writeObject(mensaje2_enc);
+		logger.debug("Terminado paso 2");
 	}
 	private void envPaso3() throws Exception {
-		
+		logger.info("Enviando boletas al votante");
 		// Genero un RandA
 		// TODO Verificar esto de los random
 		SecureRandom random = new SecureRandom();
@@ -227,9 +238,11 @@ public class MesaHandler extends Thread{
 		
 		// Se lo envío al votante
 		votanteOut.writeObject(mensaje3);
+		logger.debug("Terminado paso 3");
 	}
 
 	private void recPaso5() throws Exception {
+		logger.info("Recibiendo comprobante de la urna");
 		// Recibo el mensaje TODO: mirar por recibir excepciones.
 		String mensaje_enc = (String) urnaIn.readObject();
 		
@@ -244,9 +257,10 @@ public class MesaHandler extends Thread{
 		ComprobantesMesa.getInstance().marcarVotado(usvu); //TODO Ver si atrapar la excepcion
 		
 		this.challenge = mensaje.get(1);
+		logger.debug("Terminando paso 5");
 	}
 	private void envPaso6() throws Exception {
-		
+		logger.info("Enviando ACK a la urna");
 		 // Firmo el challenge y lo encripto con la clave publica de la urna.
 		Firmador firm = new Firmador(privadaMesa);
 		Encriptador encrypt = new Encriptador(InfoServidores.publicaUrna);
@@ -255,6 +269,7 @@ public class MesaHandler extends Thread{
 		
 		// Se lo envio a la urna.
 		urnaOut.writeObject(mensaje3);
+		logger.debug("Terminado paso 6");
 	}
 
 }

@@ -12,6 +12,7 @@ import java.net.*;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
+import org.apache.log4j.*;
 
 import eleccion.InfoServidores;
 import eleccion.Padron;
@@ -19,18 +20,22 @@ import eleccion.Padron;
 public class MesaApp {
 
 	public static void main (String args[]) {
+		// Accedo al log de la mesa
+		Logger logger=Logger.getLogger("evote.mesa");
+		PropertyConfigurator.configure(InfoServidores.log4jconf);
+		
 		// Inicializo el infoservidor
 		try {
 			InfoServidores.inicializarClaves();
 		} catch (IOException e) {
-			System.err.println("Hubo un problema al inicializar las claves privadas: " + e.getMessage());
+			logger.fatal("Hubo un problema al inicializar las claves privadas: " + e.getMessage());
 			System.exit(1);
 		}
 
 		try {
 			Padron.getInstance().cargarPadron(InfoServidores.archVotantes, InfoServidores.archVotaciones);
 		} catch (IOException e) {
-			System.err.println("Hubo un problema incializando al padron: " + e.getMessage());
+			logger.fatal("Hubo un problema incializando al padron: " + e.getMessage());
 			System.exit(1);
 		}
 
@@ -58,11 +63,12 @@ public class MesaApp {
 		}
 		catch (IOException e)
 		{
-			System.err.println("Hubo un problema al inicializar la conexion: " + e.getMessage());
+			logger.fatal("Hubo un problema al inicializar la conexion: " + e.getMessage());
 			System.exit(1);
 		}
 		// Me quedo esperando por nuevos clientes, cuando los encuentro
 		// creo un thread.
+		logger.info("Mesa lista para aceptar conexiones");
 		while (true)
 		{
 			// Espero hasta que halla un pedido de conexión en alguno de los puertos.
@@ -71,11 +77,11 @@ public class MesaApp {
 			}
 			catch (IOException e)
 			{
-				System.err.println("Hubo un problema con la seleccion de conexiones: " + e.getMessage());
+				logger.fatal("Hubo un problema con la seleccion de conexiones: " + e.getMessage());
 				System.exit(1);
 			}
 			
-			System.out.println("Recibo una conexion");
+			logger.debug("Recibo una conexion");
 			// Itero por los canales aceptados
 			for (SelectionKey aSel : selector.selectedKeys()) {
 				if (aSel.isAcceptable())
@@ -89,20 +95,20 @@ public class MesaApp {
 					if ( aChannel.equals(canalVotacion) )
 					{
 						try {
-							System.out.println("Creo un thread de mesahandler");
+							logger.debug("Creo un thread de mesahandler");
 							Socket s = aChannel.accept().socket();
 							(new MesaHandler(s)).start();
 						} catch (Exception e) {
-							System.err.println("Hubo un problema creando el thread de la mesa: " + e.getMessage());
+							logger.error("Hubo un problema creando el thread de la mesa: " + e.getMessage());
 						}
 					}
 					else{
 						try {
-							System.out.println("Creo un thread de EstadoVotacion");
+							logger.debug("Creo un thread de EstadoVotacion");
 							Socket s = aChannel.accept().socket();
 							(new EstadoVotacion(s)).start();
 						} catch (Exception e) {
-							System.err.println("Hubo un problema creando el thread de EstadoVotacion: " + e.getMessage());
+							logger.error("Hubo un problema creando el thread de EstadoVotacion: " + e.getMessage());
 						}
 						 
 					}

@@ -13,25 +13,25 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.io.*;
-import java.security.InvalidKeyException;
 import java.util.*;
 
 import criptografia.Desencriptador;
 import eleccion.InfoServidores;
-
+import org.apache.log4j.*;
 
 public class UrnaApp {
 	public static void main (String args[]) {
-
+		// Accedo al log de la urna
+		Logger logger=Logger.getLogger("evote.urna");
+		PropertyConfigurator.configure(InfoServidores.log4jconf);
+		
 		// Inicializo el infoservidor
 		try {
 			InfoServidores.inicializarClaves();
 		} catch (IOException e) {
-			System.err.println("Hubo un problema al inicializar las claves privadas: " + e.getMessage());
+			logger.fatal("Hubo un problema al inicializar las claves privadas: " + e.getMessage());
 			System.exit(1);
 		}
-
-		
 		
 		// Me creo la instancia de desencriptador encargada de resolver los pedidos del votante.
 		Desencriptador decrypt = null;
@@ -39,7 +39,7 @@ public class UrnaApp {
 			String privadaUrna = InfoServidores.readKey(InfoServidores.privadaUrnaPath);
 			decrypt = new Desencriptador(privadaUrna);
 		} catch (Exception e1) {
-			e1.printStackTrace();
+			logger.fatal("No pude crear la instancia del desencriptador", e1);
 			System.exit(1);
 		} 
 	
@@ -66,11 +66,12 @@ public class UrnaApp {
 		}
 		catch (IOException e)
 		{
-			System.err.println("Hubo un problema al inicializar la conexion: " + e.getMessage());
+			logger.fatal("Hubo un problema al inicializar la conexion: " + e.getMessage());
 			System.exit(1);
 		}
 
 		// Me quedo esperando por nuevos clientes
+		logger.info("Urna lista para aceptar conexiones");
 		while (true)
 		{
 			// Espero hasta que halla un pedido de conexión en alguno de los puertos.
@@ -79,10 +80,11 @@ public class UrnaApp {
 			}
 			catch (IOException e)
 			{
-				System.err.println("Hubo un problema con la seleccion de conexiones: " + e.getMessage());
+				logger.fatal("Hubo un problema con la seleccion de conexiones: " + e.getMessage());
 				System.exit(1);
 			}
 			
+			logger.debug("Recibo una conexion");
 			// Itero por los canales aceptados
 			for (SelectionKey aSel : selector.selectedKeys()) {
 				if (aSel.isAcceptable())
@@ -97,15 +99,17 @@ public class UrnaApp {
 					{
 						// Creo un thread para el votante
 						try {
+							logger.debug("Creo un thread de urnahandler");
 							Socket s = aChannel.accept().socket();
 							(new UrnaHandler(s)).start();
 						} catch (Exception e) {
-							System.err.println("Hubo un problema creando el thread de la urna: " + e.getMessage());
+							logger.error("Hubo un problema creando el thread de la urna: " + e.getMessage());
 						}
 					}
 					else{
 						 // Le aviso al UrnaManager la conexion del votante para que el thread ya creado lo pueda retomar.
 						try {
+							logger.debug("Ingreso al votante en UrnaManager");
 							// Abro el socket para obtener el svu
 							Socket s = aChannel.accept().socket();
 						    ObjectInputStream votanteIn;
@@ -126,7 +130,7 @@ public class UrnaApp {
 						}
 						catch (Exception e)
 						{
-							System.err.println("Hubo un problema con el mensaje del votante: " + e.getMessage());
+							logger.error("Hubo un problema con el mensaje del votante: " + e.getMessage());
 						}
 					}
 				}

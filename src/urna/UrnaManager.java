@@ -4,8 +4,11 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.apache.log4j.*;
+
 
 import eleccion.ComprobantesUrna;
+import eleccion.InfoServidores;
 
 /**
  * @author hrajchert
@@ -17,13 +20,20 @@ public class UrnaManager {
 	private Map<String, List> votanteMap;
     
 	// Lock del mapa y variable de condicion
-	final Lock MapLock;
-	final Condition MapCond;
+	private final Lock MapLock;
+	private final Condition MapCond;
+	
+	// Clase de log
+	private Logger logger;
 	
 	/**
 	 * Constructor privado de la clase para evitar que lo creen.
 	 */
 	private UrnaManager() {
+		// Accedo al log del urna manager
+		logger=Logger.getLogger("evote.urna.manager");
+		PropertyConfigurator.configure(InfoServidores.log4jconf);
+		
 		votanteMap = new HashMap<String, List>();
 		MapLock = new ReentrantLock();
 		MapCond = MapLock.newCondition();
@@ -63,7 +73,9 @@ public class UrnaManager {
 			  if ( !ComprobantesUrna.getInstance().getEstado(svu).equals("no voto")) throw new Exception();
 			  // Marco que está en proceso de votación
 			  ComprobantesUrna.getInstance().setEstado(svu, new String("en proceso"));
-//			  System.out.println("Pongo el dato " + svu);
+			  
+			  logger.debug("Pongo el dato " + svu);
+			  
 			  votanteMap.put(svu, l);
 			  MapCond.signalAll();
 		  }
@@ -84,9 +96,11 @@ public class UrnaManager {
 		  
 		  try {
 			  do {
-//				  System.out.println(Thread.currentThread().getId() + ": Me fijo si esta mi dato (" + svu + ")");
-				  MapCond.awaitUntil(new Date(now.getTime() + 10000 ));
-/*				  System.out.print("Keys: ");
+				  logger.debug("Me fijo si esta mi dato (" + svu + ")");
+				  MapCond.awaitUntil(new Date(now.getTime() + 60000 ));
+				  
+				  logger.debug("Keys = " + votanteMap);
+	  /*				  System.out.print("Keys: ");
 				  for (String aKey : votanteMap.keySet()) {
 					System.out.print(aKey + " ");
 				}
