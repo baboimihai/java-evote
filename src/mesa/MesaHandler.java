@@ -121,6 +121,7 @@ public class MesaHandler extends Thread{
 		catch (Exception e)
 		{
 			// Si no está el dni el usuario no puede votar.
+			logger.info("El dni ("+dni +") del usuario no se encuentra en el padron");
 			return false;
 		}
 		logger.debug("dni = " + dni);
@@ -143,8 +144,10 @@ public class MesaHandler extends Thread{
 		
 		// Verifico que el votante puede votar la elección requerida.
 		this.idv = msg_decrypt.get(1);
-		if ( !(Padron.getInstance().puedeVotar(this.dni, this.idv)))
-				return false;
+		if ( !(Padron.getInstance().puedeVotar(this.dni, this.idv))) {
+			logger.info("El votante " + dni + " no puede votar en la votacion " + idv);
+			return false;
+		}
 		
 		
 		// Verifico que el hash comprobante sea correcto.
@@ -173,8 +176,10 @@ public class MesaHandler extends Thread{
 		{
 			// Si la excepción es porque no lo encontró es porque no voto.
 			// caso contrario devuelvo false porque ya voto o hizo quilombo.
-			if ( !(e instanceof ComprobanteNotFoundException) )
+			if ( !(e instanceof ComprobanteNotFoundException) ){
+				logger.info("El votante " + dni + " ya voto en " + idv);
 				return false;
+			}
 		}
 		
 		// Agrego el comprobante a la lista de comprobantes.
@@ -257,6 +262,7 @@ public class MesaHandler extends Thread{
 		ComprobantesMesa.getInstance().marcarVotado(usvu); //TODO Ver si atrapar la excepcion
 		
 		this.challenge = mensaje.get(1);
+		logger.debug("Challenge = " + challenge);
 		logger.debug("Terminando paso 5");
 	}
 	private void envPaso6() throws Exception {
@@ -265,10 +271,14 @@ public class MesaHandler extends Thread{
 		Firmador firm = new Firmador(privadaMesa);
 		Encriptador encrypt = new Encriptador(InfoServidores.publicaUrna);
 		
-		String mensaje3 = encrypt.encriptar(firm.firmar(Arrays.asList(challenge)));
+		//String mensaje3 = encrypt.encriptar(firm.firmar(Arrays.asList(challenge)));
+		String challenge_firm = firm.firmar(challenge);
+		String mensaje3 = encrypt.encriptar(challenge_firm);
 		
 		// Se lo envio a la urna.
 		urnaOut.writeObject(mensaje3);
+		logger.debug("Challenge firmado = " + challenge_firm);
+		logger.debug("Challenge encriptado = " + mensaje3);
 		logger.debug("Terminado paso 6");
 	}
 
