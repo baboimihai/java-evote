@@ -194,11 +194,21 @@ public class Desencriptador {
 		try {
 			while (m.find())
 			{
-				lista.add(m.group(2).substring(0, Integer.decode(m.group(1))));
+				// lista.add(m.group(2).substring(0, Integer.decode(m.group(1))));
+				/* Inicialmente éste era el código, pero como parece que hay un
+				 * bug en las expresiones regulares de java cuando tienen
+				 * caracteres unicode en el diome, lo tengo que encodear a ascii
+				 * para que funcione :@
+				 */
+
+				byte[] bytes = b64.decodeBuffer( m.group(2).substring(0, Integer.decode(m.group(1))) );
+				String aux = new String(bytes);
+				lista.add(aux);
 				m = p.matcher(m.group(2).substring(Integer.decode(m.group(1))));
 			}
 		} catch (Exception e) {
 			System.out.println("Error en el mini-protocolo: " + e.getMessage());
+			e.printStackTrace();
 		}
 		return lista;
 
