@@ -220,7 +220,7 @@ public class ComprobantesMesa implements Iterable
 		PreparedStatement pstmt;
 		
 		usvu_hash = Hasheador.hashear(usvu);
-		pstmt = b.prepare("update cripto_comprobates set voto = 1 where usvu = ?");
+		pstmt = b.prepare("update cripto_comprobantes set voto = 1 where usvu = ?");
 		pstmt.setString(1, usvu_hash);
 		pstmt.executeUpdate();
 	}
