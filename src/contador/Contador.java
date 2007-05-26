@@ -116,7 +116,15 @@ public class Contador {
 
 		/* ahora que estoy listo para contar, procedo con la cuenta */
 		// pido los sobres. Acá hay un tema con los nombres :( TODO ver
-		Boletas sobres = Boletas.getInstance();
+
+		Boletas sobres = null;
+		try {
+			sobres = Boletas.getInstance();
+		} catch (Exception e)
+		{
+			//TODO:tocar esto
+			e.printStackTrace();
+		}
 
 		for (Iterator<String> iter = sobres.iterator(); iter.hasNext();) {
 
