@@ -141,14 +141,15 @@ public class UrnaHandler extends Thread {
 		logger.info("Le aviso a la mesa que el votante ya voto");
 		// Creo un string aleatorio challenge
 		SecureRandom random = new SecureRandom();
-		byte bytes[] = random.generateSeed(20);
-		random.nextBytes(bytes);
-		this.challenge = new String(bytes);
+//		byte bytes[] = random.generateSeed(20);
+	//	random.nextBytes(bytes);
+		//this.challenge = new String(bytes);
+		this.challenge = ((Long)random.nextLong()).toString();
+		
 
 		// Encripto con la clave publica de la mesa el svu encriptado y el challenge
 		Encriptador encrypt = new Encriptador();
 		String msg = encrypt.encriptar(Arrays.asList(usvu, challenge), InfoServidores.publicaMesa);
-		logger.debug("Challenge = " + challenge);
 		// Envio el mensaje a la mesa.
 		mesaOut.writeObject(msg);
 		logger.debug("Termino el paso 5");
@@ -158,16 +159,13 @@ public class UrnaHandler extends Thread {
 		// Agarro el msg de la mesa
 		String msg_enc = (String) mesaIn.readObject();
 		logger.info("Llego el ACK de la mesa");
-		logger.debug("Challenge encriptado = " + msg_enc);
+
 		// Lo desencripto con mi clave privada
 		Desencriptador decrypt = new Desencriptador(privadaUrna);
 		String msg = decrypt.desencriptarString(msg_enc);
 
-		logger.debug("Challenge firmado = " + msg);
-		
 		// Verifico que obtenga el challenge firmado por la mesa
 		Validador valid = new Validador(InfoServidores.publicaMesa);
-		logger.debug("Challenge validado = " + valid.validarString(msg));
 		if (!challenge.equals(valid.validarString(msg))) throw new Exception("Fallo el check del challenge");
 
 		// Guardo al sobre en la base y marco que ya votó.

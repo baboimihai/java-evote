@@ -262,7 +262,6 @@ public class MesaHandler extends Thread{
 		ComprobantesMesa.getInstance().marcarVotado(usvu); //TODO Ver si atrapar la excepcion
 		
 		this.challenge = mensaje.get(1);
-		logger.debug("Challenge = " + challenge);
 		logger.debug("Terminando paso 5");
 	}
 	private void envPaso6() throws Exception {
@@ -277,8 +276,6 @@ public class MesaHandler extends Thread{
 		
 		// Se lo envio a la urna.
 		urnaOut.writeObject(mensaje3);
-		logger.debug("Challenge firmado = " + challenge_firm);
-		logger.debug("Challenge encriptado = " + mensaje3);
 		logger.debug("Terminado paso 6");
 	}
 
