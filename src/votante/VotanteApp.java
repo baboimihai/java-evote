@@ -130,16 +130,24 @@ public class VotanteApp {
 			
 			String nombreArchivoTicket;
 			File archivoTicket;
-			do
-			{
+			boolean pudoCrear;
+			do	{
+				pudoCrear= true;
 				nombreArchivoTicket = lector.readLine();
 				archivoTicket = new File(nombreArchivoTicket);
+				try {
+					if ( archivoTicket.exists() ) archivoTicket.delete(); //TODO Preguntar el sobreescribir.
+					archivoTicket.createNewFile();
+				}
+				catch (Exception e) {
+					pudoCrear = false;
+					System.out.println("No se puede crear/sobreescribir el archivo (" + e.getMessage() + ")");
+				}
+			} while (!pudoCrear);
 				
-			} while (!archivoTicket.canWrite());
-			
 			guardarTicket(ticket, archivoTicket);
-			
 			System.out.println("Se ha guardado exitosamente su ticket. El mismo se encuentra en " + nombreArchivoTicket + ". La votación ha concluido.");
+
 
 		}
 		catch (VotanteInvalidoException vie)
@@ -200,6 +208,7 @@ public class VotanteApp {
 		BufferedWriter bw = new BufferedWriter(new FileWriter(archivo));
 		
 		bw.write(ticket);
+		bw.close();
 	}
 
 	
