@@ -1,4 +1,4 @@
-package criptografia;
+package eleccion;
 /**
  * Esta clase sirve para parsear mi existencia
  */
@@ -6,7 +6,8 @@ package criptografia;
 import java.io.*;
 import java.util.Hashtable;
 
-import eleccion.InfoServidores;
+import criptografia.GenKeys;
+
 
 public class GenPadron
 {
