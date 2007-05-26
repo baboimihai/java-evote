@@ -8,8 +8,11 @@ import java.net.Socket;
 import java.util.List;
 import java.util.Vector;
 
+import org.apache.log4j.*;
+
 import eleccion.ComprobanteNotFoundException;
 import eleccion.ComprobantesMesa;
+import eleccion.InfoServidores;
 import eleccion.Padron;
 
 public class EstadoVotacion extends Thread {
@@ -18,12 +21,17 @@ public class EstadoVotacion extends Thread {
 	private ObjectInputStream votanteIn;
 	private ObjectOutputStream votanteOut;
 	
+	// Clase de log
+	private Logger logger;
+	
 	public EstadoVotacion(Socket aVotante) throws IOException {
-	votante = aVotante;
-	System.out.println(Thread.currentThread().getId() + ": Obteniendo outputStream");
-	votanteOut = new ObjectOutputStream(votante.getOutputStream());
-	System.out.println(Thread.currentThread().getId() + ": Obteniendo inputStream");
-	votanteIn = new ObjectInputStream(votante.getInputStream());
+		// Accedo al log de  mesa estado
+		logger=Logger.getLogger("evote.mesa.estado");
+		PropertyConfigurator.configure(InfoServidores.log4jconf);
+		
+		votante = aVotante;
+		votanteOut = new ObjectOutputStream(votante.getOutputStream());
+		votanteIn = new ObjectInputStream(votante.getInputStream());
 }
 /**
  * El run sirve para correr el thread.
@@ -37,7 +45,7 @@ public void run() {
 			// Leo el dni desde el votante
 			String dni = (String) votanteIn.readObject();
 			
-			System.out.println(Thread.currentThread().getId() + ": Me llego el dni = " + dni);
+			logger.info("Me llego el dni = " + dni);
 			// Cargo la lista de votaciones en las que está habilitado el votante.
 			List<String> votacionesPosibles = Padron.getInstance().getVotaciones(dni);
 			String uvi = Padron.getInstance().getUvi(dni);
@@ -59,12 +67,12 @@ public void run() {
 				aux.add(yaVoto);
 				rta.add(aux);
 			}
-			System.out.println(Thread.currentThread().getId() + ": Devuelvo rta = " + rta);
+			logger.info("Devuelvo rta = " + rta);
 			votanteOut.writeObject(rta);
 		
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Hubo un error atendiendo el pedido" ,e);
 		}
 		
 	}
