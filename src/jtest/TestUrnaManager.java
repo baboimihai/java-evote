@@ -1,13 +1,11 @@
 package jtest;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 
-import eleccion.ComprobantesUrna;
-
-import urna.UrnaManager;
 import junit.framework.TestCase;
+import urna.UrnaManager;
+import eleccion.ComprobantesUrna;
 
 class TestUrnaManagerThread extends Thread {
 	String svu;
@@ -60,7 +58,7 @@ public class TestUrnaManager extends TestCase {
 			aux.add("1");
 			(new TestUrnaManagerThread(aSvu, aux)).start();
 		}
-		
+
 	}
 	public final void testSetVotante() throws Exception {
 		for (String aSvu : threadList) {
