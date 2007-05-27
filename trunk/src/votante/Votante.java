@@ -1,12 +1,26 @@
 package votante;
 
-import java.io.*;
-import java.net.*;
-import java.security.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
+import java.security.SecureRandom;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.List;
 
-import criptografia.*;
-import eleccion.*;
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+
+import criptografia.Desencriptador;
+import criptografia.Encriptador;
+import criptografia.Firmador;
+import criptografia.Hasheador;
+import criptografia.Validador;
+import eleccion.FraudeException;
+import eleccion.InfoServidores;
+import eleccion.Padron;
 
 
 /**
@@ -41,7 +55,7 @@ public class Votante
 	private Socket urna;
 	private ObjectInputStream urnaIn;
 	private ObjectOutputStream urnaOut;
-
+	private Logger logger;
 
 	/**
 	 * Crea un votante asociado a un DNI con una clave privada.
@@ -51,6 +65,8 @@ public class Votante
 	 */
 	public Votante(String dni, String clavePriv) throws Exception, IOException, VotanteInvalidoException
 	{
+		logger=Logger.getLogger("evote.votante");
+		PropertyConfigurator.configure(InfoServidores.log4jconf);
 		try
 		{
 			// Obtengo la clave pública del votante
@@ -259,13 +275,19 @@ public class Votante
 		//Término 2
 		t2_1 = opcBoletas.get(opcion);
 		t2_2 = randB;
+logger.debug("sobreIN: opción: " + t2_1 + " random: " + t2_2);
 		// Encripto con las claves públicas de las opciones de esta votación
 		// Con la primera clave
-		t2 = eOpciones.encriptar(Arrays.asList(t2_1, t2_2), uOpc.nextElement());
+String aux = uOpc.nextElement();
+logger.debug("encripto con la clave: " + aux);
+		t2 = eOpciones.encriptar(Arrays.asList(t2_1, t2_2), aux);
 		// Con el resto
-		while (uOpc.hasMoreElements())
-				t2 = eOpciones.encriptar(t2, uOpc.nextElement());
-
+		while (uOpc.hasMoreElements()) {
+aux = uOpc.nextElement();
+logger.debug("encripto con la clave: " + aux);
+			t2 = eOpciones.encriptar(t2, aux);
+		}
+logger.debug("sobreOUT: " + t2);
 		// Guardo el hash del sobre para chequear luego contra el ticket
 		this.sobreHasheado = Hasheador.hashear(t2);
 
