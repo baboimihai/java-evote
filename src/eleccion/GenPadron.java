@@ -30,6 +30,7 @@ public class GenPadron
 		try
 		{
 			p = new GenPadron(args[0], args[1]);
+			System.out.println("fin generación padrón");
 		} catch (Exception e)
 		{
 			e.printStackTrace();
@@ -40,8 +41,8 @@ public class GenPadron
 	{
 		this.r_votante = new BufferedReader(new FileReader(votante));
 		this.r_votacion = new BufferedReader(new FileReader(votacion));
-		this.w_votante = new BufferedWriter(new FileWriter("votante_parsed.txt"));
-		this.w_votacion = new BufferedWriter(new FileWriter("votacion_parsed.txt"));
+		this.w_votante = new BufferedWriter(new FileWriter(InfoServidores.resources + "votantes/votante_parsed.txt"));
+		this.w_votacion = new BufferedWriter(new FileWriter(InfoServidores.resources + "votacion/votacion_parsed.txt"));
 
 		parse_votante(this.r_votante, this.w_votante);
 		parse_votacion(this.r_votacion, this.w_votacion);
@@ -52,7 +53,7 @@ public class GenPadron
 		String res;
 		String[] splitted;
 		String dni_string;
-		String path = InfoServidores.readKey("resources") + "votantes/";
+		String path = InfoServidores.resources + "votantes/";
 		//String path = "";
 		String val;
 		Hashtable<String, String> tablita;
@@ -86,37 +87,40 @@ public class GenPadron
 		out.close();
 	}
 
-	void parse_votacion(BufferedReader votante, BufferedWriter out) throws Exception
+	void parse_votacion(BufferedReader votacion, BufferedWriter out) throws Exception
 	{
 		String line;
 		String res;
 		String[] splitted;
-		String path = InfoServidores.readKey("resources") + "votacion/";
+		String path = InfoServidores.resources + "votacion/";
 		//String path = "";
 		int vot_num = 0, opc_num = 0;
-		String vot_num_s, opc_num_s;
+		String idv = null;
 
 
-		while((line = votante.readLine()) != null)
+		while((line = votacion.readLine()) != null)
 		{
 			splitted = line.split(",");
 			if (line.charAt(0) == '0')
 			{
 				vot_num++;
 				opc_num = 0;
+				idv = splitted[1].trim().replace(' ', '_');
 			}
 			else if (line.charAt(0) == '1')
 				opc_num++;
 
 			if (line.charAt(0) == '1')
 			{
-				vot_num_s = (new Long(vot_num)).toString();
-				opc_num_s = (new Long(opc_num)).toString();
-				GenKeys.generarClaves(0,path+ vot_num_s +"_"+ opc_num_s +"_privada.key", path+vot_num_s +"_"+ opc_num_s +"_publica.key");
-				res = splitted[0].trim()+","+splitted[1].trim()+"," + vot_num_s + "_" + opc_num_s;
+				//vot_num_s = (new Long(vot_num)).toString();
+				//opc_num_s = (new Long(opc_num)).toString();
+				String keyName = idv + "_" + splitted[1].trim().replace(' ', '_');
+				GenKeys.generarClaves(0, path + keyName + "_privada.key",
+										 path + keyName + "_publica.key");
+				res = splitted[0].trim() + "," + splitted[1].trim() + "," + keyName;
 			}
 			else
-				res = splitted[0].trim()+","+splitted[1].trim();
+				res = splitted[0].trim() + "," + splitted[1].trim();
 			out.write(res);
 			out.newLine();
 		}

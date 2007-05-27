@@ -1,7 +1,5 @@
 package contador;
-import java.io.BufferedReader;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.util.Enumeration;
@@ -49,8 +47,6 @@ public class Contador {
 		Desencriptador desencriptador = new Desencriptador();
 		// Motor de validación
 		Validador validador = null;
-		// Clave pública de la mesa
-		String uMesa = null;
 		// ID de la votación
 		String idv = null;
 
@@ -91,10 +87,11 @@ public class Contador {
 		    	 logger.debug("Obtengo la clave privada de la opción desde el archivo: " + InfoServidores.resources + "votacion/" + elem + "_privada.key");
 
 
-		    	 key = InfoServidores.readKey(InfoServidores.resources + "votacion/" + elem + "_privada.key");
+		    	 key = InfoServidores.readKey(InfoServidores.resources + "votacion/" + idv.replace(' ', '_') + "_" + elem + "_privada.key");
 		    	 logger.debug(key);
 
 		    	 // agrego las claves a mi pila para tenerlas hacia atrás.
+		    	 //kOpc.add(key);//
 		    	 kOpcStack.push(key);
 		    	 logger.debug("agregué las claves a mi pila para tenerlas hacia atrás");
 
@@ -167,7 +164,7 @@ public class Contador {
 				try
 				{
 					if (iterator.hasNext()) // necesito saber si tengo que sacar un string o una lista
-/* aquí muere */						sobre = desencriptador.desencriptarString(sobre, clave);
+/* aquí muere */		sobre = desencriptador.desencriptarString(sobre, clave);
 					else
 						boleta = desencriptador.desencriptar(sobre, clave);
 				}
@@ -182,7 +179,7 @@ public class Contador {
 
 			try
 			{
-				boleta = validador.validar(boleta.get(1));
+				boleta = validador.validar(boleta.get(0));
 			}
 			catch (Exception e) // pinchó la validación
 			{
@@ -193,8 +190,8 @@ public class Contador {
 			}
 
 			// cambio de variable para claridad (falta mucha eh!)
-			String voto = boleta.get(1);
-			String boletaidv = boleta.get(2);
+			String voto = boleta.get(0);
+			String boletaidv = boleta.get(1);
 
 			if (boletaidv.equals(idv)) // si el sobre pertenece a la votación,
 			{

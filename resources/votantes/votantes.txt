@@ -1,15 +1,15 @@
 0,Grupo 1
-1,Mariano Besio,30111000
-1,Hernan Rajchert,30111001
-1,Pablo Garcia,30111002
-1,Carlucci,30111003
+1,Mariano Besio,30240000
+1,Hernan Rajchert,30240001
+1,Pablo Garcia,30240002
+1,Carlucci,30240003
 0,Grupo 2
-1,Ezequiel Gomez Balaguer,30111004
+1,Ezequiel Gomez Balaguer,30240004
 0,Grupo 3
-1,Coffey,30111005
-1,Bigio,30111006
+1,Coffey,30240005
+1,Bigio,30240006
 0,Grupo 4
-1,Carlucci,30111003
+1,Carlucci,30240003
 0,Grupo 5
-1,Diego Marques,30111007
-1,Hernan Rajchert,30111001
+1,Diego Marques,30240007
+1,Hernan Rajchert,30240001

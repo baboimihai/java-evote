@@ -1,20 +1,20 @@
 0,Rojo o azul?
-1,Rojo,vot1
-1,Azul,vot2
+1,Rojo,Rojo_o_azul?_Rojo
+1,Azul,Rojo_o_azul?_Azul
 2,Grupo 1
 2,Grupo 2
 0,A B o C
-1,A,vot3
-1,B,vot4
-1,C,vot5
+1,A,A_B_o_C_A
+1,B,A_B_o_C_B
+1,C,A_B_o_C_C
 2,Grupo 3
 2,Grupo 1
 2,Grupo 5
 2,Grupo 4
 0,Jefe de gobierno
-1,Telerman,vot6
-1,Macri,vot7
-1,Filmus,vot8
+1,Telerman,Jefe_de_gobierno_Telerman
+1,Macri,Jefe_de_gobierno_Macri
+1,Filmus,Jefe_de_gobierno_Filmus
 2,Grupo 3
 2,Grupo 4
 2,Grupo 5
