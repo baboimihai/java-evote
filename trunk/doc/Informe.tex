@@ -1,18 +1,6 @@
 \documentclass[a4paper,11pt]{article}
 
-%%
-%%
-%%
-%%   SUPER GRAN BIG TODO: Cambiar los R_M por R_{MF} y los U_M por U_{MC} y explicar lo de la 
-%%			  maquina de votar.
-%%			 
-%%			  Numeros de secuencia.
-%%			  Escenarios de compromiso
-%%			  Escenarios man in the middle y perdidas de paquetes
-%%			En Bugs conocidos, como la urna puede saber lo que voto UNA sola persona
-%%			que se halla ido a quejar porque su voto no cuenta, pero que tiene que hacer
-%%			fraude y un monton de cosas más. Y no puede elegir a la persona como target.
-%%
+
 
 %% Paquetes Adicionales %%
 
@@ -326,15 +314,17 @@ Con respecto a la parte criptográfica, se utiliza \emph{RSA de 1024 bits} para l
 Para poder comenzar a hacer uso del sistema se debe disponer del directorio principal del proyecto y proceder a los siguientes pasos:
 
 \begin{enumerate}
-\item Importar el proyecto en Eclipse  BLA
-\item Disponer de una conexión a la base de datos \emph{Oracle 10g} en el puerto 11521 de \verb#localhost#. 
-\item Ejecutar GenPadron pasándole como argumentos \verb#../resources/votantes/roles.txt# y \verb#../resources/votacion/votaciones.txt#. Esto genera el padrón de votación con los archivos de entrada.
-\item Ejecutar el servidor de MesaApp (en el caso de interpretar a la mesa).
-\item Ejecutar el servidor de UrnaApp (en el caso de interpretar a la urna).
-\item Ejecutar el cliente de VotanteApp (en el caso de interpretar al votante).
+\item Importar el proyecto en Eclipse como un \verb#Java Project From Existing Ant Buildfile#, cuyo antfile debe ser \verb#/build.xml#.
+\item Ejecutar las tareas ANT \verb#Build# y \verb#CreaJars#.
+\item Disponer de una conexión a la base de datos \emph{Oracle 10g} en el puerto 11521 de \verb#localhost#. Por ejemplo, utilizando el comando \verb#$ ssh -L11521:localhost:1521 usuario@eiffel.itba.edu.ar#.
+\item Ubicarse en el directorio build del proyecto.
+\item Ejecutar \verb#java -jar genpadron ../resources/votantes/roles.txt ../resources/votacion/votaciones.txt#. Esto genera el padrón de votación con los archivos de entrada.
+\item Ejecutar el servidor de MesaApp (en el caso de interpretar a la mesa) con el comando \verb#java -jar mesa.jar#.
+\item Ejecutar el servidor de UrnaApp (en el caso de interpretar a la urna) con el comando \verb#java -jar urna.jar#..
+\item Ejecutar el cliente de VotanteApp (en el caso de interpretar al votante) con el comando \verb#java -jar votante.jar#..
 \end{enumerate}
 
-Para realizar luego el conteo se debe ejecutar Contador pasándole como argumento el ID de la votación que se desea contabilizar.
+Para realizar luego el conteo se debe ejecutar Contador pasándole como argumento el ID de la votación que se desea contabilizar.  Esto se hará con el comando \verb#java -jar contador.jar {votacion1}#.
 
 Los archivos necesarios para cada programa son los siguientes (todos bajo el directorio \verb#resources#):
 
@@ -364,9 +354,6 @@ Para el votante:
 \begin{itemize}
 \item Los votantes deben incluir su clave privada en el directorio \verb#resources/votacion/#.
 \end{itemize}
-
-\subsubsection{Características no implementadas}
-Contador no verifica que los comprobantes de la mesa hayan sido generados por los votantes.
 
 
 \newpage
