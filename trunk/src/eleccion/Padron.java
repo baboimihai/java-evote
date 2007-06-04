@@ -90,17 +90,17 @@ public class Padron
 			String[] splitted;
 			splitted = line.split(",");
 			
-			if (votante_list.containsKey(splitted[2]))
+			if (votante_list.containsKey(splitted[1]))
 			//Si el hash ya contiene a este DNI, es porque esta en mas de un grupo
 			{
-				Votante v = votante_list.get(splitted[2]);
+				Votante v = votante_list.get(splitted[1]);
 				v.addGrupo(group);
-				votante_list.put(splitted[2], v);
+				votante_list.put(splitted[1], v);
 			}
 			else // Si no, insertamos un nuevo votante
 			{
-				String svu = InfoServidores.readKey(InfoServidores.resources + "votantes/" + splitted[2] + "_publica.key");
-				votante_list.put(splitted[2], new Votante(splitted[2],splitted[1], svu, group));
+				String svu = InfoServidores.readKey(InfoServidores.resources + "votantes/" + splitted[1] + "_publica.key");
+				votante_list.put(splitted[1], new Votante(splitted[1], svu, group));
 			}
 		}		
 	}
@@ -318,11 +318,11 @@ public class Padron
 		private String uvi;
 		private ArrayList<String> grupo;
 		
-		public Votante(String dni, String nombre, String uvi, String grupo)
+		public Votante(String dni, String uvi, String grupo)
 		{
 			this.grupo = new ArrayList<String>();
 			this.dni = dni;
-			this.nombre = nombre;
+		//	this.nombre = nombre;
 			this.uvi = uvi;
 			this.grupo.add(grupo);
 		}
