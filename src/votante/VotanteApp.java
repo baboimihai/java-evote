@@ -98,7 +98,7 @@ public class VotanteApp {
 			
 			do
 				opcionVot = obtenerOpcion(1, estadoVotaciones.size(), "Ingrese el número de la votación de la que desea participar: ");
-			while ((Boolean)estadoVotaciones.get(opcionVot-1).get(1) != true);
+			while ((Boolean)estadoVotaciones.get(opcionVot-1).get(1));
 			
 			
 			// Muestro las opciones disponibles para esa votación
@@ -126,28 +126,42 @@ public class VotanteApp {
 			
 			
 			// Lo almaceno donde pida el usuario
-			System.out.println("Se ha recibido su ticket de votación. Ingrese la ruta al archivo donde desea guardarlo: ");
+			System.out.println("Se ha recibido su ticket de votación satisfactoriamente.");
 			
 			String nombreArchivoTicket;
 			File archivoTicket;
 			boolean pudoCrear;
-			do	{
-				pudoCrear= true;
+			do
+			{
+				pudoCrear = true;
+				System.out.println("Ingrese la ruta al archivo donde desea guardar el ticket de votación: "); 
 				nombreArchivoTicket = lector.readLine();
 				archivoTicket = new File(nombreArchivoTicket);
-				try {
-					if ( archivoTicket.exists() ) archivoTicket.delete(); //TODO Preguntar el sobreescribir.
-					archivoTicket.createNewFile();
+				try
+				{
+					// Si ya existía lo elimino
+					if (archivoTicket.exists())
+						archivoTicket.delete();
+					
+					if (!archivoTicket.createNewFile())
+						throw new Exception("No se pudo crear el archivo.");
 				}
-				catch (Exception e) {
+				catch (Exception e)
+				{
 					pudoCrear = false;
-					System.out.println("No se puede crear/sobreescribir el archivo (" + e.getMessage() + ")");
+					System.out.println("Hubo un error de almacenamiento de ticket (" + e.getMessage() + ")");
 				}
 			} while (!pudoCrear);
-				
-			guardarTicket(ticket, archivoTicket);
+			
+			try
+			{
+				guardarTicket(ticket, archivoTicket);
+			}
+			catch (Exception e)
+			{
+				throw new Exception("No se pudo guardar el archivo (" + e.getMessage() + ")");
+			}
 			System.out.println("Se ha guardado exitosamente su ticket. El mismo se encuentra en " + nombreArchivoTicket + ". La votación ha concluido.");
-
 
 		}
 		catch (VotanteInvalidoException vie)
