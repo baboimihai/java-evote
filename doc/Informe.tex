@@ -311,16 +311,62 @@ El sistema consta de dos aplicaciones servidor, la mesa y la urna, quienes atien
 Ambos servidores utilizan su propia base de datos para guardar toda la información necesaria para el correcto funcionamiento, como boletas y comprobantes. Tanto los servidores como el cliente pueden ejecutarse en cualquier host y a través de Internet. Sin embargo, es recomendado que tanto las bases de datos como los servidores se ejecuten sobre distintos hosts. Una configuración óptima sería ejecutar cada servidor en una red distinta, con su respectiva base de datos en el mismo host.
 
 \subsection{Funcionamiento}
-Para iniciar una votación, los dos servidores deben estar ejecutándose y deben estar configurados correctamente (con las votaciones, opciones y votantes cargados). En los clientes, los votantes deben incluir su clave privada en el directorio \verb#resources/votacion/# para poder comenzar.
+Para iniciar una votación, los dos servidores deben estar ejecutándose y deben estar configurados correctamente (con las votaciones, opciones y votantes cargados), todo como se lo especifica en la sección \emph{Instalación}. 
 
 De acuerdo a lo establecido por el diseño del protocolo, el servidor de mesa aguarda las conexiones iniciales de los votantes. Al recibir un mensaje de un votante identificándose, se crea un thread para atenderlo, iniciando todo el proceso de votación. Lo mismo sucede en la urna al ser notificada del arrivo del votante. Se establecen conexiones entre votante, mesa y urna, y de allí en más se llevan a cabo todos los pasos que el protocolo define, utilizando encriptación asimétrica y firmas.
 
-Una vez concluida la votación se procede a efectuar el conteo de votos con una aplicación externa que requiere el uso de ambas bases de datos. Este programa desencripta cada sobre guardado en la de la urna para saber qué boleta se encuentra dentro, y contabilizarla, chequeando a su vez contra los comprobantes de la mesa. Para hacer la apertura de sobres cuenta con las claves privadas de todas las opciones de voto de la votación en cuestión.
+Una vez concluida la votación se procede a efectuar el conteo de votos con una aplicación externa que requiere el uso de ambas bases de datos. Este programa desencripta cada sobre guardado en la base de la urna para saber qué boleta se encuentra dentro, y contabilizarla, chequeando a su vez contra los comprobantes de la mesa. Para hacer la apertura de sobres cuenta con las claves privadas de todas las opciones de voto de la votación en cuestión.
 
 \subsection{Bases de la implementación}
 Para la realización de este sistema se eligió el lenguaje de programación \emph{Java} dada su gran portabilidad, numerosas bibliotecas y facilidad de mantenimiento. Como base de datos se utiliza \emph{Oracle 10g}, pero resulta de escasa complejidad la modificación del sistema con el fin de hacer uso de cualquier otro motor de base de datos, tanto comercial como de código libre.
 
 Con respecto a la parte criptográfica, se utiliza \emph{RSA de 1024 bits} para la encriptación asimétrica y firmado, mientras que se hace uso de \emph{SHA de 256 bits} para cuestiones de hashing.
+
+\subsection{Instalación}
+Para poder comenzar a hacer uso del sistema se debe disponer del directorio principal del proyecto y proceder a los siguientes pasos:
+
+\begin{enumerate}
+\item Importar el proyecto en Eclipse  BLA
+\item Disponer de una conexión a la base de datos \emph{Oracle 10g} en el puerto 11521 de \verb#localhost#. 
+\item Ejecutar GenPadron pasándole como argumentos \verb#../resources/votantes/roles.txt# y \verb#../resources/votacion/votaciones.txt#. Esto genera el padrón de votación con los archivos de entrada.
+\item Ejecutar el servidor de MesaApp (en el caso de interpretar a la mesa).
+\item Ejecutar el servidor de UrnaApp (en el caso de interpretar a la urna).
+\item Ejecutar el cliente de VotanteApp (en el caso de interpretar al votante).
+\end{enumerate}
+
+Para realizar luego el conteo se debe ejecutar Contador pasándole como argumento el ID de la votación que se desea contabilizar.
+
+Los archivos necesarios para cada programa son los siguientes (todos bajo el directorio \verb#resources#):
+
+Para todos los programas:
+\begin{itemize}
+\item \verb#general#
+\item \verb#votacion/*publica.key#
+\item \verb#votantes/*publica.key#
+\end{itemize}
+
+Para la mesa:
+\begin{itemize}
+\item \verb#mesa#
+\end{itemize}
+
+Para la urna:
+\begin{itemize}
+\item \verb#urna#
+\end{itemize}
+
+Para el contador:
+\begin{itemize}
+\item \verb#votacion/*privada.key#
+\end{itemize}
+
+Para el votante:
+\begin{itemize}
+\item Los votantes deben incluir su clave privada en el directorio \verb#resources/votacion/#.
+\end{itemize}
+
+\subsubsection{Características no implementadas}
+Contador no verifica que los comprobantes de la mesa hayan sido generados por los votantes.
 
 
 \newpage
