@@ -1,129 +1,345 @@
 package eleccion;
 /**
- * Esta clase sirve para parsear mi existencia
+ * 
+ * @author ezequiel85
+ * @version 1.0
+ * La clase Padron hace que Ingui se la coma mas rapido
+ *
  */
-
 import java.io.*;
-import java.util.Hashtable;
-
-import criptografia.GenKeys;
-
+import java.util.*;
 
 public class GenPadron
-{
-	private BufferedReader r_votante;
-	private BufferedReader r_votacion;
-	private BufferedWriter w_votante;
-	private BufferedWriter w_votacion;
-	long dni = 30240000;
-
+{	
+	private BufferedReader votantes, votaciones;
+	private String line;
+	private String group = null;
+	private Hashtable<String, Votante> votante_list;
+	private Hashtable<String, Votacion> votacion_list;
+	private static GenPadron ref;
+	
 	/**
-	 *
-	 * @param args, primer parametro archivo de votantes, segundo de votaciones
-	 * NO VALIDO NADA, asi que si esta mal, AJO Y AGUA
+	 * Constructor privado del padron para evitar que lo creen.
 	 */
-	public static void main(String[] args)
+	private GenPadron()
 	{
-		@SuppressWarnings("unused")
-		GenPadron p;
-
-		try
-		{
-			p = new GenPadron(args[0], args[1]);
-			System.out.println("fin generación padrón");
-		} catch (Exception e)
-		{
-			e.printStackTrace();
-		}
+		votante_list = new Hashtable<String, Votante>();
+		votacion_list = new Hashtable<String, Votacion>();
 	}
-
-	public GenPadron(String votante, String votacion) throws Exception
+			
+	/**
+	 * "Constructor" para el Singleton
+	 * @return Instancia de la clase
+	 */
+	public static synchronized GenPadron getInstance() 
 	{
-		this.r_votante = new BufferedReader(new FileReader(votante));
-		this.r_votacion = new BufferedReader(new FileReader(votacion));
-		this.w_votante = new BufferedWriter(new FileWriter(InfoServidores.resources + "votantes/votante_parsed.txt"));
-		this.w_votacion = new BufferedWriter(new FileWriter(InfoServidores.resources + "votacion/votacion_parsed.txt"));
-
-		parse_votante(this.r_votante, this.w_votante);
-		parse_votacion(this.r_votacion, this.w_votacion);
+		if ( ref == null )
+			ref = new GenPadron();
+		return ref;
 	}
-	void parse_votante(BufferedReader votante, BufferedWriter out) throws Exception
+	
+	/** Metodo privado para cargar votantes (solo para ordenar un poco cargarPadron)
+	 * @param void
+	 * @throws IOException
+	 */
+	private void cargarVotaciones() throws IOException
 	{
-		String line;
-		String res;
-		String[] splitted;
-		String dni_string;
-		String path = InfoServidores.resources + "votantes/";
-		//String path = "";
-		String val;
-		Hashtable<String, String> tablita;
-
-		tablita = new Hashtable<String, String>();
-
-		while((line = votante.readLine()) != null)
+		String nombre = null;
+		while ((line = this.votaciones.readLine()) != null)
 		{
-			splitted = line.split(",");
-			if (line.charAt(0) == '1')
-			{
-				val = tablita.get(splitted[1]);
-				if (val == null)
-				{
-					dni_string = (new Long(dni)).toString();
-					dni++;
-					tablita.put(splitted[1], dni_string);
-				}
-				else
-				{
-					dni_string = val;
-				}
-				GenKeys.generarClaves(0,path+dni_string+"_privada.key", path+dni_string+"_publica.key");
-				res = splitted[0].trim()+","+splitted[1].trim()+","+dni_string;
-			}
-			else
-				res = splitted[0].trim()+","+splitted[1].trim();
-			out.write(res);
-			out.newLine();
-		}
-		out.close();
-	}
-
-	void parse_votacion(BufferedReader votacion, BufferedWriter out) throws Exception
-	{
-		String line;
-		String res;
-		String[] splitted;
-		String path = InfoServidores.resources + "votacion/";
-		//String path = "";
-		int vot_num = 0, opc_num = 0;
-		String idv = null;
-
-
-		while((line = votacion.readLine()) != null)
-		{
-			splitted = line.split(",");
 			if (line.charAt(0) == '0')
 			{
-				vot_num++;
-				opc_num = 0;
-				idv = splitted[1].trim().replace(' ', '_');
+				nombre = (line.split(","))[1];
+				votacion_list.put(nombre, new Votacion(nombre));
+				continue;
 			}
-			else if (line.charAt(0) == '1')
-				opc_num++;
-
-			if (line.charAt(0) == '1')
+			String[] splitted;
+			Votacion v;
+			splitted = line.split(",");
+			
+			if (line.charAt(0) == '1') //Nueva lista
 			{
-				//vot_num_s = (new Long(vot_num)).toString();
-				//opc_num_s = (new Long(opc_num)).toString();
-				String keyName = idv + "_" + splitted[1].trim().replace(' ', '_');
-				GenKeys.generarClaves(0, path + keyName + "_privada.key",
-										 path + keyName + "_publica.key");
-				res = splitted[0].trim() + "," + splitted[1].trim() + "," + keyName;
+				v = votacion_list.get(nombre);
+				
+				String uvi = InfoServidores.readKey(InfoServidores.resources + "votacion/" + splitted[2] + "_publica.key");
+				v.addOpcion(splitted[1], uvi);
+				votacion_list.put(nombre, v);
 			}
-			else
-				res = splitted[0].trim() + "," + splitted[1].trim();
-			out.write(res);
-			out.newLine();
+			else // Nuevo grupo que participa en la votacion
+			{
+				v = votacion_list.get(nombre);
+				v.addGrupo(splitted[1]);
+				votacion_list.put(nombre, v);
+			}
+		}		
+	}
+	
+	/** Metodo privado para cargar votantes (solo para ordenar un poco cargarPadron)
+	 * @param void
+	 * @throws IOException
+	 */
+	private void cargarVotantes() throws IOException
+	{
+		while ((line = this.votantes.readLine()) != null)
+		{
+			if (line.charAt(0) == '0')
+			{
+				group = (line.split(","))[1];
+				continue;
+			}
+			String[] splitted;
+			splitted = line.split(",");
+			
+			if (votante_list.containsKey(splitted[1]))
+			//Si el hash ya contiene a este DNI, es porque esta en mas de un grupo
+			{
+				Votante v = votante_list.get(splitted[1]);
+				v.addGrupo(group);
+				votante_list.put(splitted[1], v);
+			}
+			else // Si no, insertamos un nuevo votante
+			{
+				String svu = InfoServidores.readKey(InfoServidores.resources + "votantes/" + splitted[1] + "_publica.key");
+				votante_list.put(splitted[1], new Votante(splitted[1], svu, group));
+			}
+		}		
+	}
+
+	/**
+	 * Carga en memoria el padron
+	 * @param votantes Path al archivo de votantes
+	 * @param votaciones Path al archivo de votaciones
+	 * @throws IOException
+	 */
+	public void cargarPadron(String votantes, String votaciones) throws IOException
+	{
+		this.votantes = new BufferedReader(new FileReader(votantes));
+		this.votaciones = new BufferedReader(new FileReader(votaciones));
+
+		this.cargarVotantes();
+		this.cargarVotaciones();
+	}
+
+	/**
+	 *  Esta clase es singleton y no se puede clonar. 
+	 */
+	  public Object clone()	throws CloneNotSupportedException 
+	  {
+	    throw new CloneNotSupportedException(); 
+	  }
+	
+	/**
+	 * Dado un DNI y un ID de votación consulta si el votante puede votar en dicha eleccion
+	 * @param dni String con el DNI
+	 * @param idv ID de la votacion
+	 * @throws Exception Si no se encontro el par (dni, idv)
+	 */
+	public boolean puedeVotar(String dni, String idv) throws Exception
+	{
+		Votante v;
+		Votacion vo;
+		Iterator i;
+		String grupo;
+		
+		v = votante_list.get(dni);
+		if (v == null)
+			throw new Exception("El DNI no corresponde a ningun votante");
+		
+		vo = votacion_list.get(idv);
+		if (vo == null)
+			throw new Exception("La votacion solicitada no existe");
+		
+		i = vo.grupos.iterator();
+		while (i.hasNext())
+		{
+			grupo = (String)i.next();
+			if (v.grupo.contains(grupo))
+				return true;
 		}
-		out.close();
+		return false;
+	}
+	
+	/**
+	 * Dado un DNI devuelve una lista con las votaciones en que puede participar el votante
+	 * @param dni String con el DNI
+	 * @throws Exception Si no se encontro el dni
+	 */
+	public List<String> getVotaciones(String dni) throws Exception
+	{
+		Votacion vo;
+		Votante v;
+		Iterator i;
+		List<String> a;
+		Enumeration<Votacion> e;
+		
+		a = new ArrayList<String>();
+		
+		v = votante_list.get(dni);
+		if (v == null)
+			throw new Exception("El DNI no corresponde a ningun votante");
+		
+		i = v.grupo.iterator();
+		
+		while(i.hasNext())
+		{
+			String rec;
+			
+			e = votacion_list.elements();
+			rec = (String) i.next();
+			while(e.hasMoreElements())
+			{	
+				vo = e.nextElement();
+				for(String grupoparticipante:vo.grupos)
+				{
+					if (grupoparticipante.equals(rec) && !a.contains(vo.nombre))
+					{
+						a.add(vo.nombre);
+					}
+				}		
+			}
+		}
+		return a;
+	}
+	
+	/**
+	 * Devuelve las opciones para un idv
+	 * @param idv El id de la votacion
+	 * @return La lista de Strings con las opciones
+	 * @throws Exception Si no existia la votacion
+	*/
+	public List<String> getOpciones(String idv) throws Exception
+	{
+		Votacion vo;
+		List<String> l;
+		Enumeration<String> e;
+		
+		l = new ArrayList<String>();
+		vo = votacion_list.get(idv);
+		if (vo == null)
+			throw new Exception("La votacion solicitada no existe");
+		e = getUOpc(vo.nombre).keys();
+		while(e.hasMoreElements())
+		{
+			l.add(e.nextElement());
+		}
+		
+		return l;
+	}
+	
+	/**
+	 * Dada una clave publica devuelve el DNI correspondiente
+	 * @param uvi String con la clave publica
+	 * @throws Exception Si no se encontro el uvi
+	 * 
+	 */
+	public String getDNI(String uvi) throws Exception
+	{
+		Votante v;
+		Enumeration<Votante> e;
+		
+		e = votante_list.elements();
+		while(e.hasMoreElements())
+		{
+			v = e.nextElement();
+			if (v.getUvi().equals(uvi))
+				return v.getDNI();
+		}
+		throw new Exception("El votante indicado no existe");
+		//Si llego aca es que la uvi indicada no existe
+	}
+
+	/**
+	 * Dado un DNI devuelve la clave publica asociada
+	 * @param dni String con el DNI
+	 * @throws Exception Si no se encontro el dni
+	 */
+	public String getUvi(String dni) throws Exception
+	{
+		Votante v;
+		
+		v = votante_list.get(dni);
+		if (v == null)
+			throw new Exception("El votante indicado no existe");
+		
+		return v.getUvi();
+	}
+	
+	/**
+	 * Dado un ID de votacion retorna un hash con los pares (opcion, clave pública)
+	 * @param idv
+	 * @throws Exception Si no se encontro la votacion
+	 */
+	public Hashtable<String,String> getUOpc(String idv) throws Exception
+	{
+		Votacion vo;
+		
+		vo = votacion_list.get(idv);
+		if (vo == null)
+			throw new Exception("La votacion solicitada no existe");
+		return vo.getListas();
+	}
+	
+	private class Votacion
+	{
+		private String nombre;
+		private Hashtable<String,String> listas;
+		private ArrayList<String> grupos;
+		
+		public Votacion(String nombre)
+		{
+			this.nombre = nombre;
+			this.listas = new Hashtable<String,String>();
+			this.grupos = new ArrayList<String>();
+		}
+		
+		public void addOpcion(String candidato, String uvi)
+		{
+			this.listas.put(candidato, uvi);
+		}
+		
+		public void addGrupo(String grupo)
+		{
+			this.grupos.add(grupo);
+		}
+		
+		public Hashtable<String, String> getListas()
+		{
+			return this.listas;
+		}
+	}
+	
+	private class Votante
+	{
+		@SuppressWarnings("unused")
+		private String dni;
+		@SuppressWarnings("unused")
+		private String nombre;
+		@SuppressWarnings("unused")
+		private String uvi;
+		private ArrayList<String> grupo;
+		
+		public Votante(String dni, String uvi, String grupo)
+		{
+			this.grupo = new ArrayList<String>();
+			this.dni = dni;
+		//	this.nombre = nombre;
+			this.uvi = uvi;
+			this.grupo.add(grupo);
+		}
+		
+		public void addGrupo(String grupo)
+		{
+			this.grupo.add(grupo);
+		}
+		
+		public String getDNI()
+		{
+			return this.dni;
+		}
+		
+		public String getUvi()
+		{
+			return this.uvi;
+		}
 	}
 }
