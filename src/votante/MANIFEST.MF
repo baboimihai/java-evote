@@ -1,0 +1,3 @@
+Manifest-Version: 1.0
+Main-Class: votante.VotanteApp
+Class-Path: ../lib/log4j-1.2.13.jar ../lib/junit.jar
