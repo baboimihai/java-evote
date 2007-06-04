@@ -197,10 +197,9 @@ La mesa le devuelve encriptada con $U_{V_i}$ (para que sólo la persona lo entien
 \end{equation}
 \end{footnotesize}
 
-El votante genera un sobre encriptando con las claves de todas las listas 
-(cada lista representa una opción en la boleta) la boleta elegida concatenada a un valor aleatorio $\text{RandB}_i$ para evitar que la mesa pueda regenerar todos los posibles sobres y saber a quién votó la persona.
+El votante elije uno de las boletas recibidas en el paso 3 y genera un sobre encriptando con las claves públicas de todas las listas (cada lista representa una opción en la boleta). La boleta elegida se concatena con un valor aleatorio $\text{RandB}_i$ para evitar que la mesa pueda regenerar todos los posibles sobres y saber a quién votó la persona.
 
-Una vez generado el sobre, el votante procede a depositarlo (enviarlo) en la urna. Para hacerlo tiene que enviar (además del sobre) el secreto que sólo él y la urna conocen. La urna puede verificar que el secreto está autorizado por la mesa y marcar internamente que ese secreto no será valido de aquí en adelante.
+Una vez generado el sobre, el votante procede a depositarlo (enviarlo) en la urna. Para hacerlo tiene que enviar (además del sobre) el secreto que sólo él y la urna conocen. La urna puede verificar que el secreto está autorizado por la mesa y marcar internamente que ese secreto está en proceso de votación (Para evitar que trate de votar dos veces).
 
 \subsubsection{Paso 5}
 
@@ -210,7 +209,8 @@ Una vez generado el sobre, el votante procede a depositarlo (enviarlo) en la urn
 \end{equation}
 \end{footnotesize}
 
-Despúes de almacenar el voto, la urna informa a la mesa que la persona ya votó (para evitar que vuelva a votar) dándole $U_U \left( S_{{VU}_i} \right)$ que es el valor que la mesa utilizó para relacionar al votante. También le envía un \emph{Challenge} para que la mesa le devuelva firmado a modo de reconocimiento (TODO: Expresar mejor esto) . La mesa guarda por ese votante el par de datos $U_{V_i}$, $R_{V_i} \Bigl[ \text{DNI} + \text{ID}_V + \text{Hash} \bigl( U_U \left( S_{{VU}_i} \right) + S_{{VM}_i}\bigr) \Bigr]$ a modo de comprobante de voto.
+Despúes de almacenar el voto, la urna informa a la mesa que la persona ya votó (para evitar que vuelva a votar) dándole $U_U \left( S_{{VU}_i} \right)$ que es el valor que la mesa utilizó para relacionar al votante. También le envía un \emph{Challenge} para que la mesa le devuelva firmado a modo de reconocimiento de voto. 
+
 
 \subsubsection{Paso 6}
 \begin{footnotesize}
@@ -218,6 +218,9 @@ Despúes de almacenar el voto, la urna informa a la mesa que la persona ya votó (
 \text{Mesa} \rightarrow \text{Urna}: U_U \bigl( R_M \left( \text{Challenge} \right) \bigr) 
 \end{equation}
 \end{footnotesize}
+La mesa guarda como comprobante el par de datos $U_{V_i}$, $R_{V_i} \Bigl[ \text{DNI} + \text{ID}_V + \text{Hash} \bigl( U_U \left( S_{{VU}_i} \right) + S_{{VM}_i}\bigr) \Bigr]$.
+
+Firma y le devuelve el challenge a la urna. Ambos marcan que la persona ya voto.
 
 
 \subsubsection{Paso 7}
@@ -229,7 +232,7 @@ Despúes de almacenar el voto, la urna informa a la mesa que la persona ya votó (
 \end{footnotesize}
 
 %La urna firma el ticket previamente firmado por la mesa y se lo envía al votante (como comprobante de la operación).
-La urna le aplica una función de hash al sobre recibido en el paso 4, lo firma y se lo devuelve al votante que lo utilizará como segunda parte de su ticket.
+Después de recibir el challenge firmado la urna La urna le aplica una función de hash al sobre recibido en el paso 4, lo firma y se lo devuelve al votante que lo utilizará como segunda parte de su ticket.
 
 \section{Conteo y detección de fraude}
 El conteo debe ser realizado en una máquina en la cual confíen todas las listas. La urna debe presentar los sobres y la mesa la lista con comprobantes de voto. Para abrir los sobres cada lista tiene que ingresar su clave privada. El conteo se realiza utilizando las cadenas $R_M \left(\text{Opc}_i + \text{ID}_V + \text{RandA}_i \right)$, que como fueron firmadas por la mesa garantizan la validez del sobre. 
