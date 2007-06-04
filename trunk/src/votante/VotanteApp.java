@@ -54,7 +54,7 @@ public class VotanteApp {
 
 			// Chequeo que pueda leerse
 			if (!archivoClavePrivada.canRead())
-				throw new Exception("No se encontró el archivo de clave privada asociado a su DNI. Colóquelo en la carpeta resources/votantes.");
+				throw new Exception("No se encontró el archivo de clave privada asociado a su DNI (" + archivoClavePrivada +"). Colóquelo en la carpeta resources/votantes.");
 			
 			String clavePrivada = obtenerClave(archivoClavePrivada);
 			
