@@ -82,7 +82,7 @@ En este trabajo analizamos el diseño e implementación de un sistema de voto elec
 
 \section{Diseño}
 
-Para poder garantizar el anonimato de los votos en el sistema, planteamos el diseño separado en tres sub-sistemas. Con esto, logramos que en ninguna de las tres partes en ningún momento se encuentre la información suficiente para que se pueda asociar un voto con un votante. Estos tres sub-sistemas son:
+Para poder garantizar el anonimato de los votos en el sistema, planteamos el diseño separado en tres subsistemas. Con esto, logramos que en ninguna de las tres partes en ningún momento se encuentre la información suficiente para que se pueda asociar un voto con un votante. Estos tres subsistemas son:
 
 \begin{itemize}
 \item Votante: Esta es la terminal en que el usuario vota. Tiene que ser de su confianza.
@@ -90,12 +90,12 @@ Para poder garantizar el anonimato de los votos en el sistema, planteamos el dis
 \item Urna: Tiene como función recibir los votos y llevar la cuenta de los mismos. Entrega al votante el comprobante de votación (ticket).
 \end{itemize}
 
-Este esquema puede apreciarse en la figura \ref{esquema}. Allí también se indica con flechas el envío de mensajes entre sub-sistemas y el orden de los mismos.
+Este esquema puede apreciarse en la figura \ref{esquema}. Allí también se indica con flechas el envío de mensajes entre subsistemas y el orden de los mismos.
 
 \begin{center}
 \begin{figure}
 \includegraphics[scale=0.70]{esquema}
-\caption{Esquema del sistema. Se indica con flechas el envío de mensajes entre sub-sistemas.}
+\caption{Esquema del sistema. Se indica con flechas el envío de mensajes entre subsistemas.}
 \label{esquema}
 \end{figure}
 \end{center}
@@ -106,7 +106,7 @@ Partimos de las siguientes hipótesis:
 \begin{itemize}
 \item Todos los votantes poseen claves públicas y privadas. 
 \item Se puede relacionar los DNI de los votantes con su clave pública.
-\item Todos los votantes conocen las claves públicas de los sub-sistemas.
+\item Todos los votantes conocen las claves públicas de los subsistemas.
 \item Cada opción de voto (partidos, listas, etc.) posee una clave pública y una privada. La pública es conocida por todos.
 \item La lista de opciones de voto es pública.
 \item Los administradores de mesa y urna son distintos y no tienen manera de contactarse entre sí (no pueden confabular para modificar los resultados). De no cumplirse esta hipótesis el sistema sería muy fácilmente vulnerable ya que a través del entrecruzamiento de los datos que posee cada subsistema se podría relacionar un voto con su respectivo votante.
@@ -117,10 +117,10 @@ Partimos de las siguientes hipótesis:
 Con el fin de analizar el protocolo, adoptamos las siguientes convenciones:
 
 \begin{itemize}
-\item $U_M$: Clave pública del sub-sistema \emph{Mesa}.
-\item $R_M$: Clave privada del sub-sistema \emph{Mesa}.
-\item $U_U$: Clave pública del sub-sistema \emph{Urna}.
-\item $R_U$: Clave privada del sub-sistema \emph{Urna}.
+\item $U_M$: Clave pública del subsistema \emph{Mesa}.
+\item $R_M$: Clave privada del subsistema \emph{Mesa}.
+\item $U_U$: Clave pública del subsistema \emph{Urna}.
+\item $R_U$: Clave privada del subsistema \emph{Urna}.
 \item $U_{V_i}$: Clave pública del i-ésimo votante.
 \item $R_{V_i}$: Clave privada del i-ésimo votante.
 \item $S_{{VU}_i}$: Secreto compartido entre el i-ésimo votante y la urna.
@@ -139,17 +139,17 @@ Un proceso de votación consta de los siguientes 6 pasos:
 \end{scriptsize}
 
 
-Para ir a votar, la persona le envía al subsistema \emph{Mesa} el siguiente mensaje encriptado con $U_M$ para que sólo la Mesa pueda saber su contenido:
+Para ir a votar, la persona le envía al subsistema \emph{Mesa} el siguiente mensaje encriptado con $U_M$ para que sólo la Mesa pueda saber su contenido, que consta de:
 \begin{itemize}
  
-\item Un secreto compartido entre la persona y la urna. Para hacer esto genera un valor aleatorio (como él lo genera, lo conoce) y lo encripta con la clave pública de la urna, para que sólo esta pueda entenderlo. Este secreto va a ser utilizado por la urna para identificar al votante como válido.
+\item Un secreto compartido entre la persona y la urna. Para hacer esto el votante genera un valor aleatorio (como él lo genera, lo conoce) y lo encripta con la clave pública de la urna, para que sólo esta pueda entenderlo. Este secreto va a ser utilizado por la urna para identificar al votante como válido.
 
 \item Un secreto compartido entre la persona y la mesa. Al igual que en el anterior, este secreto es generado por la persona. Sirve para garantizarle a la mesa que el \textbf{hash} siguiente está bien formado y para evitar que la urna
 pueda relacionar $S_{{VU}_i}$ con el DNI de la persona (ver TODO: ATAQUE correspondiente).
 
-\item La clave pública de la persona. Es un primer intento de identificación, en este punto la mesa puede buscar en el patrón el DNI que corresponde a la clave suministrada.
+\item La clave pública de la persona. Es un primer intento de identificación, en este punto la mesa puede buscar en el padrón el DNI que corresponde a la clave suministrada.
 
-\item Su DNI concatenado con el ID de la votación, un \textbf{hash} y firmado con su clave privada. La mesa ya sabe qué DNI tiene que obtener por el item anterior, y como está firmado con $R_{V_i}$ sabe que sólo pudo haber sido creado por la persona. El ID sirve para que no se pueda utilizar el token en otra votación. El hash sirve para evitar que la mesa trate de generar su propio $S_{{VU}_i}$ (ver TODO: ATAQUE correspondiente). La mesa tiene que guardar este token completo a modo de comprobante de voto y la persona tiene que guardar $S_{{VU}_i}$  y $S_{{VM}_i}$ como la primera parte de su ticket.
+\item Su DNI concatenado con el ID de la votación y un \textbf{hash}, y firmado con su clave privada. La mesa ya sabe qué DNI tiene que obtener por el item anterior, y como está firmado con $R_{V_i}$ sabe que sólo pudo haber sido creado por la persona. El ID sirve para que no se pueda utilizar el token en otra votación. El hash sirve para evitar que la mesa trate de generar su propio $S_{{VU}_i}$ (ver TODO: ATAQUE correspondiente). La mesa tiene que guardar este token completo a modo de comprobante de voto y la persona tiene que guardar $S_{{VU}_i}$  y $S_{{VM}_i}$ como la primera parte de su ticket.
 
 
 %\item Su ticket, que está compuesto por el DNI de la persona, concatenado con un string aleatorio y encriptado con su clave pública. El ticket es algo que sólo la persona puede llegar a entender y le va a servir para averiguar si su voto está presente cuando se haga el conteo. Posteriormente, ese ticket será firmado digitalmente por la urna y por la mesa para que tenga validez.
@@ -181,7 +181,7 @@ Después de verificar que la persona está registrada en el padrón y no votó, la m
 \\
 
 
-La mesa le devuelve encriptada con $U_{V_i}$ (para que sólo la persona lo entienda) las distintas opciones que puede elegir - las Boletas. Cada boleta está representada por la opción concatenada al ID de votación y a una cadena aleatoria. Están firmadas por la mesa para evitar que otra persona pueda generar una boleta válida.
+La mesa le devuelve encriptada con $U_{V_i}$ (para que sólo la persona lo entienda) las distintas opciones que puede elegir - las boletas. Cada boleta está representada por la opción concatenada al ID de votación y a una cadena aleatoria. Están firmadas por la mesa para evitar que otra persona pueda generar una boleta válida.
 
 \subsubsection{Paso 4}
 
@@ -197,7 +197,8 @@ La mesa le devuelve encriptada con $U_{V_i}$ (para que sólo la persona lo entien
 \end{equation}
 \end{footnotesize}
 
-El votante genera un sobre encriptando con las claves de los partidos la boleta elegida concatenada a un valor aleatorio $\text{RandB}_i$ para evitar que la mesa pueda regenerar todos los posibles sobres y saber a quién votó la persona.
+El votante genera un sobre encriptando con las claves de todas las listas 
+(cada lista representa una opción en la boleta) la boleta elegida concatenada a un valor aleatorio $\text{RandB}_i$ para evitar que la mesa pueda regenerar todos los posibles sobres y saber a quién votó la persona.
 
 Una vez generado el sobre, el votante procede a depositarlo (enviarlo) en la urna. Para hacerlo tiene que enviar (además del sobre) el secreto que sólo él y la urna conocen. La urna puede verificar que el secreto está autorizado por la mesa y marcar internamente que ese secreto no será valido de aquí en adelante.
 
@@ -209,7 +210,7 @@ Una vez generado el sobre, el votante procede a depositarlo (enviarlo) en la urn
 \end{equation}
 \end{footnotesize}
 
-Despúes de almacenar el voto, la urna informa a la mesa que la persona ya votó (para evitar que vuelva a votar) dándole $U_U \left( S_{{VU}_i} \right)$ que es el valor que la mesa utilizó para relacionar al votante. También le envia un \emph{Challenge} para que la mesa le devuelva firmado a modo de reconocimiento (TODO: Expresar mejor esto) . La mesa guarda por ese votante el par de datos $U_{V_i}$, $R_{V_i} \Bigl[ \text{DNI} + \text{ID}_V + \text{Hash} \bigl( U_U \left( S_{{VU}_i} \right) + S_{{VM}_i}\bigr) \Bigr]$ a modo de comprobante de voto.
+Despúes de almacenar el voto, la urna informa a la mesa que la persona ya votó (para evitar que vuelva a votar) dándole $U_U \left( S_{{VU}_i} \right)$ que es el valor que la mesa utilizó para relacionar al votante. También le envía un \emph{Challenge} para que la mesa le devuelva firmado a modo de reconocimiento (TODO: Expresar mejor esto) . La mesa guarda por ese votante el par de datos $U_{V_i}$, $R_{V_i} \Bigl[ \text{DNI} + \text{ID}_V + \text{Hash} \bigl( U_U \left( S_{{VU}_i} \right) + S_{{VM}_i}\bigr) \Bigr]$ a modo de comprobante de voto.
 
 \subsubsection{Paso 6}
 \begin{footnotesize}
@@ -231,12 +232,12 @@ Despúes de almacenar el voto, la urna informa a la mesa que la persona ya votó (
 La urna le aplica una función de hash al sobre recibido en el paso 4, lo firma y se lo devuelve al votante que lo utilizará como segunda parte de su ticket.
 
 \section{Conteo y detección de fraude}
-El conteo debe ser realizado en una maquina en la cual confien todos los partidos. La urna debe presentar los sobres y la mesa la lista con comprobantes de voto. Para abrir los sobres cada partido tiene que ingresar su clave privada. El conteo se realiza utilizando las cadenas $R_M \left(\text{Opc}_i + \text{ID}_V + \text{RandA}_i \right)$, que como fueron firmadas por la mesa garantizan la validez del sobre. 
-Los partidos tienen que publicar dos listas, una con todos los $\text{Hash} \bigl( U_U \left( S_{{VU}_i} \right) + S_{{VM}_i}\bigr)$ obtenidos de los comprobantes de la Mesa y otro con todos los $\text{Hash} \left( \text{Sobre}\right)$ obtenidos de los sobres de la Urna. De esta manera cada votante puede buscar su ticket en las listas y verificar que realmente participó en la votación sin revelar a quien voto.
+El conteo debe ser realizado en una máquina en la cual confíen todas las listas. La urna debe presentar los sobres y la mesa la lista con comprobantes de voto. Para abrir los sobres cada lista tiene que ingresar su clave privada. El conteo se realiza utilizando las cadenas $R_M \left(\text{Opc}_i + \text{ID}_V + \text{RandA}_i \right)$, que como fueron firmadas por la mesa garantizan la validez del sobre. 
+Los partidos tienen que publicar dos listas, una con todos los $\text{Hash} \bigl( U_U \left( S_{{VU}_i} \right) + S_{{VM}_i}\bigr)$ obtenidos de los comprobantes de la mesa y otro con todos los $\text{Hash} \left( \text{Sobre}\right)$ obtenidos de los sobres de la urna. De esta manera cada votante puede buscar su ticket en las listas y verificar que realmente participó en la votación sin revelar a quien voto.
 
 % Si una persona tiene un ticket firmado por la urna y la mesa y su ticket no está en la lista, quiere decir que su voto no ha contado. De esta manera se puede detectar fraude.
 
-A continuación se presenta los distintos escenarios de ataque organizados por el sistema comprometido. Se puede notar que la votación puede ser anulada por la Mesa o por la Urna, lo que se trata de lograr es identificar quien fue el responsable del fraude.
+A continuación presentamos los distintos escenarios de ataque organizados por el sistema comprometido. Se puede notar que la votación puede ser anulada por la mesa o por la urna, lo que se trata de lograr es identificar quién fue el responsable del fraude.
 
 \subsection{Ataques cometidos por la Mesa}
 \subsubsection{Utilizar información de un votante para otras elecciones}
@@ -251,16 +252,16 @@ No puede generar los comprobantes del tipo $U_{V_i}$, $R_{V_i} \Bigl[ \text{DNI}
 \subsubsection{Identificar a un votante con un sobre}
 
 
-\subsection{Ataques cometidos por la Urna}
+\subsection{Ataques cometidos por la urna}
 
 \subsubsection{Modificar un voto}\label{modif_voto}
-La urna no puede generar un sobre válido, porque la opción tiene que estar firmado por la mesa. Si decide modificar un sobre aleatoriamente lo estaría impugnando, pero como el usuario tiene como ticket un \textbf{hash} de ese sobre sabría que su voto fue modificado y podría denunciarlo.
+La urna no puede generar un sobre válido, porque la opción tiene que estar firmada por la mesa. Si decide modificar un sobre aleatoriamente lo estaría impugnando, pero como el usuario tiene como ticket un \textbf{hash} de ese sobre sabría que su voto fue modificado y podría denunciarlo.
 
 \subsubsection{Mover un voto válido de una elección a otra}
 No puede porque las boletas firmadas por la mesa contienen el ID de la votación.
 
 \subsubsection{Agregar o sacar votos}
-La urna tiene que almacenar los $R_M \bigl( U_U \left( S_{{VU}_i} \right) \bigr)$ recibidos en el paso 2, cuya cantidad debe ser la misma que la cantidad de sobres. Caso cotrario, hubo fraude de parte de la urna. Si saca un sobre, el votante puede darse cuenta por lo explicado en la subsección \ref{modif_voto}. Si agrega un sobre, no va a poder generar un secreto $S_{VU}$ encriptado firmado.
+La urna tiene que almacenar los $R_M \bigl( U_U \left( S_{{VU}_i} \right) \bigr)$ recibidos en el paso 2, cuya cantidad debe ser la misma que la cantidad de sobres. Caso contrario, hubo fraude de parte de la urna. Si saca un sobre, el votante puede darse cuenta por lo explicado en la subsección \ref{modif_voto}. Si agrega un sobre, no va a poder generar un secreto $S_{VU}$ encriptado firmado.
 
 \subsubsection{Saber que votó una persona}
 Informalmente: Si no estuviese $\text{RandB}_i$, la mesa, guardando las opciones firmadas del paso 3 y asociandolas al DNI, podría regenerar el \textbf{hash del sobre} para los distintos sobres posibles y así averiguar quien votó a quien.
