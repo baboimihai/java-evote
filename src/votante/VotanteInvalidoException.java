@@ -9,6 +9,11 @@ public class VotanteInvalidoException extends Exception
 	/**
 	 * 
 	 */
+	private static final long serialVersionUID = 925092039546601516L;
+
+	/**
+	 * 
+	 */
 	public VotanteInvalidoException()
 	{
 
