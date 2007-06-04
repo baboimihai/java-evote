@@ -11,6 +11,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Iterator;
 
+import oracle.jdbc.OracleResultSet;
+import oracle.sql.CLOB;
+
 import criptografia.Hasheador;
 
 class BoletasIterador implements Iterator<String>
@@ -138,6 +141,8 @@ this.b = Baseconn.getInstance();//TODO Inicializaciones necesarias.
 	{
 		String svu_hash = Hasheador.hashear(svu);
 		ResultSet r;
+		CLOB c;
+		String boleta;
 
 		PreparedStatement pstmt;
 		pstmt = b.prepare("select boleta from cripto_boletas where svu = ?");
@@ -150,9 +155,11 @@ this.b = Baseconn.getInstance();//TODO Inicializaciones necesarias.
 			throw new Exception("Boleta no encontrada");
 		}
 
+		c = ((OracleResultSet) r).getCLOB(1);
+		boleta = c.getSubString((long)1, (int)c.length());
 		r.close();
 
-		return r.getString(1); // Comprobante;
+		return boleta; // Comprobante;
 	}
 
 }
