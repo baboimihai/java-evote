@@ -98,7 +98,7 @@ public class VotanteApp {
 			
 			do
 				opcionVot = obtenerOpcion(1, estadoVotaciones.size(), "Ingrese el número de la votación de la que desea participar: ");
-			while (!Padron.getInstance().puedeVotar(dni, estadoVotaciones.get(opcionVot-1).get(0).toString()));
+			while (!(Boolean)estadoVotaciones.get(opcionVot-1).get(1));
 			
 			
 			// Muestro las opciones disponibles para esa votación
