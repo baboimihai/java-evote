@@ -3,7 +3,6 @@ package eleccion;
  * 
  * @author ezequiel85
  * @version 1.0
- * La clase Padron hace que Ingui se la coma mas rapido
  *
  */
 import java.io.*;
