@@ -45,7 +45,8 @@ public class Contador {
 		Hashtable<String, Integer> resultados = new Hashtable<String, Integer>();
 		// hashes de los sobres para publicar
 		HashSet<String> hashesSobres = new HashSet<String>();
-
+		HashSet<String> hashesCompMesa = new HashSet<String>();
+		
 		// conjunto de comprobantes de la urna
 		HashSet<String> comprobantesUrnaValidos = new HashSet<String>();
 		// conjunto de comprobantes de la mesa
@@ -201,18 +202,35 @@ public class Contador {
 			e.printStackTrace();
 		}
 
+				
 		System.out.println("Contador: Verificando honestidad de la Mesa...");
-		for ( Iterator<String> iter = comprobantesM.iterator(); iter.hasNext();) {
+		for ( Iterator<List<String>> iter = comprobantesM.iterator(); iter.hasNext();) {
 
-			String comprobante = iter.next();
-
+			List<String> comprobante = iter.next();
+			try {
+				Validador votantePub = new Validador(comprobante.get(0));	 
+				votantePub.validar(comprobante.get(1));
+			} catch (InvalidKeyException e) {
+				System.out.println("Contador: El comprobante: " +
+						comprobante + " no está encriptado con la clave del votante. ");
+				System.exit(1);
+				//e.printStackTrace();
+			} catch (IOException e) {
+				System.out.println("Contador: El comprobante: " +
+						comprobante + " es mal codificado. ");
+				System.exit(1);
+				
+			}
 			
-			if (!comprobantesMesaValidos.add(comprobante)) {
+			if (!comprobantesMesaValidos.add(comprobante.get(1))) {
 					//si no lo agrego, es porque está repetido, entonces hay lío
 					System.out.println("Contador: El comprobante: " +
 							comprobante + " está repetido. ");
 					System.exit(1); // si salta siempre por acá olvidar el comprobanteValido.get
 			}
+			
+			hashesCompMesa.add(Hasheador.hashear(comprobante.get(1)));
+			
 			
 		}
 
@@ -327,6 +345,14 @@ public class Contador {
 //		resultHTML.concat("<p/>");
 		int i= 0;
 		for (String string : hashesSobres) {
+			System.out.println("hash " + i++ + ": " + string);
+//			resultHTML.concat("<p/>");
+		}
+		
+		System.out.println("La siguiente es la lista de comprobantes que valieron en " +
+		"esta elección: ");
+		i= 0;
+		for (String string : hashesCompMesa) {
 			System.out.println("hash " + i++ + ": " + string);
 //			resultHTML.concat("<p/>");
 		}
