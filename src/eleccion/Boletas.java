@@ -58,10 +58,12 @@ class BoletasIterador implements Iterator<String>
 	public String next()
 	{
 		String s = null;
+		CLOB c;
 
 		try
 		{
-			s = r.getString(1);
+			c = ((OracleResultSet) r).getCLOB(1);
+			s = c.getSubString((long)1, (int)c.length());
 			r.next();
 		} catch (SQLException e)
 		{
