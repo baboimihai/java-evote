@@ -244,27 +244,27 @@ A continuación presentamos los distintos escenarios de ataque organizados por el
 
 \subsection{Ataques cometidos por la Mesa}
 \subsubsection{Utilizar información de un votante para otras elecciones}
-Informalmente: No puede por el ID Votación
+El comprobante que tiene la mesa (recibido en el paso 1) contiene un ID de votación, y está firmado por el votante. Es por eso que la mesa no puede generar un nuevo comprobante valido para otra elección y sin comprobante se puede demostrar que la mesa hizo fraude.
 
 \subsubsection{Sacar un votante de la lista de comprobantes de voto}
-Informalmente: Si se terminó el proceso de votación, la urna tendría más $R_M \bigl( U_U \left( S_{{VU}_i} \right) \bigr)$ que comprobantes de voto.
+Si la mesa elimina un comprobante la urna tendría más \mbox{$R_M \bigl( U_U \left( S_{{VU}_i} \right) + \text{ID}_V \bigr)$} que comprobantes de voto. Como está firmado por la mesa la urna no puede generarlos y de esta manera se puede contar todos los comprobantes de ambas partes y ver quien está cometiendo fraude. 
 
 \subsubsection{Generar votos inválidos}\label{mesa_gen_voto}
-No puede generar los comprobantes del tipo $U_{V_i}$, $R_{V_i} \Bigl[ \text{DNI}+ \text{ID}_V + \text{Hash} \Bigl( U_U \left( S_{{VU}_i} \right) + S_{{VM}_i}\Bigr) \Bigr]$ porque utilizan la clave privada de cada votante.
+La mesa puede generar un $S_{{VU}_i}$ encriptarlo con la clave pública de la urna y firmarlo para generar un sobre, pero no puede generar los comprobantes del tipo $U_{V_i}$, $R_{V_i} \Bigl[ \text{DNI}+ \text{ID}_V + \text{Hash} \Bigl( U_U \left( S_{{VU}_i} \right) + S_{{VM}_i}\Bigr) \Bigr]$ para sustentar el voto (porque utilizan la clave privada de cada votante).
 
 \subsubsection{Identificar a un votante con un sobre}
-
+Si no fuese por $\text{RandB}_i$ la mesa podría generar un hash de sobre para cada boleta que emitió en el paso 3 y probar si aparece en el archivo publicado por las listas. 
 
 \subsection{Ataques cometidos por la urna}
 
 \subsubsection{Modificar un voto}\label{modif_voto}
-La urna no puede generar un sobre válido, porque la opción tiene que estar firmada por la mesa. Si decide modificar un sobre aleatoriamente lo estaría impugnando, pero como el usuario tiene como ticket un \textbf{hash} de ese sobre sabría que su voto fue modificado y podría denunciarlo.
+La urna no puede generar un sobre válido, porque la opción tiene que estar firmada por la mesa. Si decide modificar un sobre aleatoriamente lo estaría impugnando, pero como el usuario tiene como ticket un \textbf{hash} de ese sobre sabría que su voto fue modificado y podría denunciarlo. Además como no puede leer los sobres cualquier ataque de este tipo sería completamente aleatorio y no beneficiaría a ningún partido (en el caso de que el votante no denuncie a la urna).
 
 \subsubsection{Mover un voto válido de una elección a otra}
-No puede porque las boletas firmadas por la mesa contienen el ID de la votación.
+La urna no puede utilizar una boleta de una votación a otra porque las boletas firmadas por la mesa contienen el ID de la votación. Además de que la opción tendría que ser válida en la nueva elección.
 
 \subsubsection{Agregar o sacar votos}
-La urna tiene que almacenar los $R_M \bigl( U_U \left( S_{{VU}_i} \right) \bigr)$ recibidos en el paso 2, cuya cantidad debe ser la misma que la cantidad de sobres. Caso contrario, hubo fraude de parte de la urna. Si saca un sobre, el votante puede darse cuenta por lo explicado en la subsección \ref{modif_voto}. Si agrega un sobre, no va a poder generar un secreto $S_{VU}$ encriptado firmado.
+La urna tiene que almacenar los $R_M \bigl( U_U \left( S_{{VU}_i} \right) + \text{ID}_V \bigr)$ recibidos en el paso 2, cuya cantidad debe ser la misma que la cantidad de sobres y de comprobantes de mesa. Caso contrario, hubo fraude de parte de la urna. Si saca un sobre, el votante puede darse cuenta por lo explicado en la subsección \ref{modif_voto}. Si agrega un sobre, no va a poder generar un secreto $S_{VU}$ encriptado firmado.
 
 \subsubsection{Saber que votó una persona}
 Informalmente: Si no estuviese $\text{RandB}_i$, la mesa, guardando las opciones firmadas del paso 3 y asociandolas al DNI, podría regenerar el \textbf{hash del sobre} para los distintos sobres posibles y así averiguar quien votó a quien.
