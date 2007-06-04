@@ -405,7 +405,7 @@ logger.debug("sobreOUT: " + t2);
 		urnaOut.close();
 		urnaIn.close();
 
-		return ticket;
+		return ticketSinFirmar + "\n" + ticket;
 	}
 
 }
