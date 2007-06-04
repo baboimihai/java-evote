@@ -311,7 +311,7 @@ El sistema consta de dos aplicaciones servidor, la mesa y la urna, quienes atien
 Ambos servidores utilizan su propia base de datos para guardar toda la información necesaria para el correcto funcionamiento, como boletas y comprobantes. Tanto los servidores como el cliente pueden ejecutarse en cualquier host y a través de Internet. Sin embargo, es recomendado que tanto las bases de datos como los servidores se ejecuten sobre distintos hosts. Una configuración óptima sería ejecutar cada servidor en una red distinta, con su respectiva base de datos en el mismo host.
 
 \subsection{Funcionamiento}
-Para iniciar una votación, los dos servidores deben estar ejecutándose y deben estar configurados correctamente (con las votaciones, opciones y votantes cargados). En los clientes, los votantes deben incluir su clave privada en el directorio \verb#resources/votantes# para poder comenzar.
+Para iniciar una votación, los dos servidores deben estar ejecutándose y deben estar configurados correctamente (con las votaciones, opciones y votantes cargados). En los clientes, los votantes deben incluir su clave privada en el directorio \verb#resources/votacion/# para poder comenzar.
 
 De acuerdo a lo establecido por el diseño del protocolo, el servidor de mesa aguarda las conexiones iniciales de los votantes. Al recibir un mensaje de un votante identificándose, se crea un thread para atenderlo, iniciando todo el proceso de votación. Lo mismo sucede en la urna al ser notificada del arrivo del votante. Se establecen conexiones entre votante, mesa y urna, y de allí en más se llevan a cabo todos los pasos que el protocolo define, utilizando encriptación asimétrica y firmas.
 
