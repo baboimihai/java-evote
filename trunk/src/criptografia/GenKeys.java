@@ -15,39 +15,59 @@ public class GenKeys {
 	 * @return 1ro la pública y después la privada
 	 */
 	public static void generarClaves(int bitsLargo, String pathPrivada, String pathPublica) throws Exception {
-	
-		if (bitsLargo == 0)
+
+		if (bitsLargo == 0 || bitsLargo < 1024)
 			bitsLargo = 1024;
 
-		BigInteger one      = new BigInteger("1");
+		if (bitsLargo % 32 != 0)
+			bitsLargo = ((bitsLargo + 31) / 32) * 32;
+
 		SecureRandom random = new SecureRandom();
+		BigInteger p, q, phi, modulus, two;
 
-		BigInteger p = BigInteger.probablePrime(bitsLargo/2, random);
-		BigInteger q = BigInteger.probablePrime(bitsLargo/2, random);
-		BigInteger phi = (p.subtract(one)).multiply(q.subtract(one));
+		two = new BigInteger("2");
+		do {
+			p = BigInteger.probablePrime(bitsLargo/2, random);
+			q = BigInteger.probablePrime(bitsLargo/2, random);
 
-		BigInteger publicKeyN = new BigInteger("65537");     // common value in practice = 2^16 + 1
+			if (p.compareTo(q) > 0) {
+				BigInteger aux;
+				aux = p;
+				p = q;
+				q = aux;
+			}
+
+			modulus = p.multiply(q);
+		} while (modulus.bitLength() != bitsLargo);
+
+		phi = (p.subtract(BigInteger.ONE)).multiply(q.subtract(BigInteger.ONE));
+
+		BigInteger publicKeyN = new BigInteger("65537"); //2^16+1 el del gpg
+
+		while (publicKeyN.compareTo(phi) >= 0 && publicKeyN.gcd(phi) != BigInteger.ONE)
+			publicKeyN = publicKeyN.add(two);
+
 		BigInteger privateKeyN = publicKeyN.modInverse(phi);
-		BigInteger modulus = p.multiply(q);
+
 
 
 		// Creo los writer para escribir el archivo.
 		BufferedWriter priv = new BufferedWriter(new FileWriter(pathPrivada));
 		BufferedWriter pub = new BufferedWriter(new FileWriter(pathPublica));
-				 
+
 		String publica = new String("public = " + publicKeyN + "\nmodulus = " + modulus);
 		String privada = new String("private = " + privateKeyN + "\nmodulus = " + modulus);
-		
+
 		//System.out.println(publica);
 		//System.out.println(privada);
 		pub.write(publica);
 		priv.write(privada);
-		
+
 		// Cierro los archivos
 		pub.close();
 		priv.close();
 	}
-	
+
 	public static void main (String [] args) throws Exception {
 
 		String pathbase = args[0];
