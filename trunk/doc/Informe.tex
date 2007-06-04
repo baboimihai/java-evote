@@ -252,6 +252,10 @@ La mesa puede generar un $S_{{VU}_i}$ encriptarlo con la clave pública de la urn
 \subsubsection{Identificar a un votante con un sobre}
 Si no fuese por $\text{RandB}_i$ la mesa podría generar un hash de sobre para cada boleta que emitió en el paso 3 y probar si aparece en el archivo publicado por las listas. 
 
+\subsubsection{Anular las elecciones}
+La mesa no puede decirle a un votante que ya votó en una elección que el votante no halla votado porque tendría que tener un comprobante que respalde esa afirmación.
+Si la mesa está fuera de servicio o si decide no contestar mensajes de los votantes, las personas que decidan votar no van a poder y les va a aparecer un mensaje para que se quejen con las autoridades, pero esto no anula las elecciones (ver restricciones del protocolo).
+
 \subsection{Ataques cometidos por la urna}
 
 \subsubsection{Modificar un voto}\label{modif_voto}
@@ -261,19 +265,32 @@ La urna no puede generar un sobre válido, porque la opción tiene que estar firma
 La urna no puede utilizar una boleta de una votación a otra porque las boletas firmadas por la mesa contienen el ID de la votación. Además de que la opción tendría que ser válida en la nueva elección.
 
 \subsubsection{Agregar o sacar votos}
-La urna tiene que almacenar los $R_M \bigl( U_U \left( S_{{VU}_i} \right) + \text{ID}_V \bigr)$ recibidos en el paso 2, cuya cantidad debe ser la misma que la cantidad de sobres y de comprobantes de mesa. Caso contrario, hubo fraude de parte de la urna. Si saca un sobre, el votante puede darse cuenta por lo explicado en la subsección \ref{modif_voto}. Si agrega un sobre, no va a poder generar un secreto $S_{VU}$ encriptado firmado.
+La urna tiene que almacenar los $R_M \bigl( U_U \left( S_{{VU}_i} \right) + \text{ID}_V \bigr)$ recibidos en el paso 2, cuya cantidad debe ser la misma que la cantidad de sobres y de comprobantes de mesa. Si saca un sobre, el votante puede darse cuenta por lo explicado en la subsección \ref{modif_voto}. Si agrega un sobre, no va a poder generar un secreto $S_{VU}$ encriptado y firmado.
 
 \subsubsection{Saber que votó una persona}
-Informalmente: Si no estuviese $\text{RandB}_i$, la mesa, guardando las opciones firmadas del paso 3 y asociandolas al DNI, podría regenerar el \textbf{hash del sobre} para los distintos sobres posibles y así averiguar quien votó a quien.
+La urna no tiene información que relacione $S_{{VU}_i}$ con el dni de la persona, y tampoco puede abrir los sobres.
 
+\subsubsection{Anular las elecciones}
+Si la urna está fuera de servicio o si decide no contestar mensajes de los votantes, las personas que quieran depositar su sobre no van a poder y les va a aparecer un mensaje para que se quejen con las autoridades, pero esto no anula las elecciones (ver restricciones del protocolo).
+Lo mismo pasa si decide enviarle un comprobante incorrecto.
 
 \subsection{Ataques cometidos por un Votante}
-\subsubsection{Anular la votación}
-\subsubsection{Votar varias veces}
-TODO
+\subsubsection{Anular las elecciones}
+Una persona puede ir a quejarse con las autoridades diciendo que su voto no fue tomado en cuenta o que no lo dejan votar, pero esto no anula las elecciones (ver restricciones del protocolo).
 
+\subsubsection{Votar varias veces}
+Una persona no puede votar varias veces porque solo tiene un $S_{{VU}_i}$ valido.
+
+\subsection{Ataques cometidos por una persona intermedia}
+\subsubsection{Robarle la identidad a un votante}
+Es el deber de cada votante asegurar su clave privada, en caso de perderla tiene que notificar a las autoridades. Si no lo hisiera, una persona podría votar en su nombre.
+La persona intermedia no puede leer los mensajes transmitidos porque no posee ninguna de las claves privadas (ni la de los votantes ni de la mesa o urna).
+
+\subsubsection{Anular las elecciones}
+Una persona que físicamente pueda meterse en el medio de la comunicación podría tirar paquetes aleatoriamente, pero esto no anularía las elecciones (ver restricciones del protocolo).
 
 \section{Vulnerabilidades y restricciones conocidas}
+El desarrollo informático del protocolo no concidera en profundidad ataques del estilo \emph{anular las elecciones} ejemplificado en los distintos tipos de ataque. Ante cualquier problema en el que al usuario le salte un cartel de quejarse (o el mismo mienta y decida hacerlo), las autoridades deben analizar el problema y resolverlo \emph{localizadamente}. Esto quiere decir que son problemas individuales a ser tratados fuera del protocolo, pero no afectan a la totalidad de la votación.
 
 \tableofcontents
 
