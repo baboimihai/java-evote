@@ -55,13 +55,14 @@ class ComprobantesMesaIterador implements Iterator<List<String>>
 	{
 		String s = null;
 		String uvi = null;
-		CLOB c;
+		CLOB c, d;
 
 		try
 		{
 			c = ((OracleResultSet)r).getCLOB(1);
 			s = c.getSubString((long)1, (int)c.length());
-			uvi = r.getString(2);
+			d = ((OracleResultSet)r).getCLOB(2);
+			uvi = d.getSubString((long)1, (int)d.length());
 			r.next();
 		} catch (SQLException e)
 		{
@@ -166,13 +167,15 @@ public class ComprobantesMesa implements Iterable
 
 		PreparedStatement pstmt;
 
-		pstmt = b.prepare("Insert into cripto_comprobantes values(?,?,?,?,?,?)");
+		pstmt = b.prepare("Insert into cripto_comprobantes values(?,?,?,?,?,?,?)");
 		pstmt.setString(1,usvu_hash);
 		pstmt.setString(2,usvu);
 		pstmt.setString(3, uvi_hash);
-		pstmt.setString(4,tokenFirmado);
-		pstmt.setString(5,idv);
-		pstmt.setInt(6, 0);
+		pstmt.setString(4, uvi);
+		pstmt.setString(5,tokenFirmado);
+		pstmt.setString(6,idv);
+		pstmt.setInt(7, 0);
+		
 
 		pstmt.executeUpdate();
 
@@ -192,7 +195,7 @@ public class ComprobantesMesa implements Iterable
 		CLOB c;
 		CLOB d;
 
-		pstmt = b.prepare("select usvu_orig, comprobante from cripto_comprobantes where uvi = ? and idv = ?");
+		pstmt = b.prepare("select usvu_clob, comprobante from cripto_comprobantes where uvi = ? and idv = ?");
 		pstmt.setString(1, uvi_hash);
 		pstmt.setString(2, idv);
 
