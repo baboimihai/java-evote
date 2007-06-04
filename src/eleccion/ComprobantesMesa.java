@@ -12,7 +12,7 @@ import oracle.sql.*;
 import oracle.jdbc.*;
 import criptografia.Hasheador;
 
-class ComprobantesMesaIterador implements Iterator<String>
+class ComprobantesMesaIterador implements Iterator<List>
 {
 	ResultSet r;
 	Baseconn b;
@@ -25,7 +25,7 @@ class ComprobantesMesaIterador implements Iterator<String>
 		try
 		{
 			b = Baseconn.getInstance();
-			pstmt = b.prepare("select comprobante from cripto_comprobantes where idv like ?");
+			pstmt = b.prepare("select comprobante, uvi from cripto_comprobantes where idv like ?");
 			pstmt.setString(1, idv);
 			r = pstmt.executeQuery();
 			r.next();
@@ -51,21 +51,23 @@ class ComprobantesMesaIterador implements Iterator<String>
 		}
 		return !a;
 	}
-	public String next()
+	public List<String> next()
 	{
 		String s = null;
+		String uvi = null;
 		CLOB c;
 
 		try
 		{
 			c = ((OracleResultSet)r).getCLOB(1);
 			s = c.getSubString((long)1, (int)c.length());
+			uvi = r.getString(2);
 			r.next();
 		} catch (SQLException e)
 		{
 			e.printStackTrace();
 		}
-		return s;
+		return Arrays.asList(uvi,s);
 	}
 	public void remove()
 	{
@@ -256,7 +258,7 @@ public class ComprobantesMesa implements Iterable
 		this.idv = idv;
 	}
 
-	public Iterator<String> iterator()
+	public Iterator<List> iterator()
 	{
 		return new ComprobantesMesaIterador(idv);
 	}
