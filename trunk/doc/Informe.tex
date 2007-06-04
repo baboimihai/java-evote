@@ -87,7 +87,7 @@ Para poder garantizar el anonimato de los votos en el sistema, planteamos el dis
 \begin{itemize}
 \item Votante: Esta es la terminal en que el usuario vota. Tiene que ser de su confianza.
 \item Mesa: Se encarga de validar que cada votante esté registrado en el padrón, y le da un grupo de boletas para que envíe la que corresponda a su elección a la urna.
-\item Urna: Tiene como función recibir los votos y llevar la cuenta de los mismos. Entrega al votante el comprobante de votación (ticket).
+\item Urna: Tiene como función recibir los votos y entrega al votante el comprobante de votación (ticket).
 \end{itemize}
 
 Este esquema puede apreciarse en la figura \ref{esquema}. Allí también se indica con flechas el envío de mensajes entre subsistemas y el orden de los mismos.
@@ -145,11 +145,11 @@ Para ir a votar, la persona le envía al subsistema \emph{Mesa} el siguiente mens
 \item Un secreto compartido entre la persona y la urna. Para hacer esto el votante genera un valor aleatorio (como él lo genera, lo conoce) y lo encripta con la clave pública de la urna, para que sólo esta pueda entenderlo. Este secreto va a ser utilizado por la urna para identificar al votante como válido.
 
 \item Un secreto compartido entre la persona y la mesa. Al igual que en el anterior, este secreto es generado por la persona. Sirve para garantizarle a la mesa que el \textbf{hash} siguiente está bien formado y para evitar que la urna
-pueda relacionar $S_{{VU}_i}$ con el DNI de la persona (ver TODO: ATAQUE correspondiente).
+pueda relacionar $S_{{VU}_i}$ con el DNI de la persona.
 
 \item La clave pública de la persona. Es un primer intento de identificación, en este punto la mesa puede buscar en el padrón el DNI que corresponde a la clave suministrada.
 
-\item Su DNI concatenado con el ID de la votación y un \textbf{hash}, y firmado con su clave privada. La mesa ya sabe qué DNI tiene que obtener por el item anterior, y como está firmado con $R_{V_i}$ sabe que sólo pudo haber sido creado por la persona. El ID sirve para que no se pueda utilizar el token en otra votación. El hash sirve para evitar que la mesa trate de generar su propio $S_{{VU}_i}$ (ver TODO: ATAQUE correspondiente). La mesa tiene que guardar este token completo a modo de comprobante de voto y la persona tiene que guardar $S_{{VU}_i}$  y $S_{{VM}_i}$ como la primera parte de su ticket.
+\item Su DNI concatenado con el ID de la votación y un \textbf{hash}, y firmado con su clave privada. La mesa ya sabe qué DNI tiene que obtener por el item anterior, y como está firmado con $R_{V_i}$ sabe que sólo pudo haber sido creado por la persona. El ID sirve para que no se pueda utilizar el token en otra votación. El hash sirve para evitar que la mesa trate de generar su propio $S_{{VU}_i}$ (ver seccion \ref{mesa_gen_voto}). La mesa tiene que guardar este token completo a modo de comprobante de voto y la persona tiene que guardar $S_{{VU}_i}$  y $S_{{VM}_i}$ como la primera parte de su ticket.
 
 
 %\item Su ticket, que está compuesto por el DNI de la persona, concatenado con un string aleatorio y encriptado con su clave pública. El ticket es algo que sólo la persona puede llegar a entender y le va a servir para averiguar si su voto está presente cuando se haga el conteo. Posteriormente, ese ticket será firmado digitalmente por la urna y por la mesa para que tenga validez.
@@ -246,7 +246,7 @@ Informalmente: No puede por el ID Votación
 \subsubsection{Sacar un votante de la lista de comprobantes de voto}
 Informalmente: Si se terminó el proceso de votación, la urna tendría más $R_M \bigl( U_U \left( S_{{VU}_i} \right) \bigr)$ que comprobantes de voto.
 
-\subsubsection{Generar votos inválidos}
+\subsubsection{Generar votos inválidos}\label{mesa_gen_voto}
 No puede generar los comprobantes del tipo $U_{V_i}$, $R_{V_i} \Bigl[ \text{DNI}+ \text{ID}_V + \text{Hash} \Bigl( U_U \left( S_{{VU}_i} \right) + S_{{VM}_i}\Bigr) \Bigr]$ porque utilizan la clave privada de cada votante.
 
 \subsubsection{Identificar a un votante con un sobre}
