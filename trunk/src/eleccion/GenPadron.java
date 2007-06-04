@@ -1,7 +1,7 @@
 package eleccion;
 
 /**
- * Esta clase sirve para parsear mi existencia
+ * Esta clase sirve para parsear
  */
 
 import java.io.*;
@@ -42,8 +42,8 @@ public class GenPadron
 	{
 		this.r_votante = new BufferedReader(new FileReader(votante));
 		this.r_votacion = new BufferedReader(new FileReader(votacion));
-		this.w_votante = new BufferedWriter(new FileWriter(InfoServidores.resources + "votantes/votante_parsed.txt"));
-		this.w_votacion = new BufferedWriter(new FileWriter(InfoServidores.resources + "votacion/votacion_parsed.txt"));
+		this.w_votante = new BufferedWriter(new FileWriter("votante_parsed.txt"));
+		this.w_votacion = new BufferedWriter(new FileWriter("votacion_parsed.txt"));
 
 		parse_votante(this.r_votante, this.w_votante);
 		parse_votacion(this.r_votacion, this.w_votacion);
@@ -55,7 +55,7 @@ public class GenPadron
 		String[] splitted;
 //		String dni_string;
 		String path = InfoServidores.resources + "votantes/";
-
+		//String path="";
 		//String val;
 		//Hashtable<String, String> tablita;
 

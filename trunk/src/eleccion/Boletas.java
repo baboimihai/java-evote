@@ -2,8 +2,6 @@ package eleccion;
 /**
  * @author ezequiel85
  * @version 23.3.5
- * Esta clase sirve para que Ingui sea boleta
- * SALUD, Y PESETAS!!!
  */
 import java.lang.Iterable;
 import java.sql.PreparedStatement;
@@ -89,7 +87,7 @@ public class Boletas implements Iterable
 	// El constructor es privado para evitar que lo instancien otras clases
 	private Boletas () throws ClassNotFoundException, SQLException
 	{
-this.b = Baseconn.getInstance();//TODO Inicializaciones necesarias.
+		this.b = Baseconn.getInstance();
 	}
 
 	/**
