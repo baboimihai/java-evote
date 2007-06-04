@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- WARNING: Eclipse auto-generated file.
+              Any modifications will be overwritten.
+              To include a user specific buildfile here, simply create one in the same
+              directory with the processing instruction <?eclipse.ant.import?>
+              as the first entry and export the buildfile again. -->
+<project basedir="." default="build" name="java-evote">
+    <property environment="env"/>
+    <property name="ECLIPSE_HOME" value="../../../../opt/eclipse-3.2.2"/>
+    <property name="workspace_loc:java-evote/bin" value="bin"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="target" value="1.5"/>
+    <property name="source" value="1.5"/>
+    <path id="java-evote.classpath">
+        <pathelement location="bin"/>
+        <pathelement location="lib/classes12.jar"/>
+        <pathelement location="lib/junit.jar"/>
+        <pathelement location="lib/log4j-1.2.13.jar"/>
+    </path>
+    <target name="init">
+        <mkdir dir="bin"/>
+        <copy includeemptydirs="false" todir="bin">
+            <fileset dir="src" excludes="**/*.launch, **/*.java"/>
+        </copy>
+    </target>
+    <target name="clean">
+        <delete dir="bin"/>
+    </target>
+    <target depends="clean" name="cleanall"/>
+    <target depends="build-subprojects,build-project" name="build"/>
+    <target name="build-subprojects"/>
+    <target depends="init" name="build-project">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" source="${source}" target="${target}">
+            <src path="src"/>
+            <classpath refid="java-evote.classpath"/>
+        </javac>
+    </target>
+    <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
+    <target description="copy Eclipse compiler jars to ant lib directory" name="init-eclipse-compiler">
+        <copy todir="${ant.library.dir}">
+            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
+        </copy>
+        <unzip dest="${ant.library.dir}">
+            <patternset includes="jdtCompilerAdapter.jar"/>
+            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
+        </unzip>
+    </target>
+    <target description="compile project with Eclipse compiler" name="build-eclipse-compiler">
+        <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
+        <antcall target="build"/>
+    </target>
+    <target name="GenKeys">
+        <java classname="criptografia.GenKeys" failonerror="true" fork="yes">
+            <arg line="0"/>
+            <classpath refid="java-evote.classpath"/>
+        </java>
+    </target>
+    <target name="InfoServidores">
+        <java classname="eleccion.InfoServidores" dir="${workspace_loc:java-evote/bin}" failonerror="true" fork="yes">
+            <classpath refid="java-evote.classpath"/>
+        </java>
+    </target>
+    <target name="MesaApp">
+        <java classname="mesa.MesaApp" dir="${workspace_loc:java-evote/bin}" failonerror="true" fork="yes">
+            <classpath refid="java-evote.classpath"/>
+        </java>
+    </target>
+	<target name="MesaJar">
+		<jar destfile="build/mesa.jar" manifest="src/mesa/MANIFEST.MF" basedir="bin/">
+			<include name="mesa/**"/>
+			<include name="criptografia/**"/>
+			<include name="eleccion/**"/>
+		</jar>
+	</target>
+	<target name="UrnaJar">
+		<jar destfile="build/urna.jar" manifest="src/urna/MANIFEST.MF" basedir="bin/">
+			<include name="urna/**"/>
+			<include name="criptografia/**"/>
+			<include name="eleccion/**"/>
+		</jar>
+	</target>
+	<target name="VotanteJar">
+		<jar destfile="build/votante.jar" manifest="src/votante/MANIFEST.MF" basedir="bin/">
+			<include name="votante/**"/>
+			<include name="criptografia/**"/>
+			<include name="eleccion/**"/>
+		</jar>
+	</target>
+	<target name="GenPadronJar">
+		<jar destfile="build/genpadron.jar" manifest="src/eleccion/MANIFEST.MF" basedir="bin/">
+			<include name="criptografia/**"/>
+			<include name="eleccion/**"/>
+		</jar>
+	</target>
+	<target name="ContadorJar">
+		<jar destfile="build/contador.jar" manifest="src/contador/MANIFEST.MF" basedir="bin/">
+			<include name="contador/**"/>
+			<include name="criptografia/**"/>
+			<include name="eleccion/**"/>
+		</jar>
+	</target>
+	<target name="CrearJars" depends="ContadorJar,GenPadronJar,VotanteJar,UrnaJar,MesaJar"/>
+		
+</project>
