@@ -25,7 +25,7 @@ class ComprobantesMesaIterador implements Iterator<List<String>>
 		try
 		{
 			b = Baseconn.getInstance();
-			pstmt = b.prepare("select comprobante, uvi from cripto_comprobantes where idv like ?");
+			pstmt = b.prepare("select comprobante, uvi_clob from cripto_comprobantes where idv like ?");
 			pstmt.setString(1, idv);
 			r = pstmt.executeQuery();
 			r.next();
