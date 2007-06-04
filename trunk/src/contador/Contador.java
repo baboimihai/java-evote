@@ -1,8 +1,5 @@
 package contador;
-import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.util.Enumeration;
@@ -51,7 +48,8 @@ public class Contador {
 
 		// conjunto de comprobantes de la urna
 		HashSet<String> comprobantesUrnaValidos = new HashSet<String>();
-
+		// conjunto de comprobantes de la mesa
+		HashSet<String> comprobantesMesaValidos = new HashSet<String>();
 
 		// Motor de desencriptación
 		Desencriptador desencriptador = new Desencriptador();
@@ -109,7 +107,7 @@ public class Contador {
 		    //logger.debug("agregué las claves a mi pila para tenerlas hacia atrás");
 
 		     }
-		     logger.error("Armé la lista inversa de claves que tengo que levantar en memoria");
+		     logger.debug("Armé la lista inversa de claves que tengo que levantar en memoria");
 
 		     // invierto la lista
 		     while(! kOpcStack.empty()) {
@@ -163,7 +161,7 @@ public class Contador {
 			e.printStackTrace();
 		}
 
-		System.out.println("Contador: Verificando honestidad de la Unra...");
+		System.out.println("Contador: Verificando honestidad de la Urna...");
 		for ( Iterator<String> iter = comprobantesU.iterator(); iter.hasNext();) {
 
 			String comprobante = iter.next();
@@ -193,8 +191,44 @@ public class Contador {
 
 		}
 
+		ComprobantesMesa comprobantesM = null;
+		try {
+			comprobantesM = ComprobantesMesa.getInstance();
+			comprobantesM.setIteratorIdv(idv);
+		} catch (Exception e)
+		{
+			logger.fatal("falló el getInstance de los comprobantes de la mesa: " + e.getMessage());
+			e.printStackTrace();
+		}
 
+		System.out.println("Contador: Verificando honestidad de la Mesa...");
+		for ( Iterator<String> iter = comprobantesM.iterator(); iter.hasNext();) {
 
+			String comprobante = iter.next();
+
+			
+			if (!comprobantesMesaValidos.add(comprobante)) {
+					//si no lo agrego, es porque está repetido, entonces hay lío
+					System.out.println("Contador: El comprobante: " +
+							comprobante + " está repetido. ");
+					System.exit(1); // si salta siempre por acá olvidar el comprobanteValido.get
+			}
+			
+		}
+
+		System.out.println("Contador: Comparando registros de la urna contra registros de la mesa...");
+
+		if (comprobantesMesaValidos.size() != comprobantesUrnaValidos.size())
+		{
+			System.out.println("Contador: la cantidad de comprobantes de la urna es distinta de la de la mesa");
+			System.exit(1); // si salta siempre por acá olvidar el comprobanteValido.get
+
+		}
+
+		
+		System.out.println("Contador: Tanto la urna como la mesa parecen honestas. " +
+		"Ahora es tarea de los votantes chequear que su voto contó.");
+		
 		/* ahora que estoy listo para contar, procedo con la cuenta */
 		// pido los sobres. Acá hay un tema con los nombres :( TODO ver
 
@@ -282,11 +316,11 @@ public class Contador {
 /*		String resultHTML = new String();
 		resultHTML.concat("<html>");
 		resultHTML.concat("<head><title>Resultados de la elección " + idv + "</title></head>");
-		resultHTML.concat("<body>Los resultados de la elección " + idv + " son: <p/>");
-		resultHTML.concat(resultados.toString());
-*/		System.out.println(resultados);
-/*		resultHTML.concat("<p/>");
-*/
+		resultHTML.concat("<body>*/
+		System.out.println("Los resultados de la elección " + idv + " son: ");
+		System.out.println(resultados.toString());
+//		resultHTML.concat("<p/>");
+
 
 		System.out.println("La siguiente es la lista de sobres que valieron en " +
 				"esta elección: ");
@@ -307,57 +341,6 @@ public class Contador {
 			e1.printStackTrace();
 		}
 */
-		/* ahora le pido a la mesa sus comprobantes, si alguno no es correcto, o está duplicado
-		 * la mandamos al paredón.
-		 */
-
-		ComprobantesMesa comprobantesM = null;
-		try {
-			comprobantesM = ComprobantesMesa.getInstance();
-			comprobantesM.setIteratorIdv(idv);
-		} catch (Exception e)
-		{
-			logger.fatal("falló el getInstance de los comprobantes de la urna: " + e.getMessage());
-			e.printStackTrace();
-		}
-
-		System.out.println("Contador: Verificando honestidad de la Mesa...");
-		for ( Iterator<String> iter = comprobantesM.iterator(); iter.hasNext();) {
-
-			String comprobante = iter.next();
-
-			List<String> comprobanteValido;
-
-			try {
-				comprobanteValido = validador.validar(comprobante);
-				if ( comprobanteValido.get(1).equals(idv) && !comprobantesUrnaValidos.add(comprobante)) {
-					//si no lo agrego, es porque está repetido, entonces hay lío
-					System.out.println("Contador: El comprobante: " +
-							comprobante + " está repetido. ");
-					System.exit(1); // si salta siempre por acá olvidar el comprobanteValido.get
-				}
-
-			} catch (InvalidKeyException e) {
-				System.out.println("Contador: El comprobante: " +
-						comprobante + " no fue generado por la mesa. ");
-				//e.printStackTrace();
-				System.exit(1);
-			} catch (IOException e) {
-				System.out.println("Contador: El comprobante: " +
-						comprobante + " está mal codificado. ");
-				//e.printStackTrace();
-				System.exit(1);
-			}
-
-		}
-
-		System.out.println("Contador: Comparando registros de la urna contra registros de la mesa...");
-
-
-		System.out.println("Contador: Tanto la urna como la mesa parecen honestas. " +
-				"Ahora es tarea de los votantes chequear que su voto contó.");
-
-
 
 	}
 
