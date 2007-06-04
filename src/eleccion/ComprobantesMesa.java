@@ -12,7 +12,7 @@ import oracle.sql.*;
 import oracle.jdbc.*;
 import criptografia.Hasheador;
 
-class ComprobantesMesaIterador implements Iterator<List>
+class ComprobantesMesaIterador implements Iterator<List<String>>
 {
 	ResultSet r;
 	Baseconn b;
@@ -258,7 +258,7 @@ public class ComprobantesMesa implements Iterable
 		this.idv = idv;
 	}
 
-	public Iterator<List> iterator()
+	public Iterator<List<String>> iterator()
 	{
 		return new ComprobantesMesaIterador(idv);
 	}
