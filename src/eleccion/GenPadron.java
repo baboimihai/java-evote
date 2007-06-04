@@ -77,7 +77,8 @@ public class GenPadron
 				//{
 				//	dni_string = val;
 				//}
-				GenKeys.generarClaves(0,path+splitted[1]+"_privada.key", path+splitted[1]+"_publica.key");
+				System.out.println("Creando claves para: " + splitted[1]);
+				GenKeys.generarClaves(0,path+splitted[1].trim()+"_privada.key", path+splitted[1].trim()+"_publica.key");
 				res = splitted[0].trim()+","+splitted[1].trim();
 			}
 			else
@@ -116,6 +117,7 @@ public class GenPadron
 				//vot_num_s = (new Long(vot_num)).toString();
 				//opc_num_s = (new Long(opc_num)).toString();
 				String keyName = idv + "_" + splitted[1].trim().replace(' ', '_').replace('/', '_');
+				System.out.println("Creando claves para: " + keyName);
 				GenKeys.generarClaves(0, path + keyName + "_privada.key",
 										 path + keyName + "_publica.key");
 				res = splitted[0].trim() + "," + splitted[1].trim() + "," + keyName;

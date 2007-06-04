@@ -77,6 +77,7 @@ public class MesaHandler extends Thread{
 			else
 			{
 				logger.warn("Trato de votar un usuario no valido");
+				votanteOut.writeObject(new Exception("Ud no esta habilitado para votar"));
 			}
 		}
 		catch (Exception e) {
@@ -177,7 +178,7 @@ public class MesaHandler extends Thread{
 			// Si la excepción es porque no lo encontró es porque no voto.
 			// caso contrario devuelvo false porque ya voto o hizo quilombo.
 			if ( !(e instanceof ComprobanteNotFoundException) ){
-				logger.info("El votante " + dni + " ya voto en " + idv);
+				logger.info("El votante " + dni + " ya voto en " + idv + "("+ e.getMessage() + ")");
 				return false;
 			}
 		}

@@ -38,8 +38,8 @@ public class GenKeys {
 		String publica = new String("public = " + publicKeyN + "\nmodulus = " + modulus);
 		String privada = new String("private = " + privateKeyN + "\nmodulus = " + modulus);
 		
-		System.out.println(publica);
-		System.out.println(privada);
+		//System.out.println(publica);
+		//System.out.println(privada);
 		pub.write(publica);
 		priv.write(privada);
 		

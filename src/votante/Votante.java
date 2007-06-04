@@ -313,7 +313,9 @@ logger.debug("sobreOUT: " + t2);
 		mesaIn = new ObjectInputStream(mesa.getInputStream());
 
 		// Recibo el mensaje con las boletas
-		String msg = (String) mesaIn.readObject();
+		Object msg_obj = mesaIn.readObject();
+		if ( msg_obj instanceof Exception) throw (Exception) msg_obj;
+		String msg = (String) msg_obj;
 
 		// Inicializo desencriptadores y validador
 		Desencriptador desencriptador = new Desencriptador(rvi);

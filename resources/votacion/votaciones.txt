@@ -1,20 +1,32 @@
-0,Rojo o azul?
-1,Rojo,Rojo_o_azul?_Rojo
-1,Azul,Rojo_o_azul?_Azul
-2,Grupo 1
-2,Grupo 2
-0,A B o C
-1,A,A_B_o_C_A
-1,B,A_B_o_C_B
-1,C,A_B_o_C_C
-2,Grupo 3
-2,Grupo 1
-2,Grupo 5
-2,Grupo 4
-0,Jefe de gobierno
-1,Telerman,Jefe_de_gobierno_Telerman
-1,Macri,Jefe_de_gobierno_Macri
-1,Filmus,Jefe_de_gobierno_Filmus
-2,Grupo 3
-2,Grupo 4
-2,Grupo 5
+0, ¿Ha mejorado la calidad de vida en los ultimos años?
+1, Si
+1, No
+1, NS/NC
+2, Grupo Alfa
+2, Grupo Control
+0, ¿Esta pensando encambiar de trabajo?
+1, Si
+1, No
+1, NS/NC
+2, Pofesional
+0, ¿Cual es su color favorito?
+1, Negro
+1, Blanco
+1, Rojo
+1, Azul
+1, Verde
+1, Amarillo
+1, Celeste
+1, Otro
+2, Estudiante
+2, Grupo Control
+0, ¿Que opina del calentamiento global?
+1, Es un problema serio y debe ser tratado inmediatamente
+1, Es un problema, pero no tan serio como lo publicitan
+1, Es un problema, pero para las generaciones venideras
+1, No es un problema, es un instrumento de propaganda
+1, El calentamiento global es una mentira
+2, Grupo Alfa
+2, Estudiante
+2, Profesional
+2, Grupo Control
