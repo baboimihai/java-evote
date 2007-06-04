@@ -57,7 +57,6 @@
 \renewcommand{\footrulewidth}{0.4pt}
 
 %% Titulo %%
-
 \title{{\bf Sistema de voto electrónico}}
 \author{M. Besio \and P. García \and E. Gómez Balaguer \and H. Rajchert}
 \date{}
@@ -67,12 +66,6 @@
 \begin{document}
 \maketitle
 \thispagestyle{fancy}
-
-\newpage
-
-\tableofcontents
-
-\newpage
 
 %% COMIENZO DEL TEXTO %%
 
@@ -129,7 +122,7 @@ Con el fin de analizar el protocolo, adoptamos las siguientes convenciones:
 \item $\text{ID}_V$: El ID de votación es una cadena que identifica la votación (única por elección).
 \end{itemize}
 
-Un proceso de votación consta de los siguientes 6 pasos:                                                        
+Un proceso de votación consta de los siguientes 7 pasos:
 
 \subsubsection{Paso 1}
 \begin{scriptsize}
@@ -139,7 +132,7 @@ Un proceso de votación consta de los siguientes 6 pasos:
 \end{scriptsize}
 
 
-Para ir a votar, la persona le envía al subsistema \emph{Mesa} el siguiente mensaje encriptado con $U_M$ para que sólo la Mesa pueda saber su contenido, que consta de:
+Para ir a votar, la persona le envía al subsistema \emph{Mesa} el siguiente mensaje encriptado con $U_M$ para que sólo la mesa pueda saber su contenido, que consta de:
 \begin{itemize}
  
 \item Un secreto compartido entre la persona y la urna. Para hacer esto el votante genera un valor aleatorio (como él lo genera, lo conoce) y lo encripta con la clave pública de la urna, para que sólo esta pueda entenderlo. Este secreto va a ser utilizado por la urna para identificar al votante como válido.
@@ -147,9 +140,9 @@ Para ir a votar, la persona le envía al subsistema \emph{Mesa} el siguiente mens
 \item Un secreto compartido entre la persona y la mesa. Al igual que en el anterior, este secreto es generado por la persona. Sirve para garantizarle a la mesa que el \textbf{hash} siguiente está bien formado y para evitar que la urna
 pueda relacionar $S_{{VU}_i}$ con el DNI de la persona.
 
-\item La clave pública de la persona. Es un primer intento de identificación, en este punto la mesa puede buscar en el padrón el DNI que corresponde a la clave suministrada.
+\item La clave pública de la persona. Es un primer intento de identificación. En este punto la mesa puede buscar en el padrón el DNI que corresponde a la clave suministrada.
 
-\item Su DNI concatenado con el ID de la votación y un \textbf{hash}, y firmado con su clave privada. La mesa ya sabe qué DNI tiene que obtener por el item anterior, y como está firmado con $R_{V_i}$ sabe que sólo pudo haber sido creado por la persona. El ID sirve para que no se pueda utilizar el token en otra votación. El hash sirve para evitar que la mesa trate de generar su propio $S_{{VU}_i}$ (ver seccion \ref{mesa_gen_voto}). La mesa tiene que guardar este token completo a modo de comprobante de voto y la persona tiene que guardar $S_{{VU}_i}$  y $S_{{VM}_i}$ como la primera parte de su ticket.
+\item Su DNI concatenado con el ID de la votación y un \textbf{hash}, y firmado con su clave privada. La mesa ya sabe qué DNI tiene que obtener por el ítem anterior, y como está firmado con $R_{V_i}$ sabe que sólo pudo haber sido creado por la persona. El ID sirve para que no se pueda utilizar el token en otra votación. El hash sirve para evitar que la mesa trate de generar su propio $S_{{VU}_i}$ (ver Sección \ref{mesa_gen_voto}). La mesa tiene que guardar este token completo a modo de comprobante de voto y la persona tiene que guardar $S_{{VU}_i}$  y $S_{{VM}_i}$ como la primera parte de su ticket.
 
 
 %\item Su ticket, que está compuesto por el DNI de la persona, concatenado con un string aleatorio y encriptado con su clave pública. El ticket es algo que sólo la persona puede llegar a entender y le va a servir para averiguar si su voto está presente cuando se haga el conteo. Posteriormente, ese ticket será firmado digitalmente por la urna y por la mesa para que tenga validez.
@@ -163,7 +156,7 @@ pueda relacionar $S_{{VU}_i}$ con el DNI de la persona.
 \end{equation}
 \end{footnotesize}
 
-Después de verificar que la persona está registrada en el padrón y no votó, la mesa le envía a la urna el secreto $ U_U \left( S_{{VU}_i} \right)$ concatenado a el ID de votación, firmado con su clave privada $R_M$. De esta manera la mesa está diciendo que si bien no sabe el secreto, la persona que lo emitió está autorizada para votar (para la votación asignada al ID correspondiente).
+Después de verificar que la persona está registrada en el padrón y que no votó, la mesa le envía a la urna el secreto $ U_U \left( S_{{VU}_i} \right)$ concatenado al ID de votación, firmado con su clave privada $R_M$. De esta manera la mesa está diciendo que si bien no sabe el secreto, la persona que lo emitió está autorizada para votar (en la votación asignada al ID correspondiente).
 
 \subsubsection{Paso 3}
 
@@ -181,7 +174,7 @@ Después de verificar que la persona está registrada en el padrón y no votó, la m
 \\
 
 
-La mesa le devuelve encriptada con $U_{V_i}$ (para que sólo la persona lo entienda) las distintas opciones que puede elegir - las boletas. Cada boleta está representada por la opción concatenada al ID de votación y a una cadena aleatoria. Están firmadas por la mesa para evitar que otra persona pueda generar una boleta válida.
+La mesa le devuelve encriptada con $U_{V_i}$ (para que sólo la persona lo entienda) las distintas opciones que puede elegir, es decir, las boletas. Cada boleta está representada por la opción concatenada al ID de votación y a una cadena aleatoria. Están firmadas por la mesa para evitar que otra persona pueda generar una boleta válida.
 
 \subsubsection{Paso 4}
 
@@ -197,9 +190,9 @@ La mesa le devuelve encriptada con $U_{V_i}$ (para que sólo la persona lo entien
 \end{equation}
 \end{footnotesize}
 
-El votante elije uno de las boletas recibidas en el paso 3 y genera un sobre encriptando con las claves públicas de todas las listas (cada lista representa una opción en la boleta). La boleta elegida se concatena con un valor aleatorio $\text{RandB}_i$ para evitar que la mesa pueda regenerar todos los posibles sobres y saber a quién votó la persona.
+El votante elije uno de las boletas recibidas en el paso 3 y genera un sobre encriptando con las claves públicas de todas las opciones de voto (cada una de ellas representa una opción en la boleta). La boleta elegida se concatena con un valor aleatorio $\text{RandB}_i$ para evitar que la mesa pueda regenerar todos los posibles sobres y saber a quién votó la persona.
 
-Una vez generado el sobre, el votante procede a depositarlo (enviarlo) en la urna. Para hacerlo tiene que enviar (además del sobre) el secreto que sólo él y la urna conocen. La urna puede verificar que el secreto está autorizado por la mesa y marcar internamente que ese secreto está en proceso de votación (Para evitar que trate de votar dos veces).
+Una vez generado el sobre, el votante procede a depositarlo (enviarlo) en la urna. Para hacerlo tiene que enviar (además del sobre) el secreto que sólo él y la urna conocen. La urna puede verificar que el secreto está autorizado por la mesa y marcar internamente que ese secreto está en proceso de votación (para evitar que se pueda votar más de una vez en la misma votación).
 
 \subsubsection{Paso 5}
 
@@ -209,7 +202,7 @@ Una vez generado el sobre, el votante procede a depositarlo (enviarlo) en la urn
 \end{equation}
 \end{footnotesize}
 
-Despúes de almacenar el voto, la urna informa a la mesa que la persona ya votó (para evitar que vuelva a votar) dándole $U_U \left( S_{{VU}_i} \right)$ que es el valor que la mesa utilizó para relacionar al votante. También le envía un \emph{Challenge} para que la mesa le devuelva firmado a modo de reconocimiento de voto. 
+Despúes de almacenar el voto, la urna informa a la mesa que la persona ya votó en esta votación (para evitar que vuelva a votar) dándole $U_U \left( S_{{VU}_i} \right)$ que es el valor que la mesa utilizó para relacionar al votante. También le envía un \emph{Challenge} para que la mesa le devuelva firmado a modo de reconocimiento de voto. 
 
 
 \subsubsection{Paso 6}
@@ -218,9 +211,13 @@ Despúes de almacenar el voto, la urna informa a la mesa que la persona ya votó (
 \text{Mesa} \rightarrow \text{Urna}: U_U \bigl( R_M \left( \text{Challenge} \right) \bigr) 
 \end{equation}
 \end{footnotesize}
-La mesa guarda como comprobante el par de datos $U_{V_i}$, $R_{V_i} \Bigl[ \text{DNI} + \text{ID}_V + \text{Hash} \bigl( U_U \left( S_{{VU}_i} \right) + S_{{VM}_i}\bigr) \Bigr]$.
+La mesa guarda como comprobante el siguiente par de datos:
+\begin{itemize}
+ \item $U_{V_i}$
+ \item $R_{V_i} \Bigl[ \text{DNI} + \text{ID}_V + \text{Hash} \bigl( U_U \left( S_{{VU}_i} \right) + S_{{VM}_i}\bigr) \Bigr]$.
+\end{itemize}
 
-Firma y le devuelve el challenge a la urna. Ambos marcan que la persona ya voto.
+Luego firma y le devuelve el \emph{Challenge} a la urna. Ambos marcan que la persona ya votó en la votación correspondiente.
 
 
 \subsubsection{Paso 7}
@@ -232,7 +229,7 @@ Firma y le devuelve el challenge a la urna. Ambos marcan que la persona ya voto.
 \end{footnotesize}
 
 %La urna firma el ticket previamente firmado por la mesa y se lo envía al votante (como comprobante de la operación).
-Después de recibir el challenge firmado la urna La urna le aplica una función de hash al sobre recibido en el paso 4, lo firma y se lo devuelve al votante que lo utilizará como segunda parte de su ticket.
+Después de recibir el \emph{Challenge} firmado la urna, la urna le aplica una función de hash al sobre recibido en el Paso 4, lo firma y se lo devuelve al votante, que lo utilizará como segunda parte de su ticket.
 
 \section{Conteo y detección de fraude}
 El conteo debe ser realizado en una máquina en la cual confíen todas las listas. La urna debe presentar los sobres y la mesa la lista con comprobantes de voto. Para abrir los sobres cada lista tiene que ingresar su clave privada. El conteo se realiza utilizando las cadenas $R_M \left(\text{Opc}_i + \text{ID}_V + \text{RandA}_i \right)$, que como fueron firmadas por la mesa garantizan la validez del sobre. 
@@ -277,6 +274,8 @@ TODO
 
 
 \section{Vulnerabilidades y restricciones conocidas}
+
+\tableofcontents
 
 \begin{thebibliography}{99}
 \bibitem{linksecuriteam}``Secure Electronic Voting Over The World Wide Web'', Mark A. Herschberg, \url{http://theory.csail.mit.edu/~cis/theses/herschberg/all.pdf}.
