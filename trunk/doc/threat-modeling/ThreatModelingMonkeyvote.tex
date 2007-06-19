@@ -1,0 +1,128 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage[spanish]{babel}
+\selectlanguage{spanish}
+\spanishdecimal{.} % Si se quiere definir el punto decimal como punto en vez de coma
+\addto\captionsspanish{\def\tablename{Tabla}} % Para renombrar todos los 'Cuadro' con 'Tabla'.
+\usepackage{fancyhdr}
+\usepackage[dvips]{graphicx}
+\usepackage[normal]{caption2}
+\usepackage{amsfonts,amssymb,amsmath,amsthm}
+\usepackage{moreverb}
+\usepackage{url}
+\usepackage[T1]{fontenc}
+\pagestyle{fancy}
+
+\pagestyle{fancy}
+\lhead{Criptografía y Seguridad}
+\chead{}
+\rhead{ITBA}
+\cfoot{\thepage}
+\renewcommand{\footrulewidth}{0.4pt}
+
+\newcommand{\expon}[1]{~10^{#1}}
+\newcommand{\dif}[1]{\mathrm{d}#1}
+
+% \\			Line break
+% \today		Fecha del sistema
+% \label{}		Etiqueta
+% \ref{}		Referencia a la etiqueta del mismo nombre (a la sección)
+% \footnote{}		Nota al pie de la página
+% \underline{}		Subrayado
+% \emph{}		Cursiva
+% \textbf{}		Negrita
+% \mbox{}		No separa lo que está entre corchetes
+% \begin{}		Comienza el entorno entre corchetes
+% \end{}		Termina el entrorno entre corchetes
+% \thepage		Número de página
+% \url{}		URL
+% \section{}		Sección
+% \subsection{}		Subsección
+% \subsubsection{}	Subsubsección
+% \frac{a}{b}		Fracción (a sobre b)
+% a_t			A sub t (expr. matemática)
+% $a$			Letra matemática a (puede ser por ejemplo \tau o directamente una letra
+
+% Para enumerar:
+% \begin{itemize}
+% \item Enumerado 1.
+% \item Enumerado 2.
+% \end{itemize}
+
+% Para poner eps:
+% \begin{figure}
+% \begin{center}
+% \includegraphics[scale=0.6]{Nombre del eps}
+% \caption{Lo que va a decir abajo}
+% \label{Para hacerle referencia}
+% \end{center}
+% \end{figure}
+
+% Para hacer ecuación:
+% \begin{equation}
+% \label{Para hacerle referencia}
+% Expresion
+% \end{equation}
+
+% Para hacer ecuación alineando un igual (por columnas)
+%\begin{eqnarray*}
+%\label{Para hacerle referencia}
+%X &=& 3 + 7\\
+%&=& 10
+%\end{eqnarray*}
+
+% Para hacer tabla:
+% \begin{table}
+% \begin{center}
+% \begin{tabular}{|c|c|} \hline Formato: cada pipe es una línea vertical.
+% a & b \\ \hline Formato: cada \hline es una línea horizontal.
+% \end{tabular}
+% \caption{Nombre de la tabla.}
+% \label{Para hacerle referencia}
+% \end{center}
+% \end{table}
+
+
+\title{{\bf Modelado de Amenazas del sistema de voto electrónico \emph{Monkeyvote}}}
+\author{M. Besio \and P. García \and E. Gómez Balaguer \and H. Rajchert}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\thispagestyle{fancy}
+
+\section{Introducción}
+El objetivo de este trabajo es descubrir las potenciales amenazas y las vulnerabilidades presentes en la aplicación de voto electrónico \emph{Monkeyvote}\footnote{Se puede acceder a su código fuente de forma anónima mediante SVN en \url{http://monkeyvote.googlecode.com/svn/trunk}.}. El análisis es realizado considerando las mismas condiciones y supuestos para las que fue desarrollado el sistema.
+
+\section{Modelado del sistema y del entorno}
+
+\subsection{Entry Points}
+
+\subsection{Assets}
+
+\subsection{Trust Levels}
+
+\subsection{Escenarios de uso}
+
+\subsection{Dependencias externas}
+
+\subsection{Notas de seguridad}
+
+\subsection{DFD del sistema}
+
+
+
+\begin{thebibliography}{99}
+\url{http://msdn.microsoft.com/library/default.asp?url=/library/en-us/dnpag2/html/tmwa.asp}.
+\end{thebibliography}
+
+\newpage
+
+\tableofcontents
+
+\begin{center}
+\tiny{\emph{Made with \LaTeX}}
+\end{center}
+
+\end{document}
+
