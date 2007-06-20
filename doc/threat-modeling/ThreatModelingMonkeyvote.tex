@@ -101,6 +101,27 @@ El objetivo de este trabajo es descubrir las potenciales amenazas y las vulnerab
 \subsection{Assets}
 
 \subsection{Trust Levels}
+Naturalmente, los niveles de confianza serán 4, y corresponderán a cada uno de los entes en que se divide el sistema. Dado que los servidores tienen un funcionamiento completamente autónomo se les puede asignar a cada uno encargados de su administración y asociarles un nivel de confianza. Por otro lado, los votantes también conforman un trust level separado. En la tabla \ref{trust_levels} se apreciar los niveles de confianza con un identificador y una descripción asociada.
+
+ Las actividades para cada nivel de confianza serán muy distintas y por ninguna razón deberían mezclarse. Este es un sistema donde los límites están muy bien marcados, y como la seguridad es un aspecto más que importante aquí, todo aquello que los trasgreda es un posible causal de malfuncionamiento.
+
+\begin{table}
+\begin{center}
+\begin{tabular}{|c|c|c|} \hline
+\textbf{ID} & \textbf{Nombre} & \textbf{Descripción}\\ \hline
+1 & Votante & Persona registrada en el sistema\\
+&& para votar.\\ \hline
+2 & Administrador de \verb#Auth1# & Encargado de la administración del\\
+&& servidor de autenticación 1.\\ \hline
+3 & Administrador de \verb#Auth2# & Encargado de la administración del\\
+&& servidor de autenticación 2.\\ \hline
+4 & Administrador de \verb#Votos# & Encargado de la administración del\\
+&& servidor de votos.\\ \hline
+\end{tabular}
+\caption{Trust levels: División en niveles de confianza para los participantes del sistema.}
+\label{trust_levels}
+\end{center}
+\end{table}
 
 \subsection{Escenarios de uso}
 
@@ -113,7 +134,7 @@ El objetivo de este trabajo es descubrir las potenciales amenazas y las vulnerab
 
 
 \begin{thebibliography}{99}
-\url{http://msdn.microsoft.com/library/default.asp?url=/library/en-us/dnpag2/html/tmwa.asp}.
+\bibitem{MSDN}\url{http://msdn.microsoft.com/library/default.asp?url=/library/en-us/dnpag2/html/tmwa.asp}.
 \end{thebibliography}
 
 \newpage
