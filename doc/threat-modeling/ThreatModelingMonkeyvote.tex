@@ -95,15 +95,12 @@
 El objetivo de este trabajo es descubrir las potenciales amenazas y las vulnerabilidades presentes en la aplicación de voto electrónico \emph{Monkeyvote}\footnote{Se puede acceder a su código fuente de forma anónima mediante SVN en \url{http://monkeyvote.googlecode.com/svn/trunk}.}. El análisis es realizado considerando las mismas condiciones y supuestos para las que fue desarrollado el sistema.
 
 \section{Modelado del sistema y del entorno}
-
-\subsection{Entry Points}
-
-\subsection{Assets}
+En esta sección se hace un modelado detallado del funcionamiento del sistema y su entorno de uso para luego poder identificar amenazas específicas de diseño e implementación. Este proceso es crítico dado que nos permite ver al sistema desde el punto de vista de un atacante.
 
 \subsection{Trust Levels}
-Naturalmente, los niveles de confianza serán 4, y corresponderán a cada uno de los entes en que se divide el sistema. Dado que los servidores tienen un funcionamiento completamente autónomo se les puede asignar a cada uno encargados de su administración y asociarles un nivel de confianza. Por otro lado, los votantes también conforman un trust level separado. En la tabla \ref{trust_levels} se apreciar los niveles de confianza con un identificador y una descripción asociada.
+Naturalmente, los niveles de confianza serán cuatro, y corresponderán a cada uno de los entes en que se divide el sistema. Dado que los servidores tienen un funcionamiento completamente autónomo se les puede asignar a cada uno encargados de su administración y asociarles un nivel de confianza. Por otro lado, los votantes también conforman un trust level separado. En la tabla \ref{trust_levels} se aprecian los niveles de confianza con un identificador y una descripción asociada.
 
- Las actividades para cada nivel de confianza serán muy distintas y por ninguna razón deberían mezclarse. Este es un sistema donde los límites están muy bien marcados, y como la seguridad es un aspecto más que importante aquí, todo aquello que los trasgreda es un posible causal de malfuncionamiento.
+ Las actividades para cada nivel de confianza serán muy distintas y por ninguna razón deberían mezclarse. Este es un sistema donde los límites están muy bien marcados, y como la seguridad es un aspecto absolutamente importante aquí, todo aquello que los trasgreda es un posible causal de malfuncionamiento.
 
 \begin{table}
 \begin{center}
@@ -118,12 +115,42 @@ Naturalmente, los niveles de confianza serán 4, y corresponderán a cada uno de l
 4 & Administrador de \verb#Votos# & Encargado de la administración del\\
 && servidor de votos.\\ \hline
 \end{tabular}
-\caption{Trust levels: División en niveles de confianza para los participantes del sistema.}
+\caption{Trust levels. División en niveles de confianza para los participantes del sistema.}
 \label{trust_levels}
 \end{center}
 \end{table}
 
+
 \subsection{Escenarios de uso}
+Aquí se identifican las posibles formas de efectuar el deployment del sistema, analizando qué escenario de uso configura cada una de ellas. Esto puede observarse en la tabla \ref{escenarios}. Nótese que si bien todas son posibles, no significa que sean recomendadas por los desarrolladores. Están aquí planteadas para que puedan ser tenidas en cuenta en el proceso de \textit{threat modeling} y se determine qué configuraciones no son soportadas por el sistema para funcionar bajo ciertos límites de seguridad.
+
+Es importante destacar que tanto las aplicaciones servidor como el cliente sólo se ejecutan en entornos Linux, con lo cual las consideraciones de seguridad son estrictamente las inherentes a este sistema operativo. Por otro lado, no se consideran todas las variantes que pueden venir aparejadas a la ubicación remota de las bases de datos, dado que esta implementación las maneja de una forma completamente local mediante \verb#SQLite#\footnote{Referirse a \url{http://www.sqlite.org/} por más información.}.
+
+\begin{table}
+\begin{center}
+\begin{tabular}{|c|c|c|} \hline
+\textbf{ID} & \textbf{Descripción}\\ \hline
+1 & Los servidores y el cliente se acceden\\
+& mutuamente a través de Internet.\\ \hline
+2 & Los tres servidores están montados\\
+& en distintos hosts en la misma red y\\
+& el cliente los accede desde Internet.\\ \hline
+3 & Tanto el cliente como los servidores están\\
+& en la misma red en distintos hosts.\\ \hline
+4 & Los servidores están montados en un mismo host,\\
+& y el cliente los accede desde Internet.\\ \hline
+5 & Todas las aplicaciones del sistema\\
+& están ejecutándose sobre un mismo host.\\ \hline
+\end{tabular}
+\caption{Escenarios de uso. Diferentes circunstancias en el uso del sistema.}
+\label{escenarios}
+\end{center}
+\end{table}
+
+
+\subsection{Entry Points}
+
+\subsection{Assets}
 
 \subsection{Dependencias externas}
 
@@ -131,6 +158,8 @@ Naturalmente, los niveles de confianza serán 4, y corresponderán a cada uno de l
 
 \subsection{DFD del sistema}
 
+\section{Modelado de amenazas y detección de vulnerabilidades}
+(Próxima entrega.)
 
 
 \begin{thebibliography}{99}
