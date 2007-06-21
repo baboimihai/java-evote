@@ -150,7 +150,7 @@ Es importante destacar que tanto las aplicaciones servidor como el cliente sólo 
 
 \subsection{Entry Points}
 
-Como es sistema de 4 componenete que pueden intercambiar datos entre ellos
+Como es sistema de cuatro componentes que pueden intercambiar datos entre ellos
 por un medio externo a ellos, para los puntos de entrada se los considera 
 como sistemas distintos. Para profundizar el análisis, se debe tener en 
 cuenta que hay dos tipos de aplicaciones, servidores y clientes.
@@ -158,7 +158,7 @@ cuenta que hay dos tipos de aplicaciones, servidores y clientes.
 Los servidores tienen la particularidad de que trabajan ``automáticamente'',
 esto quiere decir que no requieren interacción de una persona y que, por lo
 tanto, se limitan a tomar una entrada, procesarla, producir un cambio en su
-estado interno y retornar una salida. Para ello, requieren de 2 puntos de 
+estado interno y retornar una salida. Para ello, requieren de dos puntos de 
 entrada, un \verb.Socket. de comunicaciones y un repositorio o base de datos
 donde guardar su estado. El \verb.Socket. evidentemente es un punto de 
 entrada, y el repositorio de datos se lo considera como tal porque de allí
@@ -166,21 +166,24 @@ el sistema toma datos para procesar requerimientos. En las tablas
 \ref{entryAuth1}, \ref{entryAuth2} y \ref{entryVotos} se pueden encontrar
 tales puntos y sus descripciones.
 
-El cliente merece una mensión aparte, ya que a él ingresan datos de 3 lugares:
+El cliente merece una mención aparte, ya que a él ingresan datos de tres lugares:
 el teclado, donde el usuario ingresa los datos; el sistema de archivos,
 de donde el cliente lee la clave privada del usuario; y los \verb.Sockets.,
 con los que se comunica con los distintos servidores.
 
 \begin{table}
 \begin{center}
-\begin{tabular}{|c|c|c|c|} \hline
+\begin{tabular}{|r|l|l|l|} \hline
 \textbf{ID} & \textbf{Nombre} & \textbf{Descripción} & \textbf{Trust levels} \\ \hline
-
-1 &	Teclado				&		& 	(1) Votante\\ \hline
-2 & Sistema de archivos	&		&	(1) Votante\\ \hline 
-3 &	Sockets				&		& 	(???) \verb·Auth1·\\
-  &			& 		&	(???) \verb·Auth2·\\
-  &			&		&	(???) \verb·Votos·\\ \hline
+1 &	Teclado				& El teclado se usa para ingresar las 	& 	(1) Votante\\
+  &						& contraseñas y elecciones del usuario. &\\ \hline
+2 & Sistema de 			& El sistema de archivos es donde se 	&	(1) Votante\\
+  & archivos			& almacenan las claves privadas de los 	&\\
+  &						& votantes. De allí son leídas por la 	&\\
+  &						& aplicación cliente.					&\\ \hline 
+3 &	\verb.Sockets.		& Los \verb.Sockets. son por donde la  	& 	(2) \verb·Auth1·\\
+  &						& aplicación cliente se conecta con los	&	(3) \verb·Auth2·\\
+  &						& servidores de votación.				&	(4) \verb·Votos·\\ \hline
 \end{tabular}
 \caption{Puntos de entrada al sistema cliente.}
 \label{entryCli}
@@ -189,11 +192,18 @@ con los que se comunica con los distintos servidores.
 
 \begin{table}
 \begin{center}
-\begin{tabular}{|c|c|c|c|} \hline
+\begin{tabular}{|r|l|l|l|} \hline
 \textbf{ID} & \textbf{Nombre} & \textbf{Descripción} & \textbf{Trust levels} \\ \hline
-1 &	Base de Datos	&		& 	(???) \verb.Auth1.\\ \hline
-2 &	Sockets			&		& 	(???) \verb·Votante·\\
-  &					&		&	(???) \verb·Votos·\\ \hline
+1 &	Repositorio de 			& El repositorio de datos es el		& (2) \verb.Auth1.\\ 
+  &	datos					& lugar donde residen los datos de 	&	\\
+  &							& los usuarios y las encuestas.		& 	\\ \hline
+2 &	\verb.Sockets.			& El servidor de autenticación 		& (1) \verb·Votante·\\
+  &							& espera requerimientos de ingreso 	& (4) \verb.Votos.\\ 
+  &							& al sistema escuchando en un 		& \\
+  &							& \verb Socket . Asimismo utiliza 	& \\
+  &							& éste entry point para la 			& \\
+  &							& comunicación con los clientes y	& \\ 
+  &							& el servidor de votos.				& \\\hline
 \end{tabular}
 \caption{Puntos de entrada al sistema de autenticación.}
 \label{entryAuth1}
@@ -202,11 +212,18 @@ con los que se comunica con los distintos servidores.
 
 \begin{table}
 \begin{center}
-\begin{tabular}{|c|c|c|c|} \hline
+\begin{tabular}{|r|l|l|l|} \hline
 \textbf{ID} & \textbf{Nombre} & \textbf{Descripción} & \textbf{Trust levels} \\ \hline
-1 &	Base de Datos	&		& 	(???) \verb.Auth2.\\ \hline
-2 &	Sockets			&		& 	(???) \verb·Votante·\\
-  &					&		&	(???) \verb·Votos·\\ \hline
+1 &	Repositorio de 			& El repositorio de datos es el		& (2) \verb.Auth2.\\
+  & datos					& lugar donde residen los datos de  & \\
+  &							& los usuarios.						& \\ \hline
+2 &	\verb.Sockets.			& El servidor de autenticación		& (1) \verb·Votante·\\
+  &							& secundario espera requerimientos  & (4) \verb·Votos·\\
+  &							& de ingreso al sistema escuchando  & \\
+  &							& en un \verb Socket . Asismismo, 	& \\
+  &							& utiliza éste punto de entrada para& \\
+  &							& comunicación con clientes y el 	& \\
+  &							& servidor de votos.				& \\ \hline
 \end{tabular}
 \caption{Puntos de entrada al sistema de autenticación secundario.}
 \label{entryAuth2}
@@ -215,12 +232,16 @@ con los que se comunica con los distintos servidores.
 
 \begin{table}
 \begin{center}
-\begin{tabular}{|c|c|c|c|} \hline
+\begin{tabular}{|r|l|l|l|} \hline
 \textbf{ID} & \textbf{Nombre} & \textbf{Descripción} & \textbf{Trust levels} \\ \hline
-1 &	Base de Datos	&		& 	(???) \verb.Votos.\\ \hline
-2 &	Sockets			&		& 	(???) \verb·Votante·\\
-  &					&		&	(???) \verb·Auth1·\\
-  &					&		&	(???) \verb·Auth2·\\ \hline
+1 &	Repositorio de 			& El repositorio de datos es el 	& 	(4) \verb.Votos.\\
+  & datos					& lugar donde residen los votos y	& \\
+  &							& certificados de votación.			& \\ \hline
+2 &	\verb.Sockets.			& El servidor de votos espera por	& 	(1) \verb·Votante·\\
+  &							& mensajes de los servidores de 	&	(2) \verb·Auth1·\\
+  &							& autenticación y del cliente. 		&	(3) \verb·Auth2·\\
+  &							& También usa este punto de entrada & \\
+  &							& para comunicarse con ellos.		& \\ \hline
 \end{tabular}
 \caption{Puntos de entrada al sistema de servidor de votos.}
 \label{entryVotos}
@@ -228,19 +249,48 @@ con los que se comunica con los distintos servidores.
 \end{table}
 
 \subsection{Assets}
+En esta clase de sistemas hay distintos tipos de daño. El primer daño posible es
+el cambio de información, ya sea en registros de habilitación o en los registros
+que contengan los votos de las personas. Además, el sistema se considera dañado
+si en algún momento se anula el anonimato de la información, ya que es una
+premisa de la que se parte. Otro tipo de daño se puede efectuar haciendo una
+denegación de servicio o anulación intencional y sistemática de las votaciones
+en curso. Por lo tanto, los objetivos que podrían ser blanco de un ataque por 
+parte de algún interesado en hacer daño serán los de la tabla \ref{assets}.
+
 \begin{table}
 \begin{center}
-\begin{tabular}{|c|c|c|c|} \hline
+\begin{tabular}{|r|l|l|l|} \hline
 \textbf{ID} & \textbf{Nombre} & \textbf{Descripción} & \textbf{Trust levels} \\ \hline
-1	& Votos					&		& 	\\ \hline
-2	& Registros				&		& 	\\ \hline
-3	& Anonimato				&		&	\\ \hline
-4	& Claves privadas		&		&	\\ \hline
-5	& Contraseñas			&		&	\\ \hline
-6	& Consistencia de 		&		&	\\ 
-	& la base de datos		&		&	\\ \hline
-7	& Integridad de los 	&		&	\\ 
-	& datos intercambiados	&		&	\\ \hline
+1	& Votos					& Los votos	contienen las opciones	& (4) \verb.Votos. 	\\
+	&						& elegidas por los votantes.		& (1) \verb.Votante.\\ \hline
+2	& Registros primarios	& Los registros primarios contienen & (2) \verb.Auth1.	\\ 
+	&						& a los usuarios, sus roles, sus 	& (1) \verb.Votante.\\
+	&						& claves públicas y su estado en la & \\ 
+	&						& participación de cada encuesta.	& \\ \hline
+3	& Registros secundarios	& Los registros secundarios 		& (3) \verb.Auth2.	\\
+	& 						& contienen a los usuarios y sus 	& (1) \verb.Votante.\\
+	&						& claves públicas.					& \\ \hline
+4	& Certificados de 		& Los certificados de voto que emite& (1) \verb.Votante. \\
+	& votación				& el votante y firma el servidor de & (4) \verb.Votos. \\
+	&						& votos.							& \\ \hline
+4	& Anonimato				& Los votos son anónimos.			& (1) \verb.Votante.\\ \hline
+5	& Claves privadas 		& Las claves privadas de cada 		& (1) \verb.Votante.\\
+	& de los votantes		& votante.							& \\ \hline
+6	& Clave privada del		& La clave privada del servidor 	& (2) \verb.Auth1. \\
+	& servidor de 			& de autenticación.					& \\ 
+	& autenticación			&									& \\ \hline
+7	& Clave privada del		& La clave privada del servidor 	& (3) \verb.Auth2. \\
+	& servidor secundario	& de autenticación secundario.		& \\ 
+	& de autenticación		&									& \\ \hline
+8	& Clave privada del		& La clave privada del servidor 	& (4) \verb.Votos. \\
+	& servidor de votos		& de votos.							& \\ \hline
+9	& Contraseñas			& Las contraseñas de cada votante	& (1) \verb.Votante.\\ \hline
+10	& Consistencia de los	& Los registros de votos con sus	& (4) \verb.Votos.	\\ 
+	& registros de votos	& pares voto/certificado.			& (1) \verb.Votante.\\ \hline
+11	& Prestación de servicio& El servicio está disponible		& (1) \verb.Votante.\\ 
+	& 						& para el votante mientras dure la  & \\
+	&						& elección.							& \\ \hline
 	
 \end{tabular}
 \caption{Objetivos/Assets.}
