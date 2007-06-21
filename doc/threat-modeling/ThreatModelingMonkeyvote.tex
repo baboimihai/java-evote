@@ -128,7 +128,7 @@ Es importante destacar que tanto las aplicaciones servidor como el cliente sólo 
 
 \begin{table}
 \begin{center}
-\begin{tabular}{|c|c|c|} \hline
+\begin{tabular}{|c|c|} \hline
 \textbf{ID} & \textbf{Descripción}\\ \hline
 1 & Los servidores y el cliente se acceden\\
 & mutuamente a través de Internet.\\ \hline
@@ -150,7 +150,104 @@ Es importante destacar que tanto las aplicaciones servidor como el cliente sólo 
 
 \subsection{Entry Points}
 
+Como es sistema de 4 componenete que pueden intercambiar datos entre ellos
+por un medio externo a ellos, para los puntos de entrada se los considera 
+como sistemas distintos. Para profundizar el análisis, se debe tener en 
+cuenta que hay dos tipos de aplicaciones, servidores y clientes.
+
+Los servidores tienen la particularidad de que trabajan ``automáticamente'',
+esto quiere decir que no requieren interacción de una persona y que, por lo
+tanto, se limitan a tomar una entrada, procesarla, producir un cambio en su
+estado interno y retornar una salida. Para ello, requieren de 2 puntos de 
+entrada, un \verb.Socket. de comunicaciones y un repositorio o base de datos
+donde guardar su estado. El \verb.Socket. evidentemente es un punto de 
+entrada, y el repositorio de datos se lo considera como tal porque de allí
+el sistema toma datos para procesar requerimientos. En las tablas 
+\ref{entryAuth1}, \ref{entryAuth2} y \ref{entryVotos} se pueden encontrar
+tales puntos y sus descripciones.
+
+El cliente merece una mensión aparte, ya que a él ingresan datos de 3 lugares:
+el teclado, donde el usuario ingresa los datos; el sistema de archivos,
+de donde el cliente lee la clave privada del usuario; y los \verb.Sockets.,
+con los que se comunica con los distintos servidores.
+
+\begin{table}
+\begin{center}
+\begin{tabular}{|c|c|c|c|} \hline
+\textbf{ID} & \textbf{Nombre} & \textbf{Descripción} & \textbf{Trust levels} \\ \hline
+
+1 &	Teclado				&		& 	(1) Votante\\ \hline
+2 & Sistema de archivos	&		&	(1) Votante\\ \hline 
+3 &	Sockets				&		& 	(???) \verb·Auth1·\\
+  &			& 		&	(???) \verb·Auth2·\\
+  &			&		&	(???) \verb·Votos·\\ \hline
+\end{tabular}
+\caption{Puntos de entrada al sistema cliente.}
+\label{entryCli}
+\end{center}
+\end{table}
+
+\begin{table}
+\begin{center}
+\begin{tabular}{|c|c|c|c|} \hline
+\textbf{ID} & \textbf{Nombre} & \textbf{Descripción} & \textbf{Trust levels} \\ \hline
+1 &	Base de Datos	&		& 	(???) \verb.Auth1.\\ \hline
+2 &	Sockets			&		& 	(???) \verb·Votante·\\
+  &					&		&	(???) \verb·Votos·\\ \hline
+\end{tabular}
+\caption{Puntos de entrada al sistema de autenticación.}
+\label{entryAuth1}
+\end{center}
+\end{table}
+
+\begin{table}
+\begin{center}
+\begin{tabular}{|c|c|c|c|} \hline
+\textbf{ID} & \textbf{Nombre} & \textbf{Descripción} & \textbf{Trust levels} \\ \hline
+1 &	Base de Datos	&		& 	(???) \verb.Auth2.\\ \hline
+2 &	Sockets			&		& 	(???) \verb·Votante·\\
+  &					&		&	(???) \verb·Votos·\\ \hline
+\end{tabular}
+\caption{Puntos de entrada al sistema de autenticación secundario.}
+\label{entryAuth2}
+\end{center}
+\end{table}
+
+\begin{table}
+\begin{center}
+\begin{tabular}{|c|c|c|c|} \hline
+\textbf{ID} & \textbf{Nombre} & \textbf{Descripción} & \textbf{Trust levels} \\ \hline
+1 &	Base de Datos	&		& 	(???) \verb.Votos.\\ \hline
+2 &	Sockets			&		& 	(???) \verb·Votante·\\
+  &					&		&	(???) \verb·Auth1·\\
+  &					&		&	(???) \verb·Auth2·\\ \hline
+\end{tabular}
+\caption{Puntos de entrada al sistema de servidor de votos.}
+\label{entryVotos}
+\end{center}
+\end{table}
+
 \subsection{Assets}
+\begin{table}
+\begin{center}
+\begin{tabular}{|c|c|c|c|} \hline
+\textbf{ID} & \textbf{Nombre} & \textbf{Descripción} & \textbf{Trust levels} \\ \hline
+1	& Votos					&		& 	\\ \hline
+2	& Registros				&		& 	\\ \hline
+3	& Anonimato				&		&	\\ \hline
+4	& Claves privadas		&		&	\\ \hline
+5	& Contraseñas			&		&	\\ \hline
+6	& Consistencia de 		&		&	\\ 
+	& la base de datos		&		&	\\ \hline
+7	& Integridad de los 	&		&	\\ 
+	& datos intercambiados	&		&	\\ \hline
+	
+\end{tabular}
+\caption{Objetivos/Assets.}
+\label{assets}
+\end{center}
+\end{table}
+
 
 \subsection{Dependencias externas}
 
