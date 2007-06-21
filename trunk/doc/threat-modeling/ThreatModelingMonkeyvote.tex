@@ -301,7 +301,62 @@ parte de algún interesado en hacer daño serán los de la tabla \ref{assets}.
 
 \subsection{Dependencias externas}
 
+En esta sección de enumeran aquellos sistemas externos al analizado que en caso de falla o no disponibilidad pueden exponer vulnerabilidades.
+
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{|c|c|c|} \hline
+\textbf{ID} & \textbf{Nombre} & \textbf{Descripción}  \\ \hline
+1 & Base de datos & El sistema utiliza una base de datos para \\&&almacenamiento de votos y validación de usuarios \\&& que es necesario esté disponible \\ \hline
+2 & Alimentación eléctrica  & Debe encontrarse disponible para \\&& que un cliente  o un servidor no intenten \\&& conectarse a otro servidor \\&& que se encuentra offline \\ \hline
+3 & Generador de claves & Debe ser lo suficientemente confiable como \\&& para evitar que un atacante aproveche \\&& vulnerabilidades y logre regenerar una o más \\&& claves de los votantes o los servidores \\ \hline
+4 & Bibliotecas externas & Deben ofrecer niveles de encriptación iguales o mayores a \\&& los del sistema para evitar exponer información sensible \\&& durante una consulta \\ \hline
+	
+\end{tabular}
+\caption{Dependencias externas}
+\end{center}
+\end{table}
+
+
+
 \subsection{Notas de seguridad}
+
+Esta sección presenta diversas notas de interés, en el caso de las externas, para los usuarios que darán uso a este sistema, y en el caso de las internas, para explicar algunos \emph{tradeoff} realizados en la implementación.
+
+\subsubsection{Externas}
+
+En la tabla \ref{next} se enuncian las notas de seguridad externas.
+
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{|c|c|} \hline
+\textbf{ID} & \textbf{Descripción}  \\ \hline
+1 & El soporte con las claves debe mantenerse \\& a resguardo
+para evitar exponer la clave privada \\ \hline
+2 & La clave para autenticarse contra el servidor \\& debe mantenerse en el más absoluto \\& secreto para evitar que vote un impostor \\ \hline
+3 & Preferentemente se debe evitar el uso de \\& caracteres acentuados o ñ \\& para evitar potenciales inconvenientes con el \\& encoding de la base de datos \\ \hline
+
+\end{tabular}
+\caption{Notas de seguridad externas}\label{next}
+\end{center}
+\end{table}
+
+\subsubsection{Internas}
+
+En la tabla \ref{nint} se enuncian las notas de seguridad externas.
+
+\begin{table}[h!]
+\begin{center}
+\begin{tabular}{|c|c|} \hline
+\textbf{ID} & \textbf{Descripción}  \\ \hline
+1 & Se utiliza encriptación por clave simétrica, \\& ésto evita inconvenientes surgen al \\& utilizar claves asimétricas pero requiere \\& circular inicialmente una clave que \\& de obtenerse compromete la seguridad \\& de la votación\\ \hline
+2 & El tiempo de votación es limitado para \\& impedir ataques que tomen un tiempo prolongado \\& para producir un potencial resultado \\ \hline
+
+
+\end{tabular}
+\caption{Notas de seguridad internas}\label{nint}
+\end{center}
+\end{table}
 
 \subsection{DFD del sistema}
 
