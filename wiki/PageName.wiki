@@ -1,0 +1,5 @@
+#labels CHOTO,NOUSAR
+WARNING: DO NOT USE THIS UNDER ANY CIRCUMSTANCES
+ADVERTENCIA: NO USAR BAJO NINGUNA CIRCUNSTANCIA
+
+esto fue un trabajo para la facultad, es CHOTO por definición
