@@ -1,0 +1,1 @@
+A Java project for creating a cryptographic protocol to implement an electronic voting system. It utilices the Java cryptographic API.
